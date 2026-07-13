@@ -1,0 +1,31 @@
+{
+  "name": "@castalia/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src tests"
+  },
+  "dependencies": {
+    "@castalia/ui": "workspace:*",
+    "@vitejs/plugin-react-swc": "4.2.3",
+    "vite": "7.3.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-router": "7.13.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "@types/react": "19.2.9",
+    "@types/react-dom": "19.2.3",
+    "jsdom": "27.4.0",
+    "typescript": "5.9.3",
+    "vitest": "4.0.18"
+  }
+}
