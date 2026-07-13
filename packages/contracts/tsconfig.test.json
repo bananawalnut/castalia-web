@@ -1,0 +1,5 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": { "noEmit": true, "esModuleInterop": true },
+  "include": ["src", "tests"]
+}

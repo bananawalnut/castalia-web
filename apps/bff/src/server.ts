@@ -1,3 +1,6 @@
 import { buildApp } from "./app.js";
-const app = buildApp();
-await app.listen({ host: "127.0.0.1", port: 3001 });
+import { loadServerEnv } from "./runtime.js";
+
+const config = loadServerEnv(process.env);
+const app = buildApp({ config });
+await app.listen({ host: config.host, port: config.port });

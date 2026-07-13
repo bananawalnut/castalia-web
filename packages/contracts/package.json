@@ -7,13 +7,24 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest run --passWithNoTests",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "lint": "eslint src"
+    "test": "vitest run tests",
+    "typecheck": "tsc -p tsconfig.test.json --noEmit",
+    "lint": "eslint src",
+    "contract:lint": "redocly lint openapi/castalia-bff.openapi.yaml",
+    "contract:bundle": "redocly bundle openapi/castalia-bff.openapi.yaml --output dist/castalia-bff.openapi.yaml",
+    "generate": "node scripts/generate.mjs",
+    "generate:check": "node scripts/check-generated.mjs"
   },
   "devDependencies": {
+    "@redocly/cli": "2.20.0",
     "@types/node": "24.10.13",
+    "ajv": "8.17.1",
+    "ajv-formats": "3.0.1",
+    "json-schema-to-typescript": "15.0.4",
+    "openapi-typescript": "7.10.1",
+    "prettier": "3.8.1",
     "typescript": "5.9.3",
-    "vitest": "4.0.18"
+    "vitest": "4.0.18",
+    "yaml": "2.8.2"
   }
 }

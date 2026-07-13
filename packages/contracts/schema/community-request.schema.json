@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://castalia.example/schemas/community-request.schema.json",
+  "title": "Fixture community request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "label", "status", "createdAt"],
+  "properties": {
+    "id": { "const": "example-request" },
+    "label": { "const": "Example request" },
+    "status": { "const": "fixture_only_not_submitted" },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "const": "2026-01-01T00:00:00.000Z"
+    }
+  }
+}

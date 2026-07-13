@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://castalia.example/schemas/community.schema.json",
+  "title": "Fixture community",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["slug", "name", "availability"],
+  "properties": {
+    "slug": { "const": "zenith" },
+    "name": { "const": "Zenith" },
+    "availability": { "const": "unavailable" }
+  }
+}
