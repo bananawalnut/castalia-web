@@ -11,6 +11,17 @@ describe("browser environment", () => {
       }).fixtureMode,
     ).toBe(true);
   });
+  it.each(["development", "test", "production"])(
+    "accepts the %s application environment",
+    (appEnv) => {
+      expect(
+        loadBrowserEnv({
+          VITE_APP_ENV: appEnv,
+          VITE_FIXTURE_MODE: "true",
+        }).appEnv,
+      ).toBe(appEnv);
+    },
+  );
   it.each([
     [{ VITE_APP_ENV: "test", VITE_FIXTURE_MODE: "false" }, "VITE_FIXTURE_MODE"],
     [

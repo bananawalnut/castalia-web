@@ -41,6 +41,9 @@ importers:
 
   apps/bff:
     dependencies:
+      '@castalia/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
       '@fastify/cors':
         specifier: 11.2.0
         version: 11.2.0

@@ -5,7 +5,9 @@ export function Communities() {
   return (
     <>
       <h1>Choose a community</h1>
-      <p>Castalia is a fixture-only preview. Access is not connected.</p>
+      <p>
+        Castalia is a fixture-only preview. Community access is not connected.
+      </p>
       <section aria-labelledby="zenith">
         <h2 id="zenith">Zenith</h2>
         <Status>Unavailable</Status>
@@ -22,7 +24,14 @@ export function Forum() {
     <>
       <h1>Zenith forum</h1>
       <h2>Forum unavailable</h2>
-      <p>Messages, membership, sign-in, and posting are unavailable.</p>
+      <p>
+        Messages, membership, sign-in, and posting are unavailable. No Matrix
+        connection was attempted.
+      </p>
+      <p>
+        <Link to="/">Back to communities</Link>{" "}
+        <Link to="/docs">Read the documentation</Link>
+      </p>
     </>
   ) : (
     <>

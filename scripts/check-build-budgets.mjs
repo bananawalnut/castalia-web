@@ -15,12 +15,16 @@ const limit = {
 const base = process.env.CASTALIA_OUTPUT_ROOT ?? process.env.TMPDIR ?? "/tmp";
 await mkdir(base, { recursive: true });
 const output = await mkdtemp(join(base, "castalia-build-budgets-"));
-async function run(label, args, ceiling) {
+async function run(label, args, ceiling, extraEnv = {}) {
   const started = performance.now();
   await new Promise((resolve, reject) => {
     const child = spawn("pnpm", args, {
       stdio: "inherit",
-      env: { ...process.env, TURBO_TELEMETRY_DISABLED: "1" },
+      env: {
+        ...process.env,
+        ...extraEnv,
+        TURBO_TELEMETRY_DISABLED: "1",
+      },
     });
     child.on("error", reject);
     child.on("exit", (code) =>
@@ -61,6 +65,7 @@ const webMs = await run(
     "--emptyOutDir",
   ],
   limit.webMs,
+  { VITE_APP_ENV: "production", VITE_FIXTURE_MODE: "true" },
 );
 const bffMs = await run(
   "BFF build",

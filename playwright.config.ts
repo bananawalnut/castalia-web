@@ -23,7 +23,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "pnpm --filter @castalia/web exec vite --host 127.0.0.1 --port 4173 --strictPort",
+      "VITE_APP_ENV=test VITE_FIXTURE_MODE=true pnpm --filter @castalia/web exec vite --host 127.0.0.1 --port 4173 --strictPort",
     url: "http://127.0.0.1:4173",
     reuseExistingServer: false,
     timeout: 30_000,

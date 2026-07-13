@@ -1,5 +1,14 @@
 import Fastify from "fastify";
 import type { FastifyInstance } from "fastify";
+import cors from "@fastify/cors";
+import helmet from "@fastify/helmet";
+import sensible from "@fastify/sensible";
+import type {
+  FixtureCommunity,
+  FixtureCommunityRequest,
+  FixtureSession,
+  operations,
+} from "@castalia/contracts";
 import { loadServerEnv, redactForLog } from "./runtime.js";
 import type { SafeLogEntry, ServerRuntimeConfig } from "./runtime.js";
 
@@ -24,6 +33,27 @@ const securityHeaders = {
     "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
 } as const;
 
+type HealthResponse =
+  operations["getHealth"]["responses"][200]["content"]["application/json"];
+
+const healthFixture = {
+  status: "ok",
+  fixtureMode: true,
+} satisfies HealthResponse;
+const sessionFixture = {
+  status: "unavailable",
+  fixtureMode: true,
+} satisfies FixtureSession;
+const communityFixtures = [
+  { slug: "zenith", name: "Zenith", availability: "unavailable" },
+] satisfies FixtureCommunity[];
+const requestFixture = {
+  id: "example-request",
+  label: "Example request",
+  status: "fixture_only_not_submitted",
+  createdAt: "2026-01-01T00:00:00.000Z",
+} satisfies FixtureCommunityRequest;
+
 export interface BuildAppOptions {
   readonly env?: Record<string, string | undefined>;
   readonly config?: ServerRuntimeConfig;
@@ -37,25 +67,55 @@ function runtimeConfig(options: BuildAppOptions): ServerRuntimeConfig {
 
 export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   const config = runtimeConfig(options);
+  const logger =
+    config.nodeEnv === "test"
+      ? (false as const)
+      : {
+          level: config.logLevel,
+          redact: {
+            paths: [
+              "req.headers.authorization",
+              "req.headers.cookie",
+              "headers.authorization",
+              "headers.cookie",
+              "body",
+              "query",
+              "config",
+              "err.stack",
+              "err.cause",
+            ],
+            censor: "[REDACTED]",
+          },
+        };
   const fastifyOptions =
     config.requestIdHeader === undefined
-      ? { logger: false as const, disableRequestLogging: true }
+      ? { logger, disableRequestLogging: true }
       : {
-          logger: false as const,
+          logger,
           disableRequestLogging: true,
           requestIdHeader: config.requestIdHeader,
         };
   const app = Fastify(fastifyOptions);
 
-  app.addHook("onRequest", async (request, reply) => {
-    const origin = request.headers.origin;
-    if (origin === undefined || origin === config.webOrigin) return;
-    if (!config.corsOrigins.includes(origin)) {
-      await reply.code(403).send({ error: "origin_not_allowed" });
-      return reply;
-    }
-    reply.header("access-control-allow-origin", origin);
-    reply.header("vary", "Origin");
+  app.register(sensible);
+  app.register(helmet);
+  app.register(cors, {
+    credentials: false,
+    methods: ["GET", "HEAD", "OPTIONS"],
+    origin(origin, callback) {
+      if (origin === undefined || origin === config.webOrigin) {
+        callback(null, false);
+        return;
+      }
+      if (config.corsOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+      callback(
+        Object.assign(new Error("origin_not_allowed"), { statusCode: 403 }),
+        false,
+      );
+    },
   });
 
   app.addHook("onSend", async (_request, reply, payload) => {
@@ -67,60 +127,52 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
     return payload;
   });
 
-  if (options.log !== undefined) {
-    app.addHook("onResponse", async (request, reply) => {
-      options.log?.(
-        redactForLog({
-          event: "request_complete",
-          requestId: request.id,
-          method: request.method,
-          route: request.routeOptions.url,
-          statusCode: reply.statusCode,
-          durationMs: reply.elapsedTime,
-        }),
-      );
+  const emit = (entry: unknown) => {
+    const safe = redactForLog(entry);
+    options.log?.(safe);
+    if (config.nodeEnv !== "test") app.log.info(safe);
+  };
+  app.addHook("onResponse", async (request, reply) => {
+    emit({
+      event: "request_complete",
+      requestId: request.id,
+      method: request.method,
+      route: request.routeOptions.url,
+      statusCode: reply.statusCode,
+      durationMs: reply.elapsedTime,
     });
-    app.addHook("onError", async (request, reply) => {
-      options.log?.(
-        redactForLog({
-          event: "request_error",
-          requestId: request.id,
-          method: request.method,
-          route: request.routeOptions.url,
-          statusCode: reply.statusCode,
-        }),
-      );
+  });
+  app.addHook("onError", async (request, reply) => {
+    emit({
+      event: "request_error",
+      requestId: request.id,
+      method: request.method,
+      route: request.routeOptions.url,
+      statusCode: reply.statusCode,
     });
-  }
+  });
 
   app.setNotFoundHandler(async (_request, reply) =>
     reply.code(404).send({ error: "not_found" }),
   );
-  app.setErrorHandler(async (_error, _request, reply) =>
-    reply.code(500).send({ error: "internal_error" }),
-  );
+  app.setErrorHandler(async (error, _request, reply) => {
+    const statusCode =
+      error instanceof Error && "statusCode" in error
+        ? (error as Error & { statusCode: unknown }).statusCode
+        : undefined;
+    const forbidden =
+      error instanceof Error &&
+      statusCode === 403 &&
+      error.message === "origin_not_allowed";
+    return reply
+      .code(forbidden ? 403 : 500)
+      .send({ error: forbidden ? "origin_not_allowed" : "internal_error" });
+  });
 
-  app.get("/health", () => ({
-    status: "ok",
-    fixtureMode: true as const,
-  }));
-  app.get("/api/v1/session", () => ({
-    status: "unavailable" as const,
-    fixtureMode: true as const,
-  }));
-  app.get("/api/v1/communities", () => [
-    {
-      slug: "zenith" as const,
-      name: "Zenith" as const,
-      availability: "unavailable" as const,
-    },
-  ]);
-  app.get("/api/v1/community-requests/example-request", () => ({
-    id: "example-request" as const,
-    label: "Example request" as const,
-    status: "fixture_only_not_submitted" as const,
-    createdAt: "2026-01-01T00:00:00.000Z" as const,
-  }));
+  app.get("/health", () => healthFixture);
+  app.get("/api/v1/session", () => sessionFixture);
+  app.get("/api/v1/communities", () => communityFixtures);
+  app.get("/api/v1/community-requests/example-request", () => requestFixture);
 
   return app;
 }

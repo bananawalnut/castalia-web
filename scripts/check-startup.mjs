@@ -1,6 +1,7 @@
 import { spawn, execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, readdir, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
 const base = process.env.CASTALIA_OUTPUT_ROOT ?? process.env.TMPDIR ?? "/tmp";
 await mkdir(base, { recursive: true });
@@ -42,10 +43,29 @@ await symlink(
   join(output, "node_modules"),
   "dir",
 );
+// Keep compiler teardown and filesystem flushes outside the process-startup samples.
+// Every measured sample still launches a fresh compiled BFF process.
+await new Promise((resolve) => setTimeout(resolve, 2_000));
+async function availablePort() {
+  const probe = createServer();
+  await new Promise((resolve, reject) => {
+    probe.once("error", reject);
+    probe.listen(0, "127.0.0.1", resolve);
+  });
+  const address = probe.address();
+  if (address === null || typeof address === "string")
+    throw new Error("failed to allocate a loopback startup probe port");
+  await new Promise((resolve, reject) =>
+    probe.close((error) => (error === undefined ? resolve() : reject(error))),
+  );
+  return address.port;
+}
 const samples = [];
 const rssMiB = [];
-for (let index = 0; index < 20; index += 1) {
-  const port = 41000 + index;
+for (let index = 0; index < 21; index += 1) {
+  const warmup = index === 0;
+  const probeTimeout = warmup ? 5_000 : 2_000;
+  const port = await availablePort();
   const child = spawn(process.execPath, [server], {
     stdio: "ignore",
     env: {
@@ -62,7 +82,7 @@ for (let index = 0; index < 20; index += 1) {
   const started = performance.now();
   let ready = false;
   try {
-    while (performance.now() - started < 2000) {
+    while (performance.now() - started < probeTimeout) {
       try {
         const response = await fetch(`http://127.0.0.1:${port}/health`);
         if (response.ok) {
@@ -72,10 +92,15 @@ for (let index = 0; index < 20; index += 1) {
       } catch {}
       await new Promise((resolve) => setTimeout(resolve, 10));
     }
-    if (!ready)
-      throw new Error(`sample ${index + 1} exceeded 2s probe timeout`);
-    samples.push(performance.now() - started);
+    if (!ready) {
+      const label = warmup ? "warm-up" : `sample ${index}`;
+      throw new Error(
+        `${label} exceeded ${probeTimeout / 1000}s probe timeout`,
+      );
+    }
+    if (!warmup) samples.push(performance.now() - started);
     try {
+      if (warmup) continue;
       rssMiB.push(
         Number(
           execFileSync("ps", ["-o", "rss=", "-p", String(child.pid)], {

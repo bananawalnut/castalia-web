@@ -30,6 +30,10 @@ a {
   color: #174ea6;
   text-underline-offset: 0.2em;
 }
+nav a[aria-current="page"] {
+  font-weight: 700;
+  text-decoration-thickness: 0.2em;
+}
 a:focus-visible,
 input:focus-visible,
 main:focus-visible {

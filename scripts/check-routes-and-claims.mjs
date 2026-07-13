@@ -24,8 +24,16 @@ const requiredLabels = [
 ];
 const requiredCopy = [
   "Choose a community",
+  "fixture-only preview",
+  "Community access is not connected",
+  "View Zenith forum",
   "Fixture only — not submitted",
   "Forum unavailable",
+  "Messages, membership, sign-in, and posting are unavailable",
+  "No Matrix",
+  "connection was attempted",
+  "Back to communities",
+  "Read the documentation",
   "Community unavailable",
   "Requests unavailable",
   "Request not found",

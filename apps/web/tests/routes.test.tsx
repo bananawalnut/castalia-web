@@ -30,6 +30,15 @@ describe("route shell", () => {
       screen.getByRole("heading", { level: 1, name: "Zenith forum" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Forum unavailable")).toBeInTheDocument();
+    expect(
+      screen.getByText(/No Matrix connection was attempted/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Back to communities" }),
+    ).toHaveAttribute("href", "/");
+    expect(
+      screen.getByRole("link", { name: "Read the documentation" }),
+    ).toHaveAttribute("href", "/docs");
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
   it("renders unknown community without lookup", () => {

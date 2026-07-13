@@ -102,6 +102,22 @@ describe("fixture BFF boundaries", () => {
       "https://preview.example",
     );
     expect(allowed.headers["access-control-allow-credentials"]).toBeUndefined();
+    const preflight = await app.inject({
+      method: "OPTIONS",
+      url: "/health",
+      headers: {
+        origin: "https://preview.example",
+        "access-control-request-method": "GET",
+      },
+    });
+    expect(preflight.statusCode).toBe(204);
+    expect(preflight.headers["access-control-allow-origin"]).toBe(
+      "https://preview.example",
+    );
+    expect(preflight.headers["access-control-allow-methods"]).toContain("GET");
+    expect(
+      preflight.headers["access-control-allow-credentials"],
+    ).toBeUndefined();
     const rejected = await app.inject({
       method: "GET",
       url: "/health",
@@ -149,5 +165,24 @@ describe("recursive logging redaction", () => {
     expect(output).not.toContain("cookies");
     expect(output).not.toContain("participant");
     expect(output).not.toContain("ip");
+  });
+  it("emits only allowlisted request metadata through the real hooks", async () => {
+    const entries: Record<string, string | number>[] = [];
+    const app = buildApp({ env: baseEnv, log: (entry) => entries.push(entry) });
+    await app.inject({
+      method: "GET",
+      url: "/health?token=CASTALIA_SECRET_CANARY_7f3b",
+      headers: {
+        authorization: "Bearer CASTALIA_SECRET_CANARY_7f3b",
+        cookie: "session=CASTALIA_SECRET_CANARY_7f3b",
+      },
+    });
+    await app.close();
+    const output = JSON.stringify(entries);
+    expect(output).toContain("request_complete");
+    expect(output).not.toContain("CASTALIA_SECRET_CANARY_7f3b");
+    expect(output).not.toContain("token");
+    expect(output).not.toContain("authorization");
+    expect(output).not.toContain("cookie");
   });
 });
