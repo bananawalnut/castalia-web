@@ -19,7 +19,7 @@ export function Layout() {
         </Link>
         <nav aria-label="Primary">
           {navigation.map(({ to, label }) => (
-            <NavLink key={to} to={to} end={to === "/"}>
+            <NavLink key={to} to={to} end>
               {label}
             </NavLink>
           ))}

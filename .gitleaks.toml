@@ -1,0 +1,8 @@
+title = "Castalia Web secret scanning policy"
+
+[allowlist]
+description = "Deterministic synthetic canaries used only by negative security tests"
+paths = [
+  '''^apps/bff/tests/runtime\.test\.ts$''',
+  '''^tests/policy-negative\.test\.mjs$'''
+]

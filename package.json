@@ -10,18 +10,34 @@
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
+    "test:contracts": "pnpm --filter @castalia/contracts test",
+    "verify:contracts": "pnpm --filter @castalia/contracts contract:lint && pnpm --filter @castalia/contracts contract:bundle && pnpm --filter @castalia/contracts generate:check",
     "typecheck": "turbo run typecheck",
     "lint": "turbo run lint",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "verify:docs": "sh scripts/verify-docs.sh",
+    "verify:routes": "node scripts/check-routes-and-claims.mjs",
+    "verify:policies": "node --test tests/policy-negative.test.mjs && node scripts/check-workflows.mjs && node scripts/check-licenses.mjs",
+    "security:dependencies": "node scripts/check-dependencies.mjs",
+    "security:licenses": "node scripts/check-licenses.mjs",
+    "security:secrets": "node scripts/check-secrets.mjs",
+    "security:bundle": "node scripts/scan-artifacts.mjs apps/web/dist",
+    "browser:a11y": "node scripts/run-browser.mjs",
+    "budgets:build": "node scripts/check-build-budgets.mjs",
+    "budgets:startup": "node scripts/check-startup.mjs",
+    "verify:static": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm verify:docs && pnpm verify:routes",
+    "verify": "pnpm verify:static && pnpm test && pnpm verify:contracts && pnpm verify:policies && pnpm budgets:build && pnpm security:bundle && pnpm budgets:startup && pnpm security:dependencies && pnpm security:secrets && pnpm browser:a11y"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.12.1",
     "@eslint/js": "9.39.2",
+    "@playwright/test": "1.61.1",
     "@types/node": "24.10.13",
     "eslint": "9.39.2",
     "prettier": "3.8.1",
     "turbo": "2.10.4",
     "typescript": "5.9.3",
     "typescript-eslint": "8.53.1",
-    "vitest": "4.0.18"
+    "vitest": "4.1.0"
   }
 }
