@@ -43,6 +43,11 @@ async function walk(root) {
 }
 const web = join(output, "web");
 const bff = join(output, "bff");
+await run(
+  "UI prerequisite build",
+  ["--filter", "@castalia/ui", "build"],
+  limit.bffMs,
+);
 const webMs = await run(
   "web build",
   [

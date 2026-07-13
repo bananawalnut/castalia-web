@@ -11,6 +11,18 @@ const env = {
   PLAYWRIGHT_BROWSERS_PATH:
     process.env.PLAYWRIGHT_BROWSERS_PATH ?? join(base, "playwright-browsers"),
 };
+await new Promise((resolve, reject) => {
+  const build = spawn("pnpm", ["--filter", "@castalia/ui", "build"], {
+    stdio: "inherit",
+    env,
+  });
+  build.on("error", reject);
+  build.on("exit", (code) =>
+    code === 0
+      ? resolve()
+      : reject(new Error(`UI prerequisite build exited ${code}`)),
+  );
+});
 const child = spawn("pnpm", ["exec", "playwright", "test"], {
   stdio: "inherit",
   env,
