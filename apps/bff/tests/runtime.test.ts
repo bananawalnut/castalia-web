@@ -59,6 +59,7 @@ describe("fixture BFF boundaries", () => {
         expect(response.headers[name]).toBe(value);
       expect(response.headers["set-cookie"]).toBeUndefined();
       expect(response.headers["x-powered-by"]).toBeUndefined();
+      expect(response.headers["strict-transport-security"]).toBeUndefined();
     }
     await app.close();
   });
@@ -108,6 +109,8 @@ describe("fixture BFF boundaries", () => {
       headers: {
         origin: "https://preview.example",
         "access-control-request-method": "GET",
+        "access-control-request-headers":
+          "content-type,authorization,x-invented",
       },
     });
     expect(preflight.statusCode).toBe(204);
@@ -115,6 +118,15 @@ describe("fixture BFF boundaries", () => {
       "https://preview.example",
     );
     expect(preflight.headers["access-control-allow-methods"]).toContain("GET");
+    expect(preflight.headers["access-control-allow-headers"]).toBe(
+      "content-type",
+    );
+    expect(preflight.headers["access-control-allow-headers"]).not.toContain(
+      "authorization",
+    );
+    expect(preflight.headers["access-control-allow-headers"]).not.toContain(
+      "x-invented",
+    );
     expect(
       preflight.headers["access-control-allow-credentials"],
     ).toBeUndefined();

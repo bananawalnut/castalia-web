@@ -98,10 +98,11 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
   const app = Fastify(fastifyOptions);
 
   app.register(sensible);
-  app.register(helmet);
+  app.register(helmet, { hsts: false });
   app.register(cors, {
     credentials: false,
     methods: ["GET", "HEAD", "OPTIONS"],
+    allowedHeaders: ["content-type"],
     origin(origin, callback) {
       if (origin === undefined || origin === config.webOrigin) {
         callback(null, false);
