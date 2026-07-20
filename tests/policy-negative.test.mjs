@@ -6,7 +6,10 @@ import { join } from "node:path";
 import { evaluateAudit } from "../scripts/lib/dependency-policy.mjs";
 import { classifyLicense } from "../scripts/lib/license-policy.mjs";
 import { scanArtifacts } from "../scripts/lib/secret-scan.mjs";
-import { startupProbeTimeout } from "../scripts/lib/startup-policy.mjs";
+import {
+  STARTUP_PROBE_TIMEOUT_MS,
+  waitForStartup,
+} from "../scripts/lib/startup-policy.mjs";
 import { validateWorkflowText } from "../scripts/lib/workflow-policy.mjs";
 
 async function fixture() {
@@ -82,7 +85,17 @@ test("workflow policy rejects unpinned actions, unsafe checkout, target events, 
   assert.ok(errors.some((error) => error.includes("timeout")));
 });
 
-test("startup policy keeps cold-cache warm-up outside measured latency budgets", () => {
-  assert.equal(startupProbeTimeout(true), 30_000);
-  assert.equal(startupProbeTimeout(false), 2_000);
+test("startup policy fails a cold launch that exceeds two seconds", async () => {
+  let elapsed = 0;
+  const ready = await waitForStartup({
+    probe: async () => false,
+    now: () => elapsed,
+    sleep: async (milliseconds) => {
+      elapsed += milliseconds;
+    },
+  });
+
+  assert.equal(STARTUP_PROBE_TIMEOUT_MS, 2_000);
+  assert.equal(ready, false);
+  assert.equal(elapsed, 2_000);
 });

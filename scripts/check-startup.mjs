@@ -2,8 +2,8 @@ import { spawn, execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, readdir, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createServer } from "node:net";
-import { fileURLToPath } from "node:url";
-import { startupProbeTimeout } from "./lib/startup-policy.mjs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { waitForStartup } from "./lib/startup-policy.mjs";
 const base = process.env.CASTALIA_OUTPUT_ROOT ?? process.env.TMPDIR ?? "/tmp";
 await mkdir(base, { recursive: true });
 const output = await mkdtemp(join(base, "castalia-startup-"));
@@ -27,23 +27,44 @@ await new Promise((resolve, reject) => {
     code === 0 ? resolve() : reject(new Error(`BFF compile exited ${code}`)),
   );
 });
-async function findServer(root) {
+async function findCompiled(root, name) {
   for (const entry of await readdir(root, { withFileTypes: true })) {
     const path = join(root, entry.name);
     if (entry.isDirectory()) {
-      const found = await findServer(path);
+      const found = await findCompiled(path, name);
       if (found) return found;
-    } else if (entry.name === "server.js") return path;
+    } else if (entry.name === name) return path;
   }
   return undefined;
 }
-const server = await findServer(output);
+const server = await findCompiled(output, "server.js");
+const application = await findCompiled(output, "app.js");
 if (!server) throw new Error("compiled fixture BFF server not found");
+if (!application) throw new Error("compiled fixture BFF application not found");
 await symlink(
   fileURLToPath(new URL("../apps/bff/node_modules", import.meta.url)),
   join(output, "node_modules"),
   "dir",
 );
+// Precondition the compiled dependency graph without starting the product server.
+// Every actual BFF launch below still has to reach /health within two seconds.
+await new Promise((resolve, reject) => {
+  const child = spawn(
+    process.execPath,
+    [
+      "--input-type=module",
+      "--eval",
+      `const { buildApp } = await import(${JSON.stringify(pathToFileURL(application).href)}); const app = buildApp(); await app.ready(); await app.close()`,
+    ],
+    { stdio: "ignore" },
+  );
+  child.on("error", reject);
+  child.on("exit", (code) =>
+    code === 0
+      ? resolve()
+      : reject(new Error(`BFF dependency precondition exited ${code}`)),
+  );
+});
 // Keep compiler teardown and filesystem flushes outside the process-startup samples.
 // Every measured sample still launches a fresh compiled BFF process.
 await new Promise((resolve) => setTimeout(resolve, 2_000));
@@ -65,7 +86,6 @@ const samples = [];
 const rssMiB = [];
 for (let index = 0; index < 21; index += 1) {
   const warmup = index === 0;
-  const probeTimeout = startupProbeTimeout(warmup);
   const port = await availablePort();
   const child = spawn(process.execPath, [server], {
     stdio: "ignore",
@@ -81,23 +101,20 @@ for (let index = 0; index < 21; index += 1) {
   });
   const exited = new Promise((resolve) => child.once("exit", resolve));
   const started = performance.now();
-  let ready = false;
   try {
-    while (performance.now() - started < probeTimeout) {
-      try {
-        const response = await fetch(`http://127.0.0.1:${port}/health`);
-        if (response.ok) {
-          ready = true;
-          break;
+    const ready = await waitForStartup({
+      probe: async () => {
+        try {
+          const response = await fetch(`http://127.0.0.1:${port}/health`);
+          return response.ok;
+        } catch {
+          return false;
         }
-      } catch {}
-      await new Promise((resolve) => setTimeout(resolve, 10));
-    }
+      },
+    });
     if (!ready) {
       const label = warmup ? "warm-up" : `sample ${index}`;
-      throw new Error(
-        `${label} exceeded ${probeTimeout / 1000}s probe timeout`,
-      );
+      throw new Error(`${label} exceeded 2s probe timeout`);
     }
     if (!warmup) samples.push(performance.now() - started);
     try {
