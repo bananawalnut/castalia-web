@@ -3,6 +3,7 @@ import { mkdtemp, mkdir, readdir, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
+import { startupProbeTimeout } from "./lib/startup-policy.mjs";
 const base = process.env.CASTALIA_OUTPUT_ROOT ?? process.env.TMPDIR ?? "/tmp";
 await mkdir(base, { recursive: true });
 const output = await mkdtemp(join(base, "castalia-startup-"));
@@ -64,7 +65,7 @@ const samples = [];
 const rssMiB = [];
 for (let index = 0; index < 21; index += 1) {
   const warmup = index === 0;
-  const probeTimeout = warmup ? 5_000 : 2_000;
+  const probeTimeout = startupProbeTimeout(warmup);
   const port = await availablePort();
   const child = spawn(process.execPath, [server], {
     stdio: "ignore",

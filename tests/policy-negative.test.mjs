@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { evaluateAudit } from "../scripts/lib/dependency-policy.mjs";
 import { classifyLicense } from "../scripts/lib/license-policy.mjs";
 import { scanArtifacts } from "../scripts/lib/secret-scan.mjs";
+import { startupProbeTimeout } from "../scripts/lib/startup-policy.mjs";
 import { validateWorkflowText } from "../scripts/lib/workflow-policy.mjs";
 
 async function fixture() {
@@ -66,7 +67,7 @@ test("artifact scanner rejects an injected credential canary", async () => {
   await mkdir(join(root, "assets"));
   await writeFile(
     join(root, "assets", "app.js"),
-    "const token='AKIAIOSFODNN7EXAMPLE';",
+    "const marker='CASTALIA_SECRET_CANARY_ABCDEFGH';",
   );
   const findings = await scanArtifacts(root);
   assert.ok(findings.some((finding) => finding.file.endsWith("app.js")));
@@ -79,4 +80,9 @@ test("workflow policy rejects unpinned actions, unsafe checkout, target events, 
   assert.ok(errors.some((error) => error.includes("40-character")));
   assert.ok(errors.some((error) => error.includes("persist-credentials")));
   assert.ok(errors.some((error) => error.includes("timeout")));
+});
+
+test("startup policy keeps cold-cache warm-up outside measured latency budgets", () => {
+  assert.equal(startupProbeTimeout(true), 30_000);
+  assert.equal(startupProbeTimeout(false), 2_000);
 });
