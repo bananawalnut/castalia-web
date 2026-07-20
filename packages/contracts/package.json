@@ -16,12 +16,12 @@
     "generate:check": "node scripts/check-generated.mjs"
   },
   "devDependencies": {
-    "@redocly/cli": "2.20.0",
+    "@redocly/cli": "2.39.0",
     "@types/node": "24.10.13",
     "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
     "json-schema-to-typescript": "15.0.4",
-    "openapi-typescript": "7.10.1",
+    "openapi-typescript": "7.13.0",
     "prettier": "3.8.1",
     "typescript": "5.9.3",
     "vitest": "4.1.0",

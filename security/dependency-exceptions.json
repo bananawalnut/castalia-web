@@ -1,14 +1,1 @@
-[
-  {
-    "advisory": "1117015",
-    "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
-    "expires": "2026-08-13",
-    "scope": "Development-only Redocly dependency; no emitted runtime bundle dependency"
-  },
-  {
-    "advisory": "1120821",
-    "url": "https://github.com/advisories/GHSA-8988-4f7v-96qf",
-    "expires": "2026-08-13",
-    "scope": "Development-only Redocly telemetry dependency; contract linting remains local and fixture-only"
-  }
-]
+[]
