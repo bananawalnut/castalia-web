@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "NODE_ENV=development VITE_FIXTURE_MODE=true vite",
     "build": "vite build",
-    "test": "vitest run",
+    "test": "NODE_ENV=test vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src tests"
   },
