@@ -1,0 +1,59 @@
+openapi: 3.1.0
+info:
+  title: Castalia fixture BFF contract
+  version: 0.0.0
+  description: Fixture-only, read-only contract source. No live service is claimed.
+security: []
+paths:
+  /health:
+    get:
+      summary: Read fixture process health
+      operationId: getHealth
+      responses:
+        "200":
+          description: Process health and fixture posture
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [status, fixtureMode]
+                properties:
+                  status: { const: ok }
+                  fixtureMode: { const: true }
+  /api/v1/session:
+    get:
+      summary: Read the unavailable fixture session
+      operationId: getFixtureSession
+      responses:
+        "200":
+          description: Unavailable fixture session
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/session.schema.json"
+  /api/v1/communities:
+    get:
+      summary: List fixture communities
+      operationId: listFixtureCommunities
+      responses:
+        "200":
+          description: Permitted fixture community read
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 1
+                items:
+                  $ref: "../schema/community.schema.json"
+  /api/v1/community-requests/example-request:
+    get:
+      summary: Read the example fixture request
+      operationId: getFixtureCommunityRequest
+      responses:
+        "200":
+          description: Permitted example request read
+          content:
+            application/json:
+              schema:
+                $ref: "../schema/community-request.schema.json"

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://castalia.example/schemas/session.schema.json",
+  "title": "Fixture session",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "fixtureMode"],
+  "properties": {
+    "status": { "const": "unavailable" },
+    "fixtureMode": { "const": true }
+  }
+}

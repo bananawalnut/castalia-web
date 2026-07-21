@@ -1,0 +1,56 @@
+[
+  {
+    "package": "@axe-core/playwright",
+    "version": "4.12.1",
+    "license": "MPL-2.0",
+    "url": "https://github.com/dequelabs/axe-core-npm#readme"
+  },
+  {
+    "package": "axe-core",
+    "version": "4.12.1",
+    "license": "MPL-2.0",
+    "url": "https://www.deque.com/axe/"
+  },
+  {
+    "package": "@csstools/color-helpers",
+    "version": "6.1.0",
+    "license": "MIT-0",
+    "url": "https://github.com/csstools/postcss-plugins/tree/main/packages/color-helpers#readme"
+  },
+  {
+    "package": "@csstools/css-syntax-patches-for-csstree",
+    "version": "1.1.6",
+    "license": "MIT-0",
+    "url": "https://github.com/csstools/postcss-plugins/tree/main/packages/css-syntax-patches-for-csstree#readme"
+  },
+  {
+    "package": "@swc/core-darwin-arm64",
+    "version": "1.15.43",
+    "license": "Apache-2.0 AND MIT",
+    "url": "https://swc.rs"
+  },
+  {
+    "package": "@swc/core-linux-x64-gnu",
+    "version": "1.15.43",
+    "license": "Apache-2.0 AND MIT",
+    "url": "https://swc.rs"
+  },
+  {
+    "package": "dompurify",
+    "version": "3.4.12",
+    "license": "(MPL-2.0 OR Apache-2.0)",
+    "url": "https://github.com/cure53/DOMPurify"
+  },
+  {
+    "package": "type-fest",
+    "version": "4.41.0",
+    "license": "(MIT OR CC0-1.0)",
+    "url": "https://github.com/sindresorhus/type-fest#readme"
+  },
+  {
+    "package": "url-template",
+    "version": "2.0.8",
+    "license": "BSD",
+    "url": "https://github.com/bramstein/url-template#readme"
+  }
+]
