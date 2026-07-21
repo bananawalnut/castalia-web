@@ -1,6 +1,6 @@
 # Authority and claim ledger
 
-Status: accepted documentation contract for issue #1. This ledger records boundaries; it does not grant authority or prove implementation.
+Status: accepted authority contract from issue #1, reconciled with the fixture-only implementation merged by issue #2. This ledger does not grant upstream authority or prove live integration.
 
 ## Authority ledger
 
@@ -22,11 +22,15 @@ Community creation is request/status-first, not an immediate creation claim:
 4. Hub's adapter may act only after the independently owned registry and its authorized workflow permit it.
 5. Success is not established until authoritative registry status and required Matrix/provisioning evidence agree.
 
-No request submission, registry integration, provisioning, or status endpoint exists in the current documentation-only repository.
+No live request submission, registry integration, provisioning, or registry status endpoint exists. The example request endpoint is a deterministic fixture read only.
+
+## Implemented fixture routes and APIs
+
+The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, and visible unavailable states. These surfaces are fixture-only. They do not establish live Matrix access, authentication, registry lookup or mutation, provisioning, participant-authorized sends, deployment, or production readiness.
 
 ## Forum posture
 
-Under current evidence, the Zenith forum is **visible unavailable**. A future shell may keep `/community/:slug/forum` visible for orientation and navigation, but it must clearly say unavailable. It must not imply that a room is readable, joinable, authenticated, writable, federated, or even known to exist.
+Under current evidence, the Zenith forum is **visible unavailable**. The implemented fixture shell keeps `/community/:slug/forum` visible for orientation and navigation and clearly labels it unavailable. It does not imply that a room is readable, joinable, authenticated, writable, federated, or even known to exist.
 
 ## Deferred interpretation
 
@@ -47,11 +51,12 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 
 | Claim or posture | Current status | Evidence gate / owner |
 | --- | --- | --- |
-| Product routes and navigation contract are defined | Documentation claim | Issue #1 and `docs/product-boundary.md`; no route implementation claimed. |
+| Product routes and navigation contract are defined | Implemented fixture claim | Issues #1 and #2, the route shell, and route/browser checks; no live upstream behavior claimed. |
+| Fixture BFF and canonical contract sources exist | Implemented fixture claim | Issue #2, local/hosted verification, and checked-in OpenAPI/JSON Schema sources; no deployed API claimed. |
 | Matrix is canonical for Matrix state and authorized sends | Authority boundary | Matrix; this repository remains unprivileged. |
 | Community creation uses request/status-first semantics | Contract only | Independently owned registry contract plus later implementation and verification issues. |
 | Hub is adapter-only for privileged hosted provisioning | Authority boundary | Hub adapter contract; no provisioning exists here. |
-| Zenith forum is visible unavailable | Required present posture | A later UI issue must preserve the unavailable copy and navigation until access evidence passes. |
+| Zenith forum is visible unavailable | Implemented fixture posture | Issue #2 route/browser evidence proves the unavailable copy and navigation; any later live-access issue must preserve that posture until its own access evidence passes. |
 | AI interpretation | Deferred and non-authoritative | A future explicitly authorized issue, privacy/provenance contract, implementation, tests, and deployment evidence. |
 | Production readiness | Not claimed | Future QA, security, deployment, and live-target evidence gates. |
 
@@ -59,8 +64,8 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 
 This repository does not currently claim:
 
-- application routes, UI, APIs, or accessibility implementation;
-- Matrix reading, discovery, joining, authentication, posting, membership, federation, or live rooms;
+- live or privileged application routes, APIs, or upstream connectivity beyond the deterministic fixture implementation;
+- live Matrix reading, discovery, joining, authentication, posting, membership, federation, or live rooms;
 - Synapse admin/appservice authority or credentials;
 - ownership or implementation of the canonical community registry;
 - request submission, status retrieval, community or room provisioning;

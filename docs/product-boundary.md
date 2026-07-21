@@ -1,17 +1,22 @@
 # Product boundary
 
-Status: accepted planning contract for issue #1. This is not implementation or production evidence.
+Status: accepted planning contract from issue #1, reconciled with the fixture implementation merged by issue #2. This remains bounded repository evidence, not live-integration, deployment, or production evidence.
 
 ## Product states
 
 | State | Meaning |
 | --- | --- |
-| Documentation-only | The current repository state. Contracts and non-claims are recorded; no application is scaffolded. |
+| Documentation-only | Historical I01 state before the application scaffold merged. Retained as provenance, not as the current repository state. |
+| Fixture implementation | The current repository state. A deterministic fixture shell, fixture BFF, canonical contracts, and unavailable route surfaces are implemented without live upstream access. |
 | Visible unavailable | A route may be visibly represented while clearly saying it cannot currently be used. It must not expose data or imply access. |
 | Planned | An issue may own future work, but the capability does not exist until its evidence gate passes. |
 | Evidence-backed | Reserved for a later capability whose owning issue, tests, review, and deployment evidence all pass. Nothing in this issue reaches this state. |
 
-Under current evidence, the Zenith forum posture is **visible unavailable**. It is not claimed to be readable, joinable, authenticated, or writable.
+Under current evidence, the Zenith forum posture remains **visible unavailable**. The fixture page exists, but it is not claimed to be live, readable, joinable, authenticated, or writable.
+
+## Current fixture implementation
+
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The route surfaces below render deterministic fixture or unavailable states. They do not perform Matrix, registry, provisioning, authentication, or production network operations.
 
 ## Canonical routes and navigation
 
@@ -25,9 +30,9 @@ The route inventory is:
 - `/docs/api`
 - `/docs/specs`
 
-Future implementations of every route must provide keyboard-accessible navigation to Communities (`/`), the selected forum (`/community/:slug/forum` when one is selected), Create community (`/create`), and Docs (`/docs`), plus an explicit session state. An unavailable or blocked destination must remain visible and clearly labelled unavailable; it must not imply that the capability works.
+The fixture implementation of every route provides keyboard-accessible navigation to Communities (`/`), the selected forum (`/community/:slug/forum` when one is selected), Create community (`/create`), and Docs (`/docs`), plus an explicit unavailable session state. An unavailable or blocked destination remains visible and clearly labelled unavailable; it does not imply that the upstream capability works.
 
-These paths are a navigation contract, not evidence that routes or UI exist.
+These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or registry integration, authentication, provisioning, deployment, or production readiness.
 
 ## Project and repository boundary
 

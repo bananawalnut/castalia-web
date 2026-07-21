@@ -1,6 +1,6 @@
-# Repository bootstrap evidence
+# Repository and implementation evidence
 
-Status: repository/bootstrap evidence for issue #1, captured from GitHub and Git. This record is bounded to the named repository at verification time; it is not application, deployment, or production evidence.
+Status: historical repository/bootstrap evidence for issue #1 plus post-merge fixture implementation evidence from issue #2. This record is bounded to the named repository and commits; it is not deployment or production evidence.
 
 ## Accepted repository identity
 
@@ -26,20 +26,31 @@ The default `main` branch resolves to bootstrap commit:
 
 That commit adds the documentation-only README baseline. It is the base of this issue #1 branch, not proof of application scaffolding or functionality.
 
-## Public provenance
+## Historical I01 public provenance
 
 - Accepted boundary and task ledger: [issue #1](https://github.com/ZenithResearch/castalia-web/issues/1)
 - Branch: `docs/issue-1-boundaries`
 - Draft review surface: [pull request #3](https://github.com/ZenithResearch/castalia-web/pull/3)
 - Base branch and SHA: `main` at `b6452489a78b2f4c004bbe44f47fc38d5bff62e8`
 
-Issue #2 is outside this documentation PR. This evidence does not implement or authorize its scaffold work. Pull request #3 must remain draft and unmerged until separately reviewed.
+At the time this evidence was written, issue #2 was outside pull request #3 and its scaffold work was not yet merged. That statement is retained as historical I01 provenance, not current repository status.
+
+## Post-merge I02 implementation evidence
+
+- Scaffold and contract issue: [issue #2](https://github.com/ZenithResearch/castalia-web/issues/2)
+- Reviewed implementation: [pull request #4](https://github.com/ZenithResearch/castalia-web/pull/4)
+- Merge commit on `main`: `51fae5ee44aeefed0f23997c62950ed9d22e89fa`
+- Post-merge CI: static, contracts/unit, build/budgets, and browser/a11y passed for the merge commit.
+- Post-merge Security workflow: dependency policy and secret scanning passed.
+- CodeQL remained unavailable at its upload boundary because GitHub Advanced Security is not available for this private repository; it is not represented as green.
+
+This post-merge evidence establishes only the fixture implementation and its repository checks. It does not establish live Matrix or registry access, deployment, runtime security approval, or production readiness.
 
 ## Non-claims
 
 This evidence does not claim:
 
 - authorship or identity of the person who created the repository;
-- branch protection, required checks, CI, or deployment;
+- branch protection, required-check binding, or deployment;
 - shared implementation or authority with Rust/Dregg Castalia;
-- application scaffolding, Matrix access, provisioning, federation, AI interpretation, or production readiness.
+- live Matrix or registry access, provisioning, federation, AI interpretation, or production readiness.
