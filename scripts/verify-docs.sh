@@ -23,6 +23,26 @@ for phrase in 'ZenithResearch/castalia-web' 'Rust/Dregg Castalia' 'duplicate gua
   grep -Fiq "$phrase" docs/repository-evidence.md || fail "missing repository evidence phrase: $phrase"
 done
 
+for phrase in 'Current fixture implementation' 'deterministic fixture shell' 'fixture BFF'; do
+  grep -Fiq "$phrase" docs/product-boundary.md || fail "missing current product-state phrase: $phrase"
+done
+
+for phrase in 'Implemented fixture routes and APIs' 'fixture-only' 'live Matrix'; do
+  grep -Fiq "$phrase" docs/authority-and-claims.md || fail "missing current claim-ledger phrase: $phrase"
+done
+
+for phrase in 'issue #2' 'pull request #4' '51fae5ee44aeefed0f23997c62950ed9d22e89fa' 'post-merge'; do
+  grep -Fiq "$phrase" docs/repository-evidence.md || fail "missing I02 merge evidence phrase: $phrase"
+done
+
+for phrase in 'Issue #2' 'fixture implementation' 'pnpm verify'; do
+  grep -Fiq "$phrase" docs/verification.md || fail "missing current verification phrase: $phrase"
+done
+
+if grep -Fq 'The current repository state. Contracts and non-claims are recorded; no application is scaffolded.' docs/product-boundary.md; then
+  fail 'stale documentation-only state is still described as current'
+fi
+
 doc_files='README.md docs/'\*.md
 for file in $doc_files; do
   links=$(perl -ne 'while (/\[[^]]+\]\(([^)#]+)(?:#[^)]+)?\)/g) { print "$1\n" unless $1 =~ m{^(?:https?://|mailto:|/)} }' "$file")
