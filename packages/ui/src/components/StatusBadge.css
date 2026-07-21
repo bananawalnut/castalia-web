@@ -1,0 +1,78 @@
+/* Adapted from the canonical ZenithUI StatusBadge molecule. */
+.zn-status-badge {
+  --status-bg: var(--color-neutral);
+  --status-fg: var(--color-neutral-content);
+  --status-muted: var(--color-neutral-content);
+  --status-border: var(--color-neutral-hover);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid var(--status-border);
+  border-radius: var(--radius-full);
+  background: var(--status-bg);
+  color: var(--status-fg);
+  font-family: var(--font-corporate);
+  white-space: nowrap;
+}
+
+.zn-status-badge--info {
+  --status-bg: var(--color-info);
+  --status-fg: var(--color-info-content);
+  --status-muted: var(--color-info-content);
+  --status-border: var(--color-info);
+}
+
+.zn-status-badge--success {
+  --status-bg: var(--color-success);
+  --status-fg: var(--color-success-content);
+  --status-muted: var(--color-success-content);
+  --status-border: var(--color-success);
+}
+
+.zn-status-badge--warning {
+  --status-bg: var(--color-warning);
+  --status-fg: var(--color-warning-content);
+  --status-muted: var(--color-warning-content);
+  --status-border: var(--color-warning);
+}
+
+.zn-status-badge--error {
+  --status-bg: var(--color-error);
+  --status-fg: var(--color-error-content);
+  --status-muted: var(--color-error-content);
+  --status-border: var(--color-error);
+}
+
+.zn-status-badge--warm {
+  --status-bg: var(--color-secondary);
+  --status-fg: var(--color-secondary-content);
+  --status-muted: var(--color-secondary-content);
+  --status-border: var(--color-secondary);
+}
+
+.zn-status-badge__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-full);
+  background: currentColor;
+  box-shadow: 0 0 0 3px var(--status-bg);
+  flex-shrink: 0;
+}
+
+.zn-status-badge__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.zn-status-badge__meta {
+  color: var(--status-muted);
+  font-family: var(--font-corporate);
+  font-size: 11px;
+  line-height: 1;
+}

@@ -1,45 +1,42 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #172033;
-  background: #f8fafc;
-  line-height: 1.5;
-}
-* {
+/* ZenithUI Design Tokens */
+@import "@castalia/ui/tokens.css";
+
+/* Base */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-}
-body {
   margin: 0;
-  min-width: 320px;
-  overflow-x: hidden;
+  padding: 0;
 }
-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 1rem;
-  background: #fff;
-  border-bottom: 1px solid #ccd5e0;
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
-nav {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+
+body {
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  color: var(--color-base-content);
+  background-color: var(--color-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-a {
-  color: #174ea6;
-  text-underline-offset: 0.2em;
+
+/* Global focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
-nav a[aria-current="page"] {
-  font-weight: 700;
-  text-decoration-thickness: 0.2em;
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
-a:focus-visible,
-input:focus-visible,
-main:focus-visible {
-  outline: 3px solid #f59e0b;
-  outline-offset: 3px;
-}
+
+/* Skip link */
 .skip-link {
   position: absolute;
   left: -10000px;
@@ -47,30 +44,244 @@ main:focus-visible {
 .skip-link:focus {
   left: 1rem;
   top: 1rem;
-  background: #fff;
-  padding: 0.5rem;
-  z-index: 2;
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+  padding: var(--space-2) var(--space-3);
+  z-index: 100;
+  border-radius: var(--radius);
+  text-decoration: none;
 }
-main {
-  max-width: 56rem;
-  margin: auto;
-  padding: clamp(1rem, 4vw, 3rem);
+
+/* App layout */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-base-200);
+  border-bottom: 1px solid var(--color-base-border);
+  flex-wrap: wrap;
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
 .brand {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
   font-weight: 700;
+  color: var(--color-brand-text);
+  text-decoration: none;
+  letter-spacing: -0.02em;
 }
-.status {
-  display: inline-block;
-  border: 2px solid currentColor;
-  border-radius: 0.25rem;
-  padding: 0.2rem 0.5rem;
+
+.brand:hover {
+  color: var(--color-brand-hover);
 }
-@media (max-width: 420px) {
-  header {
-    align-items: flex-start;
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.app-nav a {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-base-content);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius);
+  transition:
+    background var(--transition-base),
+    color var(--transition-base);
+}
+
+.app-nav a:hover {
+  background: var(--color-base-300);
+  color: var(--color-brand-text);
+}
+
+.app-nav a[aria-current="page"] {
+  background: var(--color-brand-subtle);
+  color: var(--color-brand-text);
+  font-weight: 500;
+}
+
+.session-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-base-muted);
+  white-space: nowrap;
+}
+
+/* Main content */
+.app-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.app-main:focus {
+  outline: none;
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-base-content);
+  margin-bottom: var(--space-2);
+}
+
+.page-header p {
+  color: var(--color-base-muted);
+  font-size: var(--text-body);
+}
+
+/* Room list */
+.room-list {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.room-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.room-card h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-base-content);
+}
+
+.room-card p {
+  color: var(--color-base-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.room-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-3);
+}
+
+/* Room detail */
+.room-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.room-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.room-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+}
+
+.unavailable-notice {
+  background: var(--color-base-200);
+  border: 1px solid var(--color-base-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.unavailable-notice h2 {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--color-base-content);
+  margin-bottom: var(--space-3);
+}
+
+.unavailable-notice p {
+  color: var(--color-base-muted);
+  font-size: var(--text-body);
+  margin-bottom: var(--space-4);
+}
+
+/* Docs section */
+.docs-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.docs-card h3 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-base-content);
+}
+
+.docs-card p {
+  color: var(--color-base-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .app-header {
     flex-direction: column;
+    align-items: stretch;
   }
-  nav {
+
+  .app-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .app-nav {
+    gap: var(--space-2);
+  }
+
+  .app-main {
+    padding: var(--space-4);
+  }
+
+  .room-list {
+    grid-template-columns: 1fr;
+  }
+
+  .room-header {
     flex-direction: column;
   }
 }

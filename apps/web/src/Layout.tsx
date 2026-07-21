@@ -8,27 +8,30 @@ export function Layout() {
   useEffect(() => {
     mainRef.current?.focus();
   }, [location.pathname]);
+
   return (
-    <>
+    <div className="app-layout">
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <header>
-        <Link className="brand" to="/">
-          Castalia
-        </Link>
-        <nav aria-label="Primary">
-          {navigation.map(({ to, label }) => (
-            <NavLink key={to} to={to} end>
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-        <span>Session unavailable</span>
+      <header className="app-header">
+        <div className="app-header-left">
+          <Link className="brand" to="/">
+            Castalia
+          </Link>
+          <nav className="app-nav" aria-label="Primary">
+            {navigation.map(({ to, label }) => (
+              <NavLink key={to} to={to} end>
+                {label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+        <span className="session-status">Session unavailable</span>
       </header>
-      <main id="main" ref={mainRef} tabIndex={-1}>
+      <main id="main" className="app-main" ref={mainRef} tabIndex={-1}>
         <Outlet />
       </main>
-    </>
+    </div>
   );
 }
