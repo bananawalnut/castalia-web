@@ -30,7 +30,7 @@ The current repository implements deterministic fixture routes, read-only fixtur
 
 ## Forum posture
 
-Under current evidence, the Zenith forum is **visible unavailable**. A future shell may keep `/community/:slug/forum` visible for orientation and navigation, but it must clearly say unavailable. It must not imply that a room is readable, joinable, authenticated, writable, federated, or even known to exist.
+Under current evidence, the Zenith forum is **visible unavailable**. The implemented fixture shell keeps `/community/:slug/forum` visible for orientation and navigation and clearly labels it unavailable. It does not imply that a room is readable, joinable, authenticated, writable, federated, or even known to exist.
 
 ## Deferred interpretation
 
@@ -56,7 +56,7 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 | Matrix is canonical for Matrix state and authorized sends | Authority boundary | Matrix; this repository remains unprivileged. |
 | Community creation uses request/status-first semantics | Contract only | Independently owned registry contract plus later implementation and verification issues. |
 | Hub is adapter-only for privileged hosted provisioning | Authority boundary | Hub adapter contract; no provisioning exists here. |
-| Zenith forum is visible unavailable | Required present posture | A later UI issue must preserve the unavailable copy and navigation until access evidence passes. |
+| Zenith forum is visible unavailable | Implemented fixture posture | Issue #2 route/browser evidence proves the unavailable copy and navigation; any later live-access issue must preserve that posture until its own access evidence passes. |
 | AI interpretation | Deferred and non-authoritative | A future explicitly authorized issue, privacy/provenance contract, implementation, tests, and deployment evidence. |
 | Production readiness | Not claimed | Future QA, security, deployment, and live-target evidence gates. |
 

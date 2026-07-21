@@ -43,6 +43,12 @@ if grep -Fq 'The current repository state. Contracts and non-claims are recorded
   fail 'stale documentation-only state is still described as current'
 fi
 
+for phrase in 'future shell may keep' 'later UI issue must preserve'; do
+  if grep -Fiq "$phrase" docs/authority-and-claims.md; then
+    fail "stale future fixture-shell claim remains: $phrase"
+  fi
+done
+
 doc_files='README.md docs/'\*.md
 for file in $doc_files; do
   links=$(perl -ne 'while (/\[[^]]+\]\(([^)#]+)(?:#[^)]+)?\)/g) { print "$1\n" unless $1 =~ m{^(?:https?://|mailto:|/)} }' "$file")
