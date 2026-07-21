@@ -41,7 +41,7 @@ These paths began as the I01 navigation contract and now exist as deterministic 
 - Matrix remains canonical for accounts, rooms, events, edits, redactions, membership, and participant-authorized sends.
 - Castalia Web must remain unprivileged. It receives no Synapse admin or appservice credentials.
 - Hub owns only the privileged adapter for provisioning Zenith-hosted Matrix resources. It does not own the canonical community registry.
-- The canonical community registry is separately owned; this repository may consume an authorized contract later but does not define or provision that authority here.
+- The canonical community registry is separately owned; this repository may consume an authorized contract later but does not define or provision that authority here. Its concrete owner/source is currently unresolved under the [registry authority decision](community-registry-authority.md).
 
 ## Explicit non-goals for this boundary
 

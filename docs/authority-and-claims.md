@@ -8,7 +8,7 @@ Status: accepted authority contract from issue #1, reconciled with the fixture-o
 | --- | --- | --- |
 | Accounts, rooms, events, edits, redactions, membership, and participant-authorized sends | Matrix | Matrix remains canonical. Castalia Web is an unprivileged client. It receives no Synapse admin or appservice credentials and cannot replace Matrix truth. |
 | Zenith-hosted Matrix provisioning | Hub's privileged adapter | Hub may adapt an authorized request into hosted-resource provisioning. The adapter is not the community registry and does not make Castalia Web privileged. |
-| Community identity, descriptor, and lifecycle status | Independently owned canonical community registry | This repository does not own, define, or provision the registry. A future web client may consume its authorized contract. |
+| Community identity, descriptor, and lifecycle status | Separately owned canonical community registry; concrete owner/source unresolved | This repository does not own, define, or provision the registry. The [registry authority decision](community-registry-authority.md) is HOLD until owner-controlled evidence is accepted. |
 | Product routes and presentation | `ZenithResearch/castalia-web` | The repository may define the unprivileged web experience, while displaying upstream states without turning them into authority. |
 | Documentation interpretation | The precedence rules below | Prose cannot override Matrix truth, the registry, accepted issue boundaries, or verified evidence. |
 
@@ -54,7 +54,7 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 | Product routes and navigation contract are defined | Implemented fixture claim | Issues #1 and #2, the route shell, and route/browser checks; no live upstream behavior claimed. |
 | Fixture BFF and canonical contract sources exist | Implemented fixture claim | Issue #2, local/hosted verification, and checked-in OpenAPI/JSON Schema sources; no deployed API claimed. |
 | Matrix is canonical for Matrix state and authorized sends | Authority boundary | Matrix; this repository remains unprivileged. |
-| Community creation uses request/status-first semantics | Contract only | Independently owned registry contract plus later implementation and verification issues. |
+| Community creation uses request/status-first semantics | Contract only | Separately owned registry contract; owner/source unresolved under issue #7, with later implementation and verification issues still required. |
 | Hub is adapter-only for privileged hosted provisioning | Authority boundary | Hub adapter contract; no provisioning exists here. |
 | Zenith forum is visible unavailable | Implemented fixture posture | Issue #2 route/browser evidence proves the unavailable copy and navigation; any later live-access issue must preserve that posture until its own access evidence passes. |
 | AI interpretation | Deferred and non-authoritative | A future explicitly authorized issue, privacy/provenance contract, implementation, tests, and deployment evidence. |
