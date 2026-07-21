@@ -43,6 +43,14 @@ for phrase in 'HOLD — authority unresolved' 'Negative search results are not p
   grep -Fiq "$phrase" docs/community-registry-authority.md || fail "missing registry authority-decision phrase: $phrase"
 done
 
+for phrase in 'offline Synapse-user registry mock' 'synthetic Synapse user' 'not canonical registry or live Synapse evidence'; do
+  grep -Fiq "$phrase" README.md docs/product-boundary.md docs/authority-and-claims.md || fail "missing registry-mock claim phrase: $phrase"
+done
+
+for phrase in 'issue #7' 'pull request #8' 'f631c86' 'a433687' '40a73c1' 'branch evidence'; do
+  grep -Fiq "$phrase" docs/repository-evidence.md || fail "missing I04 registry-mock evidence phrase: $phrase"
+done
+
 if grep -Fq 'The current repository state. Contracts and non-claims are recorded; no application is scaffolded.' docs/product-boundary.md; then
   fail 'stale documentation-only state is still described as current'
 fi

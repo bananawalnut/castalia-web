@@ -46,6 +46,16 @@ At the time this evidence was written, issue #2 was outside pull request #3 and 
 
 This post-merge evidence establishes only the fixture implementation and its repository checks. It does not establish live Matrix or registry access, deployment, runtime security approval, or production readiness.
 
+## In-progress I04 registry-mock evidence
+
+- Authority and mock issue: [issue #7](https://github.com/ZenithResearch/castalia-web/issues/7)
+- Draft review surface: [pull request #8](https://github.com/ZenithResearch/castalia-web/pull/8)
+- `f631c86` records the unresolved canonical-registry authority gap and the operator-authorized synthetic Synapse-user fallback.
+- `a433687` records the focused RED contract for deterministic mapping, privacy filtering, invalid-source rejection, duplicate rejection, and zero network access.
+- `40a73c1` implements the network-free mapper and routes BFF fixture-community reads through it.
+
+These commits are branch evidence, not merge or deployment evidence. The mock accepts only synthetic `fixture.invalid` user identities and preserves the unavailable community posture. It does not enumerate a homeserver, prove a Matrix user or room exists, or make Synapse the canonical community registry.
+
 ## Non-claims
 
 This evidence does not claim:

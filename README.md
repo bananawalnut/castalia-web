@@ -7,10 +7,10 @@ The repository now contains an executable local fixture shell and BFF. It does *
 ## Architecture
 
 - `apps/web` — React 19/Vite 7 declarative SPA with bounded fixture routes and visible unavailable states.
-- `apps/bff` — Fastify 5 fixture BFF with process-health/session/fixture reads, strict environment validation, exact-origin CORS, security headers, and allowlisted logs.
+- `apps/bff` — Fastify 5 fixture BFF with process-health/session/fixture reads, including communities supplied by the offline Synapse-user registry mock, plus strict environment validation, exact-origin CORS, security headers, and allowlisted logs.
 - `packages/contracts` — authoritative OpenAPI 3.1 and JSON Schema 2020-12 sources, fixtures, checked-in generated TypeScript, and drift checks.
 - `packages/ui` — small local UI primitives used by the fixture shell.
-- `packages/matrix-client` — network-free, read-only interface and unavailable fixture; no Matrix SDK or privileged operations.
+- `packages/matrix-client` — network-free, read-only interface, unavailable fixture, and fail-closed synthetic Synapse-user registry mapper; no Matrix SDK, homeserver calls, or privileged operations.
 
 ## Exact toolchain
 

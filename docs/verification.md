@@ -17,6 +17,7 @@ pnpm verify
 
 - required issue #1 documents, including repository evidence, exist;
 - current fixture implementation wording and issue #2 merge provenance are present;
+- registry authority-gap and offline Synapse-user mock boundaries are present;
 - README Markdown links resolve to committed files;
 - the canonical route inventory appears in the product boundary;
 - authority, request/status, unavailable-forum, deferred-interpretation, precedence, and non-claim language is present;
@@ -36,3 +37,5 @@ The checks are intentionally conservative text guards. Reviewers must still insp
 | Accepted repository identity, duplicate/creation evidence, bootstrap SHA, and public provenance | `docs/repository-evidence.md` |
 | Issue #2 fixture implementation is distinguished from live integration | Current-state sections in `docs/product-boundary.md` and `docs/authority-and-claims.md` |
 | I02 issue, pull request, merge commit, and post-merge limitations are recorded | `docs/repository-evidence.md` |
+| Synthetic Synapse-user registry mapping is fail-closed, private-safe, and network-free | `packages/matrix-client/tests/client.test.ts` and BFF tests |
+| Canonical registry authority remains unresolved and separate from the mock | `docs/community-registry-authority.md` and `docs/authority-and-claims.md` |

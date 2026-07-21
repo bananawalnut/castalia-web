@@ -53,6 +53,7 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 | --- | --- | --- |
 | Product routes and navigation contract are defined | Implemented fixture claim | Issues #1 and #2, the route shell, and route/browser checks; no live upstream behavior claimed. |
 | Fixture BFF and canonical contract sources exist | Implemented fixture claim | Issue #2, local/hosted verification, and checked-in OpenAPI/JSON Schema sources; no deployed API claimed. |
+| Synapse-user registry mock supplies fixture communities | Implemented fixture claim | Issue #7 mapper/BFF tests; synthetic `fixture.invalid` users only, network-free, and not canonical registry or live Synapse evidence. |
 | Matrix is canonical for Matrix state and authorized sends | Authority boundary | Matrix; this repository remains unprivileged. |
 | Community creation uses request/status-first semantics | Contract only | Separately owned registry contract; owner/source unresolved under issue #7, with later implementation and verification issues still required. |
 | Hub is adapter-only for privileged hosted provisioning | Authority boundary | Hub adapter contract; no provisioning exists here. |
