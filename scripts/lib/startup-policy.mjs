@@ -12,9 +12,28 @@ export async function waitForStartup({
   sleep = defaultSleep,
 }) {
   const started = now();
-  while (now() - started < timeout) {
-    if (await probe()) return true;
-    await sleep(interval);
+  const controller = new AbortController();
+  let deadlineTimer;
+  const deadline = new Promise((resolve) => {
+    deadlineTimer = setTimeout(() => {
+      controller.abort();
+      resolve(false);
+    }, timeout);
+  });
+  const polling = (async () => {
+    while (now() - started < timeout) {
+      if (await probe({ signal: controller.signal })) return true;
+      const remaining = timeout - (now() - started);
+      if (remaining <= 0) return false;
+      await sleep(Math.min(interval, remaining));
+    }
+    return false;
+  })();
+
+  try {
+    return await Promise.race([polling, deadline]);
+  } finally {
+    clearTimeout(deadlineTimer);
+    controller.abort();
   }
-  return false;
 }

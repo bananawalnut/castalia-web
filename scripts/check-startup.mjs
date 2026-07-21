@@ -103,9 +103,11 @@ for (let index = 0; index < 21; index += 1) {
   const started = performance.now();
   try {
     const ready = await waitForStartup({
-      probe: async () => {
+      probe: async ({ signal }) => {
         try {
-          const response = await fetch(`http://127.0.0.1:${port}/health`);
+          const response = await fetch(`http://127.0.0.1:${port}/health`, {
+            signal,
+          });
           return response.ok;
         } catch {
           return false;

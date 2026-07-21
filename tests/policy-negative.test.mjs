@@ -99,3 +99,16 @@ test("startup policy fails a cold launch that exceeds two seconds", async () => 
   assert.equal(ready, false);
   assert.equal(elapsed, 2_000);
 });
+
+test("startup policy bounds a hanging health probe", async () => {
+  const started = performance.now();
+  const ready = await waitForStartup({
+    probe: async () => new Promise(() => {}),
+    timeout: 25,
+  });
+
+  const elapsed = performance.now() - started;
+  assert.equal(ready, false);
+  assert.ok(elapsed >= 20);
+  assert.ok(elapsed < 250);
+}, 500);
