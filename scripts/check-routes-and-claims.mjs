@@ -19,7 +19,7 @@ const requiredRoutes = [
 ];
 const requiredLabels = ["Rooms", "Zenith", "Create room", "Docs"];
 const requiredCopy = [
-  "Castalia — Fixture Preview",
+  "Castalia // Fixture Preview",
   "Group chats and rooms are listed below",
   "Members unavailable",
   "Messages unavailable",
@@ -45,7 +45,7 @@ for (const value of [
   "<main",
   'aria-label="Primary"',
   "Skip to content",
-  "mainRef.current?.focus()",
+  "mainRef.current?.focus({ preventScroll: true })",
 ])
   if (!layout.includes(value))
     failures.push(`missing layout contract ${value}`);

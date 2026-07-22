@@ -6,7 +6,7 @@ export function Layout() {
   const location = useLocation();
   const mainRef = useRef<HTMLElement>(null);
   useEffect(() => {
-    mainRef.current?.focus();
+    mainRef.current?.focus({ preventScroll: true });
   }, [location.pathname]);
 
   return (
@@ -16,8 +16,8 @@ export function Layout() {
       </a>
       <header className="app-header">
         <div className="app-header-left">
-          <Link className="brand" to="/">
-            Castalia
+          <Link className="brand" to="/" aria-label="Castalia home">
+            Start
           </Link>
           <nav className="app-nav" aria-label="Primary">
             {navigation.map(({ to, label }) => (

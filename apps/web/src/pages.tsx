@@ -2,7 +2,6 @@ import { Link, useParams } from "react-router";
 import {
   Badge,
   Card,
-  Divider,
   SectionLabel,
   StatusBadge,
   type ButtonSize,
@@ -42,34 +41,49 @@ function ActionLink({
 
 export function Rooms() {
   return (
-    <>
-      <header className="page-header">
+    <div className="bitmap-scene">
+      <img
+        className="bitmap-figure bitmap-angel"
+        src="/bitmap/angel.png"
+        alt=""
+        aria-hidden="true"
+      />
+      <img
+        className="bitmap-figure bitmap-warrior"
+        src="/bitmap/warrior.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <header className="page-header bitmap-message">
         <SectionLabel variant="eyebrow">
-          Castalia — Fixture Preview
+          Castalia // Fixture Preview
         </SectionLabel>
-        <h1>Rooms</h1>
-        <p>
+        <h1>Rooms are ready.</h1>
+        <p className="bitmap-declaration">The line is not.</p>
+      </header>
+
+      <section className="rooms-window" aria-labelledby="rooms-heading">
+        <div className="window-titlebar">
+          <h2 id="rooms-heading">Rooms</h2>
+          <span>01 found</span>
+        </div>
+        <p className="window-intro">
           Group chats and rooms are listed below. Live Matrix connection is
           unavailable in fixture mode.
         </p>
-      </header>
-
-      <section aria-labelledby="rooms-heading">
-        <h2 id="rooms-heading" className="sr-only">
-          Available rooms
-        </h2>
         <div className="room-list">
           {rooms.map((room) => (
             <Card key={room.slug} variant="interactive" className="room-card">
               <div>
                 <SectionLabel variant="marker">Group chat</SectionLabel>
-                <h2>{room.name}</h2>
+                <h3>{room.name}</h3>
                 <p>{room.description}</p>
               </div>
               <div className="room-card-footer">
                 <Badge variant="default">Members unavailable</Badge>
                 <ActionLink to={`/room/${room.slug}`} size="sm">
-                  View
+                  Enter
                 </ActionLink>
               </div>
             </Card>
@@ -77,37 +91,15 @@ export function Rooms() {
         </div>
       </section>
 
-      <Divider
-        style={{ marginTop: "var(--space-8)", marginBottom: "var(--space-6)" }}
-      />
-
-      <section aria-labelledby="status-heading">
-        <h2 id="status-heading" className="sr-only">
-          Connection status
-        </h2>
-        <Card variant="default">
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "var(--space-4)",
-              flexWrap: "wrap",
-            }}
-          >
-            <StatusBadge label="Fixture" meta="disconnected" tone="warning" />
-            <span
-              style={{
-                color: "var(--color-base-muted)",
-                fontSize: "var(--text-sm)",
-              }}
-            >
-              No Matrix session active. Messages, sign-in, and posting are
-              unavailable.
-            </span>
-          </div>
-        </Card>
+      <section className="bitmap-status" aria-labelledby="status-heading">
+        <h2 id="status-heading">Connection</h2>
+        <StatusBadge label="Fixture" meta="disconnected" tone="warning" />
+        <p>
+          No Matrix session active. Messages, sign-in, and posting are
+          unavailable.
+        </p>
       </section>
-    </>
+    </div>
   );
 }
 
