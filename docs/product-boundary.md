@@ -32,7 +32,7 @@ The route inventory is:
 
 The fixture implementation of every route provides keyboard-accessible navigation to Communities (`/`), the selected forum (`/community/:slug/forum` when one is selected), Create community (`/create`), and Docs (`/docs`), plus an explicit unavailable session state. An unavailable or blocked destination remains visible and clearly labelled unavailable; it does not imply that the upstream capability works.
 
-These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or registry integration, authentication, provisioning, deployment, or production readiness.
+These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or Castalia Control integration, authentication, provisioning, deployment, or production readiness.
 
 ## Project and repository boundary
 
@@ -45,15 +45,27 @@ These paths began as the I01 navigation contract and now exist as deterministic 
 - A future Web client may present exact-request wallet proof plus delegated Dregg authority directly to Castalia Control. It must not create a cookie/BFF authority session or persist raw capabilities.
 - See the [Castalia Control authority boundary](castalia-control-authority.md) for fixture-versus-anchored authority and execution separation.
 
-## Explicit non-goals for this boundary
+## Historical issue #1 non-goals
 
-Issue #1 does not:
+Issue #1 did not:
 
 - scaffold or implement the application;
 - provide Matrix room reading, joining, posting, membership, or federation;
 - provision communities, infrastructure, accounts, or rooms;
-- implement wallet proof, `dga1_` presentation, Castalia Control, anchored Dregg authority, or provisioner execution;
 - add Matrix credentials or assume live rooms;
 - implement AI interpretation or create an interpreter repository;
 - define a universal ontology; or
 - establish deployment or production readiness.
+
+Those constraints remain historical provenance. Issue #2 later implemented only the fixture surfaces described above; it did not make the deferred capabilities live.
+
+## Current issue #9 and repository non-goals
+
+Issue #9 changes documentation and semantic claim checks only. It does not:
+
+- implement wallet proof, `dga1_` custody or presentation, Castalia Control, anchored Dregg authority, or provisioner execution;
+- provide Matrix reading, joining, posting, membership, federation, login, access-token, cross-signing, or E2EE behavior;
+- provision communities, infrastructure, accounts, rooms, or syndicate admission;
+- add infrastructure, Synapse-admin, appservice, signing, federation-admission, or deployment credentials;
+- create a cookie/BFF authorization rail or move authorization into Castalia Web; or
+- establish deployment, security approval, or production readiness.

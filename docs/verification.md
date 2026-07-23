@@ -52,4 +52,8 @@ Verified on the issue #9 worktree:
 - contract lint/bundle/generated-source checks, policy-negative tests, workflow/license checks, build budgets, artifact scan, and startup budgets — passed during `pnpm verify`;
 - `git diff --check` — passed.
 
-The complete `pnpm verify` gate is not green on the unchanged dependency baseline: dependency policy reports two HIGH `fast-uri` advisories fixed upstream in `3.1.4` and `4.1.1`. Issue #9 changes no manifest or lockfile and does not remediate or waive that security failure. The pull request must remain draft/blocked until the baseline security owner resolves or explicitly routes the dependency gate; passing issue #9 documentation checks must not be presented as full repository readiness.
+The complete `pnpm verify` gate is not green on the unchanged dependency baseline: dependency policy reports two HIGH `fast-uri` advisories fixed upstream in `3.1.4` and `4.1.1`. Issue #9 changes no manifest or lockfile and does not remediate or waive that security failure; remediation is routed to issue #11.
+
+Required hosted security checks are independently not green at the recorded issue #9 head. The `javascript-typescript` CodeQL check is red, and dependency review reports that it is unsupported until Dependency graph and GitHub Advanced Security are available for this private repository. Issue #9 changes no workflow or repository security setting; diagnosis and restoration are routed to issue #12.
+
+The pull request must remain draft/blocked until issues #11 and #12 are resolved with exact-head green evidence or an authorized owner records an explicit unresolved external blocker. Passing issue #9 documentation checks must not be presented as full repository readiness.
