@@ -47,3 +47,25 @@ The advisory metadata names `find-my-way >=9.6.1` as patched, but `9.6.1` is not
 - CodeQL and dependency review remain separately governed by issue #12 and cannot be called green without successful hosted checks.
 
 Exact GREEN and hosted evidence will be appended only after the commands complete.
+
+## Issue #14 GREEN evidence
+
+Commit `a790cf1` resolves Fastify’s compatible 9.x dependency to `find-my-way` `9.7.0`. Commit `09feb9f` updates direct `react-router` to `7.18.0` without a major change.
+
+Verified on stacked head `09feb9fc3b70a594c7b49b6e7e8506d86cf0301d`:
+
+- `pnpm install --frozen-lockfile` — passed;
+- `pnpm why find-my-way -r` — reports only `9.7.0` through Fastify 5.8.5;
+- `pnpm why react-router -r` — reports only direct `7.18.0` in the Web package;
+- fresh live audit — advisories 1124273, 1124268, 1124271, and 1124272 are absent;
+- dependency policy — passed with `moderate=0 high=0 critical=0`;
+- forced uncached BFF tests — 18/18 passed;
+- forced uncached contracts tests — 4/4 passed;
+- Web tests — 11/11 passed;
+- browser accessibility/privacy/navigation tests — 11/11 passed;
+- route claims, typechecks, lint, contract generation, policy-negative tests, workflow/license checks, builds/budgets, startup budgets, artifact scan, and history secret scan — passed;
+- complete `pnpm verify` — exited `0`.
+
+The first local full run reached the browser gate before the configured temporary Playwright browser root had been populated. Chromium was installed into that temporary root and the unchanged exact head then passed all browser and full verification gates. Earlier Vitest worker timeouts were traced to a stale shell-level `NODE_ENV=production`; rerunning under the repository’s intended test environment passed without a source workaround. Neither local environment condition is represented as a product defect or tracked code change.
+
+Hosted checks and independent reviews remain pending. Issue #12 still governs hosted CodeQL and dependency-review availability; issue #14 cannot claim those gates are green without successful exact-head checks.
