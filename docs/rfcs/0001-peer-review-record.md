@@ -86,7 +86,15 @@ After the initial review, the user added a substantive product requirement:
 - an RFC may claim to solve all or part of a problem; and
 - submitting a solution claim must not itself mark the problem solved.
 
-The RFC now adds `ProblemEntryV1`, `RfcMetadataV1`, `ProblemSolutionClaimV1`, and `ExchangeEntryV1`; a many-to-many problem/RFC graph; append-only exchanges; human/agent attribution; problem and solution-claim lifecycle states; board and RFC routes; and a canonical repository structure. This is a substantive revision. Initial reviews do not approve it. A focused ontology, security/authority, and product/workflow review is required and will be appended here.
+The RFC now adds `ProblemEntryV1`, `RfcMetadataV1`, `ProblemSolutionClaimV1`, and `ExchangeEntryV1`; a many-to-many problem/RFC graph; append-only exchanges; human/agent attribution; problem and solution-claim lifecycle states; board and RFC routes; and a canonical repository structure. This is a substantive revision. Initial reviews do not approve it.
+
+Focused review batch `deleg_2d387995` completed with three `REQUEST CHANGES` verdicts. Resolution began, then paused at the user's checkpoint request. The complete reports are preserved verbatim:
+
+- [Focused ontology review](reviews/0001-problem-exchange-ontology-review.md)
+- [Focused security and authority review](reviews/0001-problem-exchange-security-review.md)
+- [Focused product and workflow review](reviews/0001-problem-exchange-product-review.md)
+
+At checkpoint, canonical root ownership and part of the immutable revision, solution-claim, threading, request, lifecycle, and delegation model had been corrected in the RFC working tree. The remaining findings are intentionally unresolved. Resume by reconciling every focused report finding into this ledger, then run exact-head review and verification. Do not infer the inaccessible X post's contents.
 
 Remaining blockers:
 

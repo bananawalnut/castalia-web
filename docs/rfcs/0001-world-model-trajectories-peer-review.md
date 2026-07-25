@@ -10,7 +10,7 @@
 
 ## Summary
 
-Castalia Web should provide a paired problem board and RFC exchange surface. People and agents can publish problems, invite others to attack them, submit RFCs, claim that an RFC solves one or more problems, challenge those claims, contribute evidence or counterexamples, and revise proposals through addressable exchanges. WMT can then inspect whether the confirmed formalization of an RFC can hold together, which minimal formalization conflicts exist, which maximal compatible claim subsets remain, and what a proposed revision changes. Human peer review and community decisions remain authoritative.
+Castalia Web should provide a paired problem board and RFC exchange surface. In Gate 2, people and agents can draft, validate, preview, and export problems, invitations to attack them, RFCs, claims that an RFC addresses one or more problems, challenges, evidence, counterexamples, and revisions. Publication occurs only after a human submits the export and the repository accepts its pull request. WMT can then inspect whether the confirmed formalization of an RFC can hold together, which minimal formalization conflicts exist, which maximal compatible claim subsets remain, and what a proposed revision changes. Human peer review and community decisions remain authoritative.
 
 The minimum useful integration is a repository-backed problem/RFC exchange that can export drafts, solution claims, and reviews for human pull-request submission, paired with a read-only analysis instrument. It does not decide truth, mark a problem solved, approve an RFC, rank reviewers, allocate funds, mutate Matrix state, or execute governance. A model may propose a formalization only in a later, separately authorized phase. The initial path imports human-reviewed typed IR and exposes the natural-language-to-logic seam.
 
@@ -19,8 +19,8 @@ The minimum useful integration is a repository-backed problem/RFC exchange that 
 A reviewer should be able to:
 
 1. browse a problem board and open an immutable problem revision;
-2. publish or answer an invitation for a person or agent to attack, investigate, clarify, or solve the problem;
-3. submit an RFC that explicitly claims to solve all or a bounded part of the problem;
+2. draft and export an open or directed invitation for a person or agent to attack, investigate, clarify, or address the problem;
+3. draft and export an RFC that explicitly claims to address all or a bounded part of the problem;
 4. open a repository-backed RFC revision and traverse its linked problem, solution claim, and exchange thread;
 5. inspect each natural-language claim beside its source locator and plain-English back-translation;
 6. confirm or reject the formalization before analysis;
@@ -111,48 +111,50 @@ The relation between problems and RFCs is many-to-many. A problem may have compe
 Required fields:
 
 - `schema_version`: exactly `castalia.problem.v1`;
-- stable `problem_id`, immutable `problem_revision`, and canonical content digest;
+- stable `problem_id`, immutable `problem_revision`, canonical repository-authority ID, canonical path, commit SHA, and canonical content digest excluding self-digest fields;
 - `title`, exact problem `statement`, context, scope, constraints, known evidence, counterevidence, open questions, and explicit success or falsification criteria;
 - authors and submitter attribution, with human/agent/model-assistance disclosure;
-- ontology tags plus related, parent, narrower, broader, prerequisite, and superseded problem references;
-- lifecycle status and immutable exchange/decision references; and
+- ontology tags plus authored forward semantic references; and
 - visibility and sensitivity classification.
 
-Problem state has separate dimensions. `lifecycle_status` is `draft`, `open`, `closed`, `withdrawn`, or `superseded`. `assessment_status` is `unassessed`, `under_investigation`, `contested`, or `solved_under_criteria`. Candidate-solution count, unanswered calls, unresolved counterexamples, and dormancy are derived attention facets, not lifecycle states. Only an authorized decision record may change lifecycle or assessment status after initial draft creation. A `solved_under_criteria` decision must cite the exact criteria, evidence, RFC revisions, unresolved counterevidence, and preserved dissent. “Solved” never means universally or finally true.
+The immutable problem revision contains no mutable status, backreference, attention, exchange, or decision arrays. Generated indexes derive those projections. Problem state has separate dimensions: `disposition` is `draft`, `open`, `closed`, `withdrawn`, or `superseded`; `assessment` is `unassessed`, `under_investigation`, `contested`, or `solved_under_criteria`; and candidate-solution count, unanswered calls, unresolved counterexamples, and dormancy are derived attention facets. Only an authorized decision record may change disposition or assessment after initial draft creation. A `solved_under_criteria` decision must cite the exact criteria, evidence, RFC revisions, unresolved counterevidence, and preserved dissent. “Solved” never means universally or finally true.
 
 ### `RfcMetadataV1`
 
-Every RFC adds stable identity, title, summary, author attribution, immutable revision and digest, lifecycle status, parent/supersession/dependency references, and zero or more `problem_solution_claim_refs`. An RFC may exist without claiming to solve a problem, but the UI must make that absence explicit.
+Every RFC adds stable identity, title, summary, content-author attribution, immutable revision identity `(repository_authority_id, commit_sha, canonical_path, content_digest)`, parent revision, and authored dependency references. Mutable lifecycle, review, exchange, decision, solution-claim, and backlink projections are excluded. An RFC may exist without a problem-solution claim, but the UI must make that absence explicit.
 
 ### `ProblemSolutionClaimV1`
 
 Required fields:
 
 - stable `solution_claim_id`;
-- exact `problem_id` and `problem_revision`;
+- immutable `solution_claim_revision`, `solution_claim_digest`, canonical repository-authority ID, canonical path, commit SHA, and optional same-ID `supersedes` revision;
+- exact `problem_id`, `problem_revision`, and problem digest;
 - exact `rfc_id`, `rfc_revision`, and RFC digest;
-- `scope`: `full`, `partial`, `prerequisite`, `mitigation`, `experiment`, or `counterproposal`;
+- `coverage`: `full` or `partial`;
+- `approach_role`: `direct_solution`, `prerequisite`, `mitigation`, `experiment`, or `counterproposal`;
 - precise claim statement explaining how the RFC addresses the problem;
-- criteria addressed, criteria not addressed, mechanism, evidence, assumptions, limitations, risks, and falsifiers;
+- criterion-ID-bound criteria addressed and not addressed, mechanism, evidence, assumptions, limitations, risks, and falsifiers;
 - submitter attribution and model-assistance/conflict-of-interest disclosures;
-- status and immutable review, exchange, resolution, and decision references.
+- authored evidence references only.
 
-Solution-claim state is also split. `submission_status` is `submitted`, `withdrawn`, or `superseded`. `assessment_status` is `unreviewed`, `under_review`, `contested`, `partially_supported`, `supported_under_criteria`, or `rejected_under_criteria`. The RFC author may create or withdraw the claim but cannot set an assessed status or make the problem solved. Assessed status requires the policy-defined review evidence and an authorized decision record. WMT analysis of the RFC cannot determine either status.
+Solution-claim state is a generated projection, never a mutable field in the claim revision. `disposition` is `submitted`, `withdrawn`, or `superseded`; `assessment` is `unreviewed`, `under_review`, `contested`, `partially_supported`, `supported_under_criteria`, or `rejected_under_criteria`. The RFC author may create an immutable claim or submit a withdrawal request but cannot set a projected status or make the problem solved. Assessed status requires policy-defined review evidence and an authorized decision record. WMT analysis of the RFC cannot determine either status.
 
 ### `ExchangeEntryV1`
 
 Every exchange is append-only and addressable. Required fields:
 
-- stable `exchange_id` and immutable repository evidence;
-- actor attribution with `actor_kind: human | agent`, declared identity, principal/acting-for reference, model/runtime disclosure, and community-standing state;
-- target references to a problem, RFC revision, problem-solution claim, formal claim, analysis artifact, review, decision, or another exchange;
-- `kind`: `problem_call`, `specialist_invitation`, `request_attack`, `request_clarification`, `solution_claim`, `critique`, `counterexample`, `evidence`, `rebuttal`, `clarification`, `candidate_revision`, `endorsement`, `dissent`, or `withdrawal`;
+- stable globally scoped `exchange_id`, immutable revision/digest, canonical repository-authority ID, canonical path, commit SHA, and idempotency key;
+- separate content authors, submitter, committer, signer, automation/model assistance, optional represented principal, authorization-evidence, and community-standing-snapshot references;
+- immutable `thread_id`, one `root_subject_ref`, zero-or-one `parent_exchange_ref`, and typed related-artifact references;
+- `kind`: `problem_call`, `specialist_invitation`, `request_attack`, `request_clarification`, `critique`, `counterexample`, `evidence`, `rebuttal`, `clarification`, `comment`, or `dissent`;
+- `request_mode: open | directed`, structured inert `requested_actor_refs`, and explicit requested next action for request kinds;
 - prose body, cited source locators, evidence/artifact references, and explicit requested next action;
 - `responds_to`, `supersedes`, immutable resolution/tombstone references, and preserved-dissent fields.
 
-Exchange status is `open`, `resolved`, `withdrawn`, `superseded`, or `tombstoned`. Resolution and moderation are represented by separate immutable artifacts; an exchange never rewrites itself to claim resolution.
+An exchange is a message only. It may reference but never recreate a solution claim, candidate RFC revision, review, resolution, withdrawal, endorsement, decision, or tombstone. Parent and child share one thread root. `supersedes` is an acyclic same-author correction edge and never hides the prior entry. Generated request state is `open`, `acknowledged`, `answered`, `declined`, `withdrawn`, or `superseded`; acknowledgement and decline are voluntary response events and create no assignment, obligation, endorsement, standing, or authority. Generated exchange disposition is `open`, `resolved`, `withdrawn`, `superseded`, or `tombstoned`. Resolution and moderation are separate immutable artifacts; an exchange never rewrites itself to claim resolution.
 
-Inviting a named person or agent to attack a problem is routing, not assignment or endorsement. Agent entries are visibly agent-authored or agent-assisted and bind the represented principal when one exists. No agent may claim human identity, reviewer independence, community standing, or decision authority through Git attribution alone.
+Inviting a named person or agent to attack a problem is routing, not assignment or endorsement. Recipient references are inert data, never active mentions. An agent entry must not bind or be attributed to a principal unless independently verifiable delegation evidence binds principal identity, agent identity, repository authority, permitted entry kinds/targets, validity interval, and revocation state. Verification fails closed at ingestion. Otherwise the UI says “self-declared agent; no principal authority established.” No agent may claim human identity, reviewer independence, community standing, or decision authority through Git attribution alone.
 
 ### Exchange invariants
 
