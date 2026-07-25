@@ -1,6 +1,7 @@
 # RFC 0001 — World Model Trajectories for RFC peer review
 
 - Status: Draft
+- Review posture: Changes requested; acceptance blockers remain
 - Scope: Product and integration contract only
 - Target repository: `ZenithResearch/castalia-web`
 - Engine source: `bananawalnut/world-model-trajectories`
@@ -9,7 +10,7 @@
 
 ## Summary
 
-Castalia Web should let a community inspect whether the formalized claims in an RFC can hold together, where irreducible disagreements occur, which coherent positions remain, and what a proposed revision changes. It should do this with the World Model Trajectories (WMT) engine from the owned fork, locally in the browser, while keeping human peer review and community decisions authoritative.
+Castalia Web should let a community inspect whether the confirmed formalization of an RFC can hold together, which minimal formalization conflicts exist, which maximal compatible claim subsets remain, and what a proposed revision changes. It should do this with the World Model Trajectories (WMT) engine from the owned fork while keeping human peer review and community decisions authoritative.
 
 The first integration is a read-only analysis instrument. It does not decide truth, approve an RFC, rank reviewers, allocate funds, mutate Matrix state, or execute governance. A model may propose a formalization only in a later, separately authorized phase. The initial path imports human-reviewed typed IR and exposes the natural-language-to-logic seam.
 
@@ -21,7 +22,7 @@ A reviewer should be able to:
 2. inspect each natural-language claim beside its source locator and plain-English back-translation;
 3. confirm or reject the formalization before analysis;
 4. run WMT locally;
-5. inspect consistency, minimal conflicts, coherent positions, forced consequences, and bounded repair suggestions;
+5. inspect consistency, minimal formalization conflicts, maximal compatible claim subsets, and consequences entailed by the confirmed formalization;
 6. fork a candidate revision without overwriting the accepted source;
 7. submit a peer-review artifact that cites the exact RFC revision, claim-set digest, engine commit, and analysis result; and
 8. leave approval, rejection, funding, and governance to the community's separately authorized process.
@@ -35,12 +36,12 @@ The reviewed fork already provides the relevant reasoning kernel:
 - a Rust-to-Wasm engine that emits solver scripts;
 - Z3 4.16 in the browser;
 - explicit `unknown` handling;
-- minimal conflicts, maximal coherent positions, repair suggestions, and forced consequences;
+- minimal conflicts, maximal compatible claim subsets, repair candidates, and formal consequences;
 - same-claim-ID revision semantics;
 - state export/import and forkable trajectory snapshots; and
 - defeasible reasoning where a general default may yield to a more specific claim without hiding strict contradictions.
 
-The engine's claim is bounded: consistency of the formalization, not truth or faithful natural-language interpretation. Castalia Web must preserve that boundary everywhere.
+The engine's claim is bounded: consistency of the formalization, not truth, social disagreement, consensus, or faithful natural-language interpretation. Castalia Web must preserve that boundary everywhere.
 
 ## Current evidence and limitations
 
@@ -56,7 +57,7 @@ At the reviewed commit:
 - the first browser load fetches roughly 34 MiB of Z3 Wasm; and
 - the current repository is a static application, not a versioned embeddable package for Castalia Web.
 
-Those last four facts prevent direct reuse of the current site shell. Castalia Web should consume a bounded engine package from the fork, not copy `site/app.js` or embed the existing page.
+Those last four facts prevent direct reuse of the current site shell. Castalia Web should consume a bounded engine package from the fork, not copy `site/app.js` or embed the existing page. The pinned engine also interpolates user-controlled identifiers and operator strings into SMT-LIB, does not propagate malformed or `unknown` solver output fail-closed through every phase, can emit an unverified conflict-local repair as “optimal,” and does not expose enforceable resource budgets. Gate 0 must fix and test those defects; the pinned commit cannot qualify unchanged.
 
 ## Product boundary
 
@@ -73,8 +74,8 @@ Peer review is a signed or repository-attributed response to an exact RFC revisi
 - accept or contest a formalization;
 - identify missing claims or source spans;
 - propose a claim revision;
-- identify a genuine disagreement;
-- propose an alternative coherent position; or
+- identify a likely human disagreement through attributed prose;
+- adopt a computed compatible subset as an attributed human position; or
 - state that the solver result is `unknown`, incomplete, or irrelevant to the substantive question.
 
 A WMT analysis can support a review. It cannot constitute a review by itself.
@@ -86,7 +87,7 @@ This RFC does not change the current Castalia Web authority ledger.
 - Matrix remains canonical for Matrix state.
 - Castalia Control/Dregg authority remains outside this RFC.
 - The repository remains canonical for the RFC revision and checked-in peer-review artifacts in the first slice.
-- WMT is authoritative only for deterministic analysis produced by the pinned engine and solver over the exact typed claim set supplied to it.
+- WMT output is reproducible computational evidence for the supplied formalization, engine, solver, profile, and budgets. It is not an authority source.
 - Humans and the community's accepted process remain authoritative for formalization acceptance, RFC disposition, and every consequential action.
 
 ## Proposed artifact contracts
@@ -94,6 +95,8 @@ This RFC does not change the current Castalia Web authority ledger.
 The schemas below are normative field sets for later JSON Schema work. They are not implemented by this RFC.
 
 ### `RfcClaimSetV1`
+
+This is the provenance envelope. It is never passed directly to `WmtEngine.ingest`.
 
 Required fields:
 
@@ -103,62 +106,61 @@ Required fields:
 - `rfc_digest`: digest of the exact canonical RFC bytes;
 - `claim_set_digest`: digest of the canonical claim-set bytes excluding this field;
 - `engine_target`: owned fork URL plus exact commit;
-- `sorts`, `predicates`, and `functions`: the shared typed vocabulary;
-- `claims`: ordered WMT-compatible claims; and
-- `formalization_reviews`: review references proving which claim mappings were confirmed, contested, or not reviewed.
+- `logic_profile`: exactly `castalia.strict-unweighted.v1` in the first slice;
+- `sorts`, `predicates`, and `functions`: explicitly declared typed vocabulary;
+- `claims`: ordered claims with Castalia provenance; and
+- `formalization_review_policy_id` plus immutable formalization-review references.
 
-Each claim must add Castalia provenance to the WMT fields:
+Each claim contains stable `id`, exact natural-language `source`, `source_locator`, typed `formula`, plain-English `back` translation, and review references. First-slice claims are active, strict, and unweighted. No `weight`, `defeasible`, inferred declaration, or ranked repair is accepted.
 
-- stable `id`;
-- exact natural-language `source`;
-- `source_locator` pointing to the RFC heading, paragraph, or line range;
-- typed `formula`;
-- deterministic or model-supplied `back` translation;
-- `weight` with a named provenance rather than an unexplained number;
-- `active`;
-- `defeasible`;
-- `formalization_status`: `unreviewed`, `confirmed`, `contested`, or `rejected`; and
-- `formalization_review_refs`.
+`formalization_status` is a derived projection, not an author-controlled claim field. `RfcFormalizationReviewV1` records reviewer attribution, exact claim-set digest, per-claim disposition, source-coverage attestation, missing-claim findings, vocabulary/IR review, rationale, timestamp, conflict-of-interest disclosure, model-assistance disclosure, and immutable repository evidence. The first repository policy requires two distinct GitHub review identities, at least one who did not author the claim set, no unresolved per-claim contest, explicit source-coverage confirmation, and exact typed-IR inspection. This proves only `confirmed_under_repository_policy`; it does not prove community standing.
 
-No claim with `unreviewed`, `contested`, or `rejected` formalization status may contribute to an authoritative-looking green/coherent summary. The UI must separate exploratory analysis from a fully confirmed claim-set analysis.
+Claim-set readiness is derived as `unreviewed`, `partially_reviewed`, `contested`, or `confirmed_under_repository_policy`. Exploratory analysis may run before confirmation, but it cannot support a formalization or RFC disposition and cannot receive an unqualified coherent status.
 
-### `RfcAnalysisV1`
+### `WmtIngestV1`
 
-Required fields:
+Castalia deterministically projects a validated claim envelope to WMT's exact input shape:
 
-- `schema_version`: exactly `castalia.rfc-analysis.v1`;
-- `rfc_id`, `rfc_revision`, `rfc_digest`, and `claim_set_digest`;
-- `engine_repository` and exact `engine_commit`;
-- solver identity and version;
-- analysis mode: `strict` or `defeasible`;
-- status: `coherent`, `inconsistent`, `unknown`, `budget_exhausted`, or `invalid`;
-- minimal conflicts found;
-- maximal coherent positions found;
-- whether enumeration is exhaustive;
-- forced consequences and their minimal witness claim IDs;
-- repair suggestions with entrenchment totals;
-- excluded claim IDs and reasons;
-- start/end timestamps and bounded runtime metrics; and
-- a digest of the canonical result bytes.
+```json
+{
+  "sorts": [],
+  "preds": [],
+  "funcs": [],
+  "claims": []
+}
+```
 
-`budget_exhausted` means every reported conflict or position is real but the set may be incomplete. It must never be rendered as `coherent` or as an exhaustive decision surface.
+The projection strips Castalia-only metadata and maps `predicates` to `preds` and `functions` to `funcs`. Before projection it rejects unknown fields, duplicate claim IDs, duplicate or conflicting declarations, namespace collisions, undeclared symbols, unsupported sorts/operators, free variables, invalid arity, unsupported weights/defaults, and any identifier outside the closed lexical profile. The exact canonical projected bytes and their domain-separated digest are bound into the analysis.
+
+The first logic profile permits Boolean values, explicitly declared uninterpreted sorts, constants, predicates, equality, negation, conjunction, disjunction, implication, biconditional, and bounded universal/existential quantification. Arithmetic operators, raw real literals, auto-declaration, defeasible reasoning, weights, and repair ranking are deferred. Every user symbol is encoded to compiler-owned identifiers; no user string is interpolated as SMT-LIB.
+
+### `RfcAnalysisSemanticV1`
+
+This deterministic artifact contains:
+
+- exact RFC, claim-set, projected-input, engine, solver-artifact, logic-profile, and budget digests;
+- formalization readiness and excluded claim IDs/reasons;
+- status: `compatible`, `formalization_conflict`, `unknown`, `invalid`, `enumeration_capped`, `timeout`, `cancelled`, or `resource_exhausted`;
+- minimal formalization conflicts found;
+- maximal compatible claim subsets found;
+- whether enumeration is exhaustive; and
+- consequences entailed by this formalization under this logic profile, each bound to its minimal witness claim IDs.
+
+It contains no timestamps or runtime telemetry. Canonical JSON and hash algorithms must be selected and test-vectored before acceptance. Browser-generated output is unverified derived evidence even when self-digested. It becomes verified computational evidence only after a locked CI job independently regenerates the same semantic bytes from reviewed source and signed release provenance.
+
+The first slice emits no repair suggestion. A later contract may emit a conflict-local candidate or solver-verified global minimum-weight hitting set, but must state scope, verified restoration, whether optimality is proven, and whether the conflict collection was exhaustive.
+
+### `RfcAnalysisExecutionV1`
+
+This nondeterministic envelope binds one semantic-result digest to start/end timestamps, supported-device profile, limits applied, stop reason, solver-call count, and bounded performance telemetry. It is not included in the semantic-result digest.
 
 ### `RfcPeerReviewV1`
 
-Required fields:
+Required fields include review ID; declared author identity; repository URL; immutable commit SHA or pull-request review ID; author-versus-committer distinction; signature-verification state; exact RFC/claim-set bindings; optional verified analysis digest; cited claims/locators; rationale; model-assistance and conflict-of-interest disclosures; and optional candidate-revision reference.
 
-- `schema_version`: exactly `castalia.rfc-peer-review.v1`;
-- review ID and reviewer attribution reference;
-- exact RFC and claim-set revision bindings;
-- optional exact analysis digest;
-- disposition: `comment`, `request_revision`, `approve_formalization`, `reject_formalization`, `approve_rfc`, or `reject_rfc`;
-- cited claim IDs and source locators;
-- prose rationale;
-- optional proposed claim patch or candidate branch reference;
-- disclosure of model assistance; and
-- repository commit/signature evidence when available.
+Individual dispositions are `comment`, `request_revision`, `recommend_approve_formalization`, `recommend_reject_formalization`, `recommend_approve_rfc`, and `recommend_reject_rfc`. Only a separate repository decision record created by the authorized RFC maintainer can transition RFC status. Git attribution is provenance only: **Git-attributed; community standing not established.**
 
-The first slice may use Git commit attribution and pull-request review evidence. Wallet/Dregg-backed reviewer standing is a future authority integration and must not be invented here.
+Reviews also carry `responds_to`, `supersedes`, `status`, `resolution`, `resolution_rationale`, and `preserved_as_dissent`. Computed compatible subsets remain separate from attributed human positions. Accepted RFCs retain unresolved and preserved dissent with neutral ordering; no computed subset or human position is ranked or called defeated without an authorized governance artifact.
 
 ## Integration architecture
 
@@ -170,12 +172,12 @@ Repository-backed RFC Markdown + typed claim sidecar
   digest binding / schema / source locators
                     |
                     v
-      dedicated browser Web Worker
-  pinned WMT core + pinned Z3 Wasm assets
+ credentialless analysis origin + sandboxed frame
+  pinned WMT core + Z3 inside bounded workers
                     |
                     v
       deterministic local analysis
-  status / MUS / positions / witnesses / repair
+ conflicts / compatible subsets / witnesses
                     |
                     v
        non-authoritative review UI
@@ -187,29 +189,48 @@ Repository-backed RFC Markdown + typed claim sidecar
 
 ### Dependency boundary
 
-The WMT fork must first produce an embeddable, versioned browser-engine release. That prerequisite should:
+The WMT fork must first produce an embeddable, versioned browser-engine release. That prerequisite must:
 
-1. expose the Wasm facade and Z3 driver behind one documented worker-safe adapter;
+1. expose the Wasm facade and Z3 driver behind one documented worker-safe adapter with a closed input grammar;
 2. publish JSON schemas or generated types for inputs and outputs;
 3. include licenses for WMT, Z3, and the isolation shim;
-4. publish a manifest containing source commit, toolchain versions, artifact digests, and test evidence;
-5. preserve `unknown` and enumeration-budget states exactly;
+4. publish signed provenance binding source tree, lockfiles, pinned Rust/wasm-pack/Z3/npm toolchains, build commands, SBOM, licenses, every JavaScript/Wasm/worker digest, reproducible-build comparison, and test evidence;
+5. parse exact bounded solver replies and preserve `unknown`, malformed, timeout, cancellation, and enumeration-cap states through every driver phase without emitting partial semantic results;
 6. contain no UI, OpenRouter call, API-key storage, or implicit persistence; and
-7. run native and real-browser conformance tests before release.
+7. run native and real-browser conformance tests before release;
+8. encode compiler-owned SMT identifiers and reject raw solver text, unsupported operators, duplicate names, collisions, free variables, and undeclared vocabulary; and
+9. remove eager powerset repair allocation and every unverified repair fallback from the package path.
 
 Castalia Web then pins the exact fork commit and artifact digests. It must not track a mutable branch, download code at runtime from GitHub, or copy unversioned generated Wasm into this repository without provenance.
 
-### Worker and browser isolation
+### Analysis origin, worker, and browser isolation
 
-Solver work should run in a dedicated worker so long analyses cannot block navigation or review controls. The adapter must serialize one Z3 session per worker, enforce an operation budget, support cancellation by terminating the worker, and return typed failure states.
+A worker provides responsiveness and cancellation, not security containment. The first slice must run on a dedicated credentialless analysis origin inside a sandboxed frame with a narrowly validated `postMessage` protocol. That origin receives no Matrix, repository-write, wallet, provider, review, or application-session credential. Its CSP sets `connect-src 'none'`, narrows `worker-src` and script hashes, enables Trusted Types, and forbids navigation, forms, downloads except explicit reviewed export, and ambient same-origin access.
 
-The existing WMT site relies on cross-origin isolation support for multi-threaded Z3 Wasm. The integration issue must prove the exact production header/service-worker strategy in Castalia Web rather than assuming the current static-site shim composes with Vite, the BFF, or a deployment target.
+Within that origin, solver work runs in bounded workers. The adapter serializes one Z3 session per analysis, supports cancellation by terminating the entire worker tree, discards every unfinished result, and proves that a fresh worker succeeds after cancellation or crash.
+
+Gate 0 includes a runnable Vite production spike proving module-worker import, nested Z3 pthread workers, asset paths, production COOP/COEP headers, page and worker `crossOriginIsolated`, cancellation and context release, fresh-worker recovery, and the declared Chromium/Firefox/Safari support matrix. The production path prohibits the current service-worker isolation shim.
+
+### First-slice security ceilings
+
+The first contract applies these hard ceilings; supported-device profiles may only lower them:
+
+- 256 KiB raw claim-set bytes before parsing;
+- 32 claims, 128 declarations, 4,096 aggregate formula nodes, 256 nodes per formula;
+- 64-character ASCII identifiers encoded to compiler-owned symbols;
+- 8 KiB per source/back-translation/review string;
+- formula depth 32, quantifier depth 2, arity 8;
+- 512 cumulative solver calls, 1 second per solver query, and 12 seconds wall time;
+- 64 reported conflicts, 64 compatible subsets, 1 MiB semantic output;
+- one analysis worker tree per tab and two concurrent analysis origins per browser profile.
+
+Every limit is checked before expanded allocation where possible, then between solver rounds. A breach terminates the worker tree and returns only its typed stop reason. Device adaptation cannot raise a ceiling. Gate 0 must test and calibrate usefulness under these ceilings before acceptance; changing them later creates a versioned profile.
 
 ### Persistence
 
-The first slice is memory-only until the user explicitly exports an artifact. It does not use `localStorage`, `sessionStorage`, cookies, IndexedDB, service workers for data persistence, or automatic uploads.
+The first slice is public-RFC-only and memory-only until the user explicitly previews and exports an artifact. It rejects Matrix-origin text and private-repository fetching. It does not use `localStorage`, `sessionStorage`, cookies, IndexedDB, service workers for data persistence, telemetry, diagnostics logging, browser caches for RFC data, or automatic uploads.
 
-A later persistence issue may add explicit local or repository-backed saves after privacy, encryption, provenance, and lifecycle rules are accepted. WMT's existing local trajectory tree is a product reference, not reusable persistence authority.
+A clear/reset action terminates the worker tree, drops references, revokes object URLs, and removes generated exports. Navigation, reload, cancellation, crash, clear, and export paths must be tested with storage and network inspection. A later private-content or persistence RFC must define authorization evidence, redaction, encryption, retention, cache, export, clipboard, incident, and deletion behavior. WMT's existing local trajectory tree is a product reference, not reusable persistence authority.
 
 ### Formalization seam
 
@@ -231,47 +252,50 @@ The first review surface should show five layers in order:
 
 1. **Source** — exact RFC revision and digest.
 2. **Formalization** — source sentence, source locator, back-translation, status, and reviewer evidence.
-3. **Analysis** — coherent, inconsistent, unknown, invalid, or budget-exhausted with engine/solver provenance.
-4. **Positions** — irreducible disagreements, coherent alternatives, consequences, and repair suggestions.
+3. **Analysis** — compatible, formalization conflict, unknown, invalid, capped, timed out, cancelled, or resource exhausted with full profile/provenance.
+4. **Computed structure** — minimal formalization conflicts, maximal compatible claim subsets, and consequences entailed by this formalization under this logic profile.
 5. **Human decision** — peer-review controls that make clear no solver result chooses the RFC disposition.
 
 Required language:
 
-- “Consistency of the confirmed formalization, not truth.”
-- “A repair is a suggestion, not a verdict.”
+- “Consistency of the confirmed formalization, not truth or community consensus.”
+- “Computed compatible subsets are not human or minority positions.”
 - “Unknown is not consistent.”
 - “This analysis does not approve, reject, fund, or execute the RFC.”
 
-The UI must never use green/coherent styling to imply truth, consensus, governance approval, or funding eligibility.
+Every result view and export displays formalization readiness, exclusions, logic profile, completeness, limits, engine/solver identity, and the non-truth/non-consensus warning. The UI must never use green/coherent styling to imply truth, consensus, governance approval, or funding eligibility.
+
+WCAG 2.2 AA is normative. Every graph has a complete text/table alternative. All controls are keyboard operable with visible focus and logical headings; status never relies on color; long identifiers have accessible names; focus is restored after completion/cancellation; live regions announce running, complete, failed, cancelled, unknown, and capped states without repetition. Verification includes zoom/reflow, reduced motion, high contrast, and representative screen-reader coverage.
 
 ## Privacy and security requirements
 
-- Default to public or explicitly reviewer-authorized RFC text. Never ingest private Matrix room content merely because the browser can display it.
-- Bind every result to exact RFC bytes, claim-set bytes, engine commit, and solver version.
+- Accept public repository-backed RFC text only. Reject Matrix-origin text, private repository fetching, and cross-route transfer into analysis.
+- Bind every result to exact RFC bytes, claim-set bytes, projected WMT bytes, logic profile, all budgets/options, engine and solver artifact hashes, and solver version.
 - Reject digest mismatch, schema mismatch, duplicate claim IDs, conflicting vocabulary declarations, invalid source locators, and unsupported engine versions before solver startup.
-- Treat auto-declaration as exploratory convenience only. A reviewable claim set must declare its vocabulary explicitly; inferred declarations must be visible and block final formalization approval.
-- Bound claim count, input bytes, quantifier depth or supported profile, solver rounds, worker runtime, output bytes, and rendered graph size.
-- Surface Z3 errors and `unknown`; never coerce them into a verdict.
-- Escape all source, back-translation, gloss, and reviewer content. Do not use raw HTML assembly for untrusted fields.
+- Disable auto-declaration. Reviewable and exploratory claim sets declare vocabulary explicitly and pass the same closed lexical/type profile.
+- Enforce the first-slice security ceilings before expanded allocation and at every solver phase.
+- Parse an exact bounded output grammar for each Z3 command. Missing, duplicate, trailing, malformed, unexpected, error, or `unknown` responses terminate the operation without recording a conflict, compatible subset, witness, or compatibility verdict from that response.
+- Render every artifact-controlled value as a text node. Disable raw Markdown HTML; allowlist link schemes and repository hosts; sanitize generated SVG; prohibit untrusted `innerHTML`/`dangerouslySetInnerHTML`; enforce strict CSP and Trusted Types.
 - Keep solver scripts and result internals out of logs unless a reviewer explicitly exports a redacted diagnostic artifact.
 - Do not store provider keys, wallet material, Matrix tokens, capabilities, or review credentials in WMT state.
-- Scan shipped browser artifacts for credentials and unexpected network endpoints.
+- Scan shipped browser artifacts and dependency/import graphs for credentials, model clients, persistence APIs, and network endpoints; enforce no-network behavior at runtime.
 - Preserve WMT and Z3 license notices in distributions.
 
 ## Failure semantics
 
 | Condition | Required behavior |
 | --- | --- |
-| RFC or claim-set digest mismatch | Reject before analysis; do not offer a repair. |
+| RFC, claim-set, projected-input, profile, budget, engine, or artifact digest mismatch | Reject before analysis. |
 | Unconfirmed formalization | Mark analysis exploratory; block approval based on it. |
 | WMT ingest error | Show `invalid` with bounded diagnostics. |
-| Z3 `unknown` or malformed output | Show `unknown`; never treat as coherent. |
-| Enumeration budget reached | Show `budget_exhausted`; reported sets are partial. |
-| Worker timeout or crash | Terminate worker, discard partial unbound output, permit explicit retry. |
+| Genuine Z3 `unknown` | Show `unknown`; stop the current operation with no semantic result from later phases. |
+| Parse/type/protocol/malformed solver output | Show `invalid`; terminate and discard partial output. |
+| Enumeration limit reached | Show `enumeration_capped`; reported sets are real but partial and cannot support exhaustive claims. |
+| Timeout, cancellation, resource breach, or worker crash | Terminate the complete worker tree, discard partial output, return the distinct typed reason, and permit explicit retry in a fresh worker. |
 | Engine/artifact digest mismatch | Fail closed before loading Wasm. |
 | Cross-origin isolation unavailable | Show analysis unavailable; do not fall back to remote execution. |
 | Proposed model formalization in first slice | Reject as unsupported; preserve manual/import path. |
-| Analysis suggests a repair | Require a new candidate RFC revision; never mutate the source in place. |
+| A reviewer proposes a changed claim set | Require a new candidate RFC revision; never mutate the source in place. |
 
 ## Delivery sequence
 
@@ -279,34 +303,39 @@ The UI must never use green/coherent styling to imply truth, consensus, governan
 
 Owned by `bananawalnut/world-model-trajectories`.
 
-- Define the embeddable worker adapter and schemas.
+- Fix the SMT compiler, solver-response handling, result semantics, and resource model before packaging.
+- Complete the runnable Vite/credentialless-origin/worker feasibility spike and supported-browser matrix.
+- Define the embeddable worker adapter, exact projection, schemas, and versioned security ceilings.
 - Remove site UI, OpenRouter, and persistence from the package boundary.
-- Publish manifest, licenses, artifact digests, native tests, and browser conformance evidence.
+- Publish signed provenance, reproducible-build evidence, SBOM, licenses, artifact digests, native tests that fail when pinned Z3 is absent/wrong, and browser conformance evidence.
 - Prove fork/upstream relationship and update policy.
 
-Stop if the fork cannot produce reproducible pinned artifacts without importing the static site shell.
+Stop if the fork cannot produce reproducible pinned artifacts without importing the static site shell, cannot eliminate SMT injection and phase-level fail-open behavior, or cannot prove the credentialless-origin/worker topology.
 
 ### Gate 1 — Castalia contracts and fixtures
 
 Owned by `ZenithResearch/castalia-web`.
 
-- Add canonical JSON Schemas and generated TypeScript for the three RFC artifacts.
-- Add positive and hostile fixtures for digest binding, status handling, duplicate IDs, undeclared vocabulary, unknown/budget states, and source locators.
+- Add canonical JSON Schemas and generated TypeScript for claim sets, formalization reviews, projected WMT input, deterministic semantic output, execution envelopes, peer reviews, and repository decision records.
+- Add positive and hostile fixtures for projection, digest binding, status handling, duplicate IDs, conflicting declarations, undeclared vocabulary, SMT tokens, unknown/invalid/limit states, and source locators.
 - Keep all routes fixture-only and network-free.
 
-### Gate 2 — local read-only analysis
+### Gate 2 — minimum useful review slice
 
-- Load the pinned package in a dedicated worker.
-- Render source/formalization/analysis layers.
-- Prove no persistence and no network beyond same-origin static assets.
-- Prove cancellation, limits, unknown, malformed, timeout, and budget behavior.
+- Load the pinned package in the credentialless analysis origin and bounded workers.
+- Use repository-backed public RFCs and checked-in reviewed claim sets.
+- Provide strict, unweighted, accessible conflict, compatible-subset, and witness views with exploratory/confirmed separation.
+- Export an attributed review recommendation and an unverified analysis artifact; never mutate the source.
+- Bind candidate revisions to parents and require human action to submit or merge them.
+- Prove no persistence, no network, no credentials, cancellation, limits, unknown, invalid, timeout, cap, and recovery behavior.
+- Validate two realistic RFC fixtures: one where a formalization conflict helps review and one where analysis correctly adds no substantive value.
+- Run moderated reviewer evaluation for usefulness and truth/consensus misconceptions. Human source/formalization inspection and ordinary review remain usable when analysis is unavailable.
 
-### Gate 3 — repository-backed peer review
+### Gate 3 — verified regeneration and repository lifecycle
 
-- Export deterministic analysis and review artifacts.
-- Bind proposed revisions to parent RFC revisions.
-- Use repository/PR attribution only; do not claim wallet or community-standing authority.
-- Require human action to submit or merge every review/revision.
+- Independently regenerate deterministic semantic artifacts in locked CI before labeling them verified computational evidence.
+- Use repository/PR attribution only and display that community standing is not established.
+- Require an authorized repository decision record for every RFC state transition and preserve unresolved dissent.
 
 ### Gate 4 — optional assisted formalization
 
@@ -316,17 +345,19 @@ Deferred. Requires its own accepted privacy, provider, credential, and authority
 
 The implementation issue train must include:
 
-- native WMT tests against the pinned source;
-- exact artifact digest and license checks;
-- browser conformance for WMT plus Z3 in the worker;
-- JSON Schema positive/negative fixtures;
-- deterministic repeated-analysis fixtures;
-- semantic reachability tests for `unknown`, budget, digest mismatch, and malformed solver output;
-- no-network and no-persistence browser tests;
-- worker cancellation and resource-budget tests;
-- XSS tests for source/back-translation/reviewer fields;
-- bundle endpoint and secret scans;
-- accessibility and 320 px layout checks;
+- native WMT tests that require the exact pinned Z3 version;
+- signed provenance, reproducible-build, SBOM, artifact-digest, license, and vulnerability checks;
+- production-built credentialless-origin and nested-worker browser conformance;
+- RFC-envelope projection tests that preserve explicit vocabulary and reject unknown fields, duplicate IDs, collisions, undeclared symbols, unsupported grammar, and SMT tokens;
+- phase-by-phase injection of `unknown`, errors, malformed, missing, duplicate, and trailing solver replies, each proving no verdict or partial result escapes;
+- large-input/deep-nesting/resource tests proving no eager powerset allocation or worker storm;
+- cap, timeout, cancellation, crash, and resource-breach tests proving partial output is discarded and fresh-worker retry succeeds;
+- strict-mode consequence/witness fixtures bound to the exact effective claim set;
+- deterministic repeated semantic-result bytes across browser and locked-CI regeneration;
+- no-network, no-credential, no-telemetry, clear/reset, and no-persistence browser tests;
+- hostile XSS fixtures for every string, Markdown, URL, locator, SVG, import, export, ID, and filename surface;
+- bundle endpoint, dependency allowlist/import-graph, and secret scans;
+- WCAG 2.2 AA, text alternatives, keyboard, live-region, zoom/reflow, reduced-motion, high-contrast, and screen-reader checks;
 - exact copy checks for the non-authoritative claim boundary; and
 - independent exact-head technical, security/privacy, and product/governance reviews.
 
@@ -334,26 +365,29 @@ The implementation issue train must include:
 
 This RFC is ready to move from Draft to Accepted only when:
 
-- the WMT fork maintainer confirms the packaging prerequisite is feasible;
+- Gate 0's source fixes, reproducible release, and runnable browser topology pass; maintainer confirmation alone is insufficient;
 - technical review confirms the proposed contracts map to actual WMT behavior;
 - security/privacy review finds no unresolved high-severity issue;
 - product/governance review confirms solver evidence cannot masquerade as peer review or authority;
 - the current Castalia authority ledger is not broadened;
 - every peer-review finding is resolved, explicitly deferred with an owner/gate, or preserved as minority dissent; and
-- the user explicitly accepts the RFC.
+- the authorized Castalia Web RFC maintainer records acceptance in an immutable repository decision artifact.
 
 Acceptance authorizes issue decomposition. It does not authorize implementation, merge, deployment, model calls, credentials, Matrix access, or governance actions.
 
-## Open decisions
+## RFC lifecycle
 
-1. Which repository file layout should be canonical for RFC Markdown, claim sidecars, analyses, and peer reviews?
-2. Which digest canonicalization standard should bind JSON artifacts?
-3. What bounded first-slice logic profile should Castalia support beyond WMT's general IR?
-4. Should the first UI support only strict reasoning, or expose defeasible mode with a separate explicit reviewer choice?
-5. Which exact deployment header strategy will support Z3 Wasm without broadening origin isolation risk?
-6. What reviewer attribution evidence is sufficient before wallet/Dregg standing is integrated?
-7. What claim-count and solver-work budgets produce a useful first review surface on supported devices?
-8. Should analysis artifacts be checked in, reproducibly regenerated in CI, or both?
+The repository lifecycle is `Draft → In Review → Accepted | Rejected | Withdrawn → Superseded`. A substantive RFC, claim-set, profile, or budget change creates a new immutable revision, marks earlier analyses stale, and resets affected review readiness.
+
+The Castalia Web RFC maintainer may create a repository decision record that transitions this repository's implementation-contract status after required reviews. That decision does not establish community governance approval. Every decision record names the actor, authority scope, source revision, required reviews, unresolved or preserved dissent, rationale, timestamp, and immutable GitHub evidence. A merged status-header edit without that record has no transition effect.
+
+## Remaining acceptance decisions
+
+1. Select and test-vector the canonical JSON and domain-separated hash algorithms.
+2. Confirm the dedicated credentialless analysis origin and production COOP/COEP deployment target through Gate 0.
+3. Calibrate the fixed security ceilings against supported devices without raising them in the current profile.
+4. Name the initial Castalia Web RFC maintainer role and repository evidence for its decisions.
+5. Decide the canonical repository layout for RFC Markdown, sidecars, semantic/execution artifacts, reviews, and decision records.
 
 ## Explicit non-claims
 
@@ -361,7 +395,7 @@ This RFC does not prove or authorize:
 
 - truth, factual accuracy, community consensus, RFC acceptance, reviewer standing, funding eligibility, or governance validity;
 - natural-language-to-logic faithfulness without human review;
-- exhaustive analysis when the budget is reached;
+- exhaustive analysis when an enumeration or resource limit is reached;
 - live Matrix reading, private-room ingestion, identity exposure, or Matrix mutation;
 - wallet, Dregg, Castalia Control, provisioning, treasury, or execution authority;
 - OpenRouter or any other model-provider integration;
@@ -379,4 +413,4 @@ This RFC does not prove or authorize:
 
 ## Peer-review record
 
-Independent peer-review reports and their resolution ledger will be linked here before this RFC can be accepted.
+See [RFC 0001 peer-review record](0001-peer-review-record.md). All three independent reviews requested changes. The RFC remains Draft until the recorded acceptance blockers and remaining decisions are closed and freshly reviewed.
