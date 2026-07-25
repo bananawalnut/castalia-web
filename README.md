@@ -54,6 +54,8 @@ Browser downloads, reports, temporary files, and performance outputs honor `PLAY
 
 See [documentation verification](docs/verification.md) and [repository bootstrap evidence](docs/repository-evidence.md) for the narrower I01 historical evidence.
 
+Draft product and integration proposals live in the [RFC index](docs/rfcs/README.md). RFCs are non-implementing review surfaces until explicitly accepted and decomposed into their own evidence-backed issues.
+
 ## Fixture-only non-goals
 
 This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, registration/join/posting/redaction, registry lookup or mutation, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, deployment/rollback/signing, branch-rule binding, or production readiness. `/health` proves only that the local fixture process is responding.
