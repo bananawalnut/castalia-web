@@ -77,6 +77,17 @@ The reviewer returned seven high-severity and one medium-severity finding:
 
 All initial findings caused normative RFC changes. None were dismissed. Findings that require code or deployment proof are resolved at the document-design level but remain explicit acceptance blockers behind Gate 0 or the listed acceptance decisions.
 
+## Post-review product correction — paired problem board and RFC exchange
+
+After the initial review, the user added a substantive product requirement:
+
+- the RFC system must support addressable exchanges between people and agents;
+- it must be paired with a problem board that supports directed invitations to attack a problem;
+- an RFC may claim to solve all or part of a problem; and
+- submitting a solution claim must not itself mark the problem solved.
+
+The RFC now adds `ProblemEntryV1`, `RfcMetadataV1`, `ProblemSolutionClaimV1`, and `ExchangeEntryV1`; a many-to-many problem/RFC graph; append-only exchanges; human/agent attribution; problem and solution-claim lifecycle states; board and RFC routes; and a canonical repository structure. This is a substantive revision. Initial reviews do not approve it. A focused ontology, security/authority, and product/workflow review is required and will be appended here.
+
 Remaining blockers:
 
 1. choose and test-vector canonical JSON and domain-separated hashing;

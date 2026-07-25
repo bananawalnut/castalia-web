@@ -4,7 +4,7 @@ RFCs define proposed product and integration contracts. They do not establish ru
 
 ## Active RFCs
 
-- [RFC 0001 — World Model Trajectories for RFC peer review](0001-world-model-trajectories-peer-review.md) — draft contract for bounded, non-authoritative consistency analysis of RFC claims through the pinned World Model Trajectories fork. All three initial reviews requested changes; see the [peer-review record](0001-peer-review-record.md).
+- [RFC 0001 — Problem-board and RFC exchanges with World Model Trajectories peer review](0001-world-model-trajectories-peer-review.md) — draft contract for paired problem/RFC exchanges and bounded, non-authoritative consistency analysis through the pinned World Model Trajectories fork. All three initial reviews requested changes; see the [peer-review record](0001-peer-review-record.md).
 
 ## Status vocabulary
 
