@@ -6,7 +6,7 @@ fail() {
   exit 1
 }
 
-required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/repository-evidence.md docs/verification.md'
+required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/repository-evidence.md docs/verification.md docs/rfcs/README.md docs/rfcs/0001-world-model-trajectories-peer-review.md docs/rfcs/0001-peer-review-record.md'
 for file in $required; do
   test -f "$file" || fail "missing required file: $file"
 done
@@ -49,7 +49,7 @@ for phrase in 'future shell may keep' 'later UI issue must preserve'; do
   fi
 done
 
-doc_files='README.md docs/'\*.md
+doc_files='README.md docs/'\*.md' docs/rfcs/'\*.md
 for file in $doc_files; do
   links=$(perl -ne 'while (/\[[^]]+\]\(([^)#]+)(?:#[^)]+)?\)/g) { print "$1\n" unless $1 =~ m{^(?:https?://|mailto:|/)} }' "$file")
   if test -n "$links"; then
