@@ -102,7 +102,7 @@ The problem board and RFC collection are two views over one repository-backed ex
 - A **Problem** states something worth attacking, investigating, or solving.
 - An **RFC** proposes a mechanism, design, experiment, or intervention.
 - A **ProblemSolutionClaim** states that one exact RFC revision claims to solve all or a bounded part of one exact problem revision.
-- An **ExchangeEntry** lets a person or agent request an attack, answer a request, critique a claim, add evidence, provide a counterexample, rebut, clarify, revise, endorse, or preserve dissent.
+- An **ExchangeEntry** lets a person or agent request an attack, answer a request, critique a claim, add evidence, provide a counterexample, rebut, clarify, comment, or preserve dissent. It may discuss or reference canonical candidate-revision, endorsement/review, resolution, and decision artifacts but never recreates them.
 - A **DecisionRecord** may change repository lifecycle state after the authorized process runs.
 
 The relation between problems and RFCs is many-to-many. A problem may have competing RFCs. One RFC may claim to solve several problems. The link is a first-class reviewable claim, not a tag and not proof of solution.
@@ -169,6 +169,14 @@ An exchange is a message only. It may reference but never recreate a solution cl
 
 Inviting a named person or agent to attack a problem is routing, not assignment or endorsement. Recipient references are inert data, never active mentions. An agent entry must not bind or be attributed to a principal unless independently verifiable delegation evidence binds principal identity, agent identity, repository authority, permitted entry kinds/targets, validity interval, and revocation state. Verification fails closed at ingestion. Otherwise the UI says “self-declared agent; no principal authority established.” No agent may claim human identity, reviewer independence, community standing, or decision authority through Git attribution alone.
 
+### `ExchangeRequestEventV1`
+
+The first version constrains a directed request to exactly one inert requested actor; an open request has none. Request lifecycle uses a separate canonical immutable event with globally scoped event ID, revision/digest, repository-authority ID, canonical path, commit SHA, exact request revision/digest, `event_kind: acknowledge | answer | decline | withdraw`, actor attribution/delegation evidence, idempotency key, and optional same-author supersession. `answer` requires an exact answer-exchange revision reference.
+
+Acknowledgement, answer, and decline must come from the requested actor or a policy-verified delegate authorized for that request. Withdrawal must come from the inviter or an authorized moderator. Same-author correction is the only supersession path. Stale request targets, duplicate IDs with different bytes, multiple effective events of the same kind, conflicting terminal events, unauthorized actors, and answer events without a valid answer exchange fail closed. Identical replay is idempotent.
+
+The generated request state is deterministic: open requests are `open` until a valid answer or inviter withdrawal; directed requests are `open`, `acknowledged`, `answered`, `declined`, `withdrawn`, or `superseded` according to the latest valid non-superseded event sequence. `answered`, `declined`, and `withdrawn` are terminal for that request revision. A new request requires a new exchange revision. Actor-oriented indexes derive “addressed to me” and “unanswered” only from verified actor/delegation matching.
+
 ### Exchange invariants
 
 1. Every entry binds immutable target revisions; later edits create superseding entries.
@@ -183,20 +191,58 @@ Inviting a named person or agent to attack a problem is routing, not assignment 
 
 All displayed state is regenerated from immutable content plus accepted events and decisions. Authors request transitions; they do not rewrite projected state. Decisions bind the exact affected revision and authority snapshot. Stale decisions do not retarget newer revisions.
 
-| Entity | Transition | Required canonical artifact | Authority and constraints |
+| Entity | Exact source to target | Required canonical artifact | Authority, terminal/reopen, and stale rules |
 | --- | --- | --- | --- |
-| Problem | absent to `draft` | problem revision | Content author may draft; not published. |
-| Problem | `draft` to `open` | `publish_problem` decision | Repository maintainer; public/safety validation passed. |
-| Problem | `open` and `closed` | `close_problem` / `reopen_problem` decision | Maintainer; bounded reason; close never implies solved. |
-| Problem | any non-superseded to `withdrawn` | withdrawal request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained. |
-| Problem | `open|closed` to `superseded` | `supersede_problem` decision | Exact successor revision required; prior permalink retained. |
-| Problem assessment | `unassessed` to `solved_under_criteria` or back | assessment decision | Named assessment authority; exact criteria/evidence/counterevidence/dissent required. |
-| Community RFC | `Draft` through review/disposition | typed RFC decision | Community RFC maintainer policy; reopening uses a new decision and exact revision. |
-| Solution claim | absent to `submitted` | immutable claim revision plus publish decision | Claimant may draft; repository decision makes it visible. |
-| Solution claim | `submitted` to `withdrawn|superseded` | request plus typed decision | Claimant request or moderator authority; exact successor for supersession. |
-| Solution assessment | `unreviewed` to a supported/rejected state or back | solution-assessment decision | Named assessment authority; policy review evidence and criterion IDs required. |
-| Exchange request | `open` to an acknowledgement/answer/decline/withdrawal/supersession | typed response/event | Addressee controls acknowledge/decline; inviter controls withdrawal; same author controls correction; silence has no effect. |
-| Exchange | `open` to `resolved|tombstoned` | resolution or moderation decision | Named resolver/moderator scope; unsafe payload may be hidden while safe audit evidence remains. |
+| Problem disposition | absent to `draft` | problem revision | Author-created local draft; not published. |
+| Problem disposition | `draft` to `open` | `publish_problem` decision | Repository maintainer; exact draft revision; safety validation passed. |
+| Problem disposition | `open` to `closed` | `close_problem` decision | Maintainer; bounded reason; does not imply solved. |
+| Problem disposition | `closed` to `open` | `reopen_problem` decision | Maintainer; exact closed revision and rationale. |
+| Problem disposition | `draft` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; terminal except tombstone. |
+| Problem disposition | `open` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained; terminal except tombstone. |
+| Problem disposition | `closed` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained; terminal except tombstone. |
+| Problem disposition | `draft` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; terminal except tombstone. |
+| Problem disposition | `open` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; prior permalink retained; terminal except tombstone. |
+| Problem disposition | `closed` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; prior permalink retained; terminal except tombstone. |
+| Problem assessment | `unassessed` to `solved_under_criteria` | `assess_problem_solved` decision | Named assessment authority; exact criteria/evidence/counterevidence/dissent. |
+| Problem assessment | `solved_under_criteria` to `unassessed` | `reopen_problem_assessment` decision | Same authority scope; reason and invalidated evidence required. |
+| Community RFC disposition | absent to `Draft` | RFC revision | Author-created local draft; not published. |
+| Community RFC disposition | `Draft` to `In Review` | `open_rfc_review` decision | Community RFC maintainer; exact revision. |
+| Community RFC disposition | `Draft` to `Withdrawn` | request plus `withdraw_rfc` decision | Author request or moderator authority; reopen only by explicit decision. |
+| Community RFC disposition | `In Review` to `Accepted` | `accept_rfc` decision | Maintainer policy and required reviews; exact revision. |
+| Community RFC disposition | `In Review` to `Rejected` | `reject_rfc` decision | Maintainer policy; reason/dissent retained; may reopen. |
+| Community RFC disposition | `In Review` to `Withdrawn` | request plus `withdraw_rfc` decision | Author request or moderator authority; may reopen. |
+| Community RFC disposition | `Rejected` to `In Review` | `reopen_rfc_review` decision | Maintainer; new rationale/review requirements. |
+| Community RFC disposition | `Withdrawn` to `In Review` | `reopen_rfc_review` decision | Author request plus maintainer decision. |
+| Community RFC disposition | `Accepted` to `Superseded` | `supersede_rfc` decision | Exact successor RFC revision; terminal except tombstone. |
+| Solution disposition | absent to `submitted` | claim revision plus `publish_solution_claim` decision | Claimant drafts; maintainer publishes exact revision. |
+| Solution disposition | `submitted` to `withdrawn` | request plus `withdraw_solution_claim` decision | Claimant request or moderator authority; terminal except tombstone. |
+| Solution disposition | `submitted` to `superseded` | `supersede_solution_claim` decision | Exact successor claim revision; terminal except tombstone. |
+| Solution assessment | `unreviewed` to `partially_supported` | `assess_solution_partial` decision | Named assessment authority; policy evidence and criterion IDs. |
+| Solution assessment | `unreviewed` to `supported_under_criteria` | `assess_solution_supported` decision | Named assessment authority; policy evidence and criterion IDs. |
+| Solution assessment | `unreviewed` to `rejected_under_criteria` | `assess_solution_rejected` decision | Named assessment authority; policy evidence and criterion IDs. |
+| Solution assessment | `partially_supported` to `unreviewed` | `reopen_solution_assessment` decision | Same authority scope; reason and invalidated evidence required. |
+| Solution assessment | `supported_under_criteria` to `unreviewed` | `reopen_solution_assessment` decision | Same authority scope; reason and invalidated evidence required. |
+| Solution assessment | `rejected_under_criteria` to `unreviewed` | `reopen_solution_assessment` decision | Same authority scope; reason and invalidated evidence required. |
+| Request state | `open` to `acknowledged` | `ExchangeRequestEventV1(acknowledge)` | Exact requested actor or verified delegate; nonterminal. |
+| Request state | `open` to `answered` | `ExchangeRequestEventV1(answer)` | Exact requested actor/delegate plus answer-exchange ref; terminal. |
+| Request state | `acknowledged` to `answered` | `ExchangeRequestEventV1(answer)` | Exact requested actor/delegate plus answer-exchange ref; terminal. |
+| Request state | `open` to `declined` | `ExchangeRequestEventV1(decline)` | Exact requested actor/delegate; terminal. |
+| Request state | `acknowledged` to `declined` | `ExchangeRequestEventV1(decline)` | Exact requested actor/delegate; terminal. |
+| Request state | `open` to `withdrawn` | `ExchangeRequestEventV1(withdraw)` | Inviter or authorized moderator; terminal. |
+| Request state | `acknowledged` to `withdrawn` | `ExchangeRequestEventV1(withdraw)` | Inviter or authorized moderator; terminal. |
+| Request state | `open` to `superseded` | same-author corrected request revision | Exact successor; prior request retained; terminal. |
+| Request state | `acknowledged` to `superseded` | same-author corrected request revision | Exact successor; prior request retained; terminal. |
+| Exchange disposition | absent to `open` | exchange revision | Repository publish decision after validation. |
+| Exchange disposition | `open` to `resolved` | resolution decision | Named resolver scope; may reopen. |
+| Exchange disposition | `resolved` to `open` | reopen-resolution decision | Named resolver scope; reason required. |
+| Exchange disposition | `open` to `withdrawn` | request plus withdrawal decision | Author request or moderator authority; terminal except tombstone. |
+| Exchange disposition | `resolved` to `withdrawn` | request plus withdrawal decision | Author request or moderator authority; terminal except tombstone. |
+| Exchange disposition | `open` to `superseded` | same-author correction plus publish decision | Exact successor; terminal except tombstone. |
+| Exchange disposition | `resolved` to `superseded` | same-author correction plus publish decision | Exact successor; terminal except tombstone. |
+
+Every decision/event includes expected source state, exact target revision/digest, repository-authority ID, authority snapshot, and idempotency key. CI applies accepted artifacts in canonical repository order. A source-state mismatch, stale target, decision for a newer/latest alias rather than an exact revision, conflicting transition, or attempted transition from a terminal state fails closed. Reopening always uses the explicit row above; absent rows are forbidden.
+
+Tombstoning is a terminal moderation overlay rather than a disposition transition. An authorized moderation/redaction decision may overlay any published artifact revision, after which its unsafe payload is unavailable and only the safe audit tombstone remains. No lifecycle row may remove or reopen that overlay; reversal requires a new independently authorized restoration decision and a new clean artifact revision.
 
 `under_investigation`, `candidate_solutions`, `contested`, unanswered, dormant, and unresolved-counterexample labels are deterministic attention projections, not dispositions or authority decisions. `closed`, `withdrawn`, `superseded`, support, rejection, resolution, and preserved dissent never arise from counts, WMT, or author-edited metadata.
 
@@ -241,6 +287,7 @@ community-rfcs/
 │   ├── actor-attribution.schema.json
 │   ├── problem-solution-claim.schema.json
 │   ├── exchange-entry.schema.json
+│   ├── exchange-request-event.schema.json
 │   ├── rfc-claim-set.schema.json
 │   ├── rfc-formalization-review.schema.json
 │   ├── wmt-ingest.schema.json
@@ -289,6 +336,7 @@ community-rfcs/
 ├── indexes/
 │   ├── problem-rfc-links.json
 │   ├── exchange-targets.json
+│   ├── actor-requests.json
 │   └── lifecycle-state.json
 ├── fixtures/
 │   ├── valid/
@@ -299,6 +347,10 @@ community-rfcs/
 Git is the revision system. Substantive changes use branches and pull requests; repositories do not duplicate every revision into extra folders. Problems and RFCs own their source documents and local sidecars. Multi-target artifacts—solution claims, exchanges, and decisions—have exactly one canonical top-level file. Generated indexes provide the bidirectional problem/RFC and exchange-target projections and must be reproducible from canonical artifacts. CI rejects duplicate IDs, conflicting files, stale indexes, missing targets, target-digest mismatches, forbidden reference cycles, and references to revisions that do not exist in Git history.
 
 `repository-layout.json` is normative. It defines repository-authority ID; allowed artifact kinds; exact path regex and schema mapping; uppercase ID grammar; Unicode normalization; canonical filename and extension rules; authored versus generated paths; allowed extras; no-symlink policy; reference cardinality/depth; canonical JSON bytes; domain-separated digest algorithms; and generated-index commands. CI rejects unknown files in governed paths, case-folding collisions, path traversal, symlinks, invalid IDs, mutable self-digest input, stale projections, and non-reproducible indexes. Valid and invalid fixtures test every rule.
+
+The displayed repository structure is the final normative v1 layout. JSON uses RFC 8785 JSON Canonicalization Scheme (JCS), UTF-8, and NFC-normalized strings. JSON numbers are restricted to interoperable safe integers; decimal, arbitrary-precision, and real values are canonical strings under their field schemas. Self-digest fields and generated projections are excluded before canonicalization. Markdown/text source uses UTF-8 without BOM, NFC, LF line endings, and exactly one final newline.
+
+The v1 hash profile is `castalia.sha256-jcs.v1`. Artifact digest preimage is the ASCII/UTF-8 bytes `castalia-artifact-v1`, NUL, artifact kind, NUL, schema version, NUL, then canonical artifact bytes. The digest string is `sha256:` plus 64 lowercase hexadecimal SHA-256 characters. The required test vector uses kind `test-vector`, schema `castalia.test.v1`, and JCS body `{"schema_version":"castalia.test.v1","value":"α"}`; its expected digest is `sha256:a080d96ed43647029898f9a0c450a17c3649ce8ea389ae6872f0275b741f58eb`. CI fixtures must also cover key reordering, Unicode normalization, line endings, excluded self-digests, number rejection, domain separation, and one-byte mutation.
 
 ## Proposed artifact contracts
 
@@ -467,7 +519,7 @@ The problem detail surface keeps three concepts visually separate:
 
 1. **Problem definition** — source, criteria, scope, evidence, and current decision record.
 2. **Candidate RFCs** — each linked through an explicit full/partial coverage claim and an independent direct-solution/prerequisite/mitigation/experiment/counterproposal role.
-3. **Exchange** — addressable calls, invitations, responses, critiques, evidence, counterexamples, rebuttals, revisions, endorsements, and dissent.
+3. **Exchange** — addressable calls, invitations, responses, critiques, evidence, counterexamples, rebuttals, comments, dissent, and discussion links to separate canonical revision or endorsement/review artifacts.
 
 Local drafting begins with an explicit action chooser: problem, RFC, problem-solution claim, invitation/request, challenge/counterexample, formalization review, peer review, or candidate revision. The form explains the authority and validation contract for that artifact and requires exact target revisions. Choosing RFC may atomically bundle optional problem-solution claims but never preselects `full` coverage. Choosing an invitation requires open/directed mode, inert addressee references, and a requested action, with “invitation—not assignment or endorsement” persistent copy. The final preview says **Not published** and shows every file/diff in the dependency-complete PR bundle.
 
@@ -506,8 +558,8 @@ WCAG 2.2 AA is normative. Every graph has a complete text/table alternative. All
 - Directed invitations are opt-in routing requests. They do not create assignments, obligations, endorsements, direct notifications, or public claims about the target. Live notification requires verified target identity, recipient preferences, rate limits, anti-replay controls, abuse reporting, and repository moderation policy.
 - Reject secrets, credentials, private-room material, doxxing, and unsupported sensitive-data classes before export. Git permanence must be shown before submission. A moderation/redaction decision creates a content-addressed tombstone that preserves graph integrity and decision provenance without redisplaying removed content; history rewriting is a separately authorized incident procedure.
 - Gate 2 uses inert actor references in rendered copy and exports; it never emits active `@mentions`. The example specialist is represented by synthetic `ACTOR-SPECIALIST-EXAMPLE`. Silence has no effect. Only the inviter may request withdrawal, and nobody may supersede another author's prose.
-- Gate 2 accepts only `classification: public`. It rejects unsupported sensitivity classes before render/export, remote images/embeds, credentials, secrets, direct personal data, and unallowlisted links. Unreviewed content is labeled and excluded from recommendations.
-- Per-artifact ceilings are 64 KiB canonical bytes, 16 KiB body text, 32 references, 8 inert recipients, 16 external citations, and graph depth 64. A local PR bundle is capped at 128 artifacts, 32 new exchange entries, 8 invitations, and 1 MiB canonical bytes. Identical artifacts deduplicate by repository-authority ID plus globally scoped ID and digest. These are safety ceilings, not standing or quality signals.
+- A repository-owned content policy classifies harassment and illegal/unlawful content as prohibited alongside credentials, secrets, doxxing, private material, and unsupported personal/sensitive data. Gate 2 accepts only `classification: public`; it rejects clearly prohibited content before render/export and fails closed into a non-exportable quarantine state when adjudication is required. It also rejects unsupported sensitivity classes, remote images/embeds, and unallowlisted links. Quarantined content cannot enter a downloadable PR bundle. Unreviewed permitted content is labeled and excluded from recommendations.
+- Per-artifact ceilings are 64 KiB canonical bytes, 16 KiB body text, 32 references, exactly one inert recipient for a directed request, zero recipients for an open request, 16 external citations, and graph depth 64. A local PR bundle is capped at 128 artifacts, 32 new exchange entries, 8 invitations, and 1 MiB canonical bytes. Identical artifacts deduplicate by repository-authority ID plus globally scoped ID and digest. These are safety ceilings, not standing or quality signals.
 - Repository policy defines duplicate detection, per-principal quotas, quarantine, hostile-link handling, dual-use review, moderator reason codes/scope, reporting, appeals, audit evidence, observability, and incident response. Multiple agents with one verified principal deduplicate to that principal for abuse controls. No view ranks, trends, recommends, or aggregates endorsements/invitations from unverified identities.
 - Correction, author withdrawal, moderator hiding, redaction, and emergency purge are distinct. Redaction replaces rendered payload with a safe content-addressed tombstone; projections, search, bundles, caches, and later exports honor it. The audit event retains only safe provenance, digest, reason code, authority evidence, appeal state, and retention metadata. Emergency history rewrite and invalidation of known derivatives require separately scoped incident authority; already-forked copies cannot be recalled.
 - Bind every result to exact RFC bytes, claim-set bytes, projected WMT bytes, logic profile, all budgets/options, engine and solver artifact hashes, and solver version.
@@ -565,6 +617,7 @@ Owned by `ZenithResearch/castalia-web`.
 - Add `repository-layout.json` plus deterministic index generation and strict path/reference validation.
 - Add positive and hostile fixtures for projection, digest binding, status handling, duplicate IDs, conflicting declarations, undeclared vocabulary, SMT tokens, unknown/invalid/limit states, and source locators.
 - Add graph fixtures for many-to-many solution claims, immutable target revisions, actor/principal separation, exchange replies/supersession, stale indexes, broken links, duplicate IDs, replay, forbidden cycles, tombstones, and problem/RFC lifecycle decisions.
+- Add hostile content fixtures proving harassment, illegal/unlawful content, secrets, doxxing, unsupported personal/sensitive data, malicious links, and ambiguous cases are rejected or non-exportably quarantined with reason codes, moderator scope, appeal, and audit evidence.
 - Keep all routes fixture-only and network-free.
 
 ### Gate 2 — minimum useful review slice
@@ -637,11 +690,9 @@ The community RFC repository maintainer may create a repository decision record 
 
 ## Remaining acceptance decisions
 
-1. Select and test-vector the canonical JSON and domain-separated hash algorithms.
-2. Confirm the dedicated credentialless analysis origin and production COOP/COEP deployment target through Gate 0.
-3. Calibrate the fixed security ceilings against supported devices without raising them in the current profile.
-4. Define the community RFC maintainer policy and repository evidence required for feature RFC decisions.
-5. Confirm the canonical repository structure specified in this revision or record an explicit replacement decision.
+1. Confirm the dedicated credentialless analysis origin and production COOP/COEP deployment target through Gate 0.
+2. Calibrate the fixed security ceilings against supported devices without raising them in the current profile.
+3. Define the community RFC maintainer policy and repository evidence required for feature RFC decisions.
 
 ## Explicit non-claims
 

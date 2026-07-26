@@ -137,16 +137,30 @@ At checkpoint `1153420`, canonical root ownership and part of the immutable revi
 | P4 immutable navigation | Added immutable problem/RFC/solution/exchange/review/decision routes; latest aliases and old dissent remain resolvable. | Design-resolved; re-review required |
 | P5 publication overclaim and overloaded routes | Reframed Gate 2 as local draft/validate/preview/download, added intent-specific routes/action chooser, and dependency-complete PR bundles. | Design-resolved; re-review required |
 
+## Exact-head review of `cef7e5d`
+
+Fresh review batch `deleg_603a0786` returned three `REQUEST CHANGES` verdicts. Verbatim reports:
+
+- [Ontology review](reviews/issue-16-exact-head-ontology-review-cef7e5d.md)
+- [Security review](reviews/issue-16-exact-head-security-review-cef7e5d.md)
+- [Product review](reviews/issue-16-exact-head-product-review-cef7e5d.md)
+
+| Blocking finding | Correction after `cef7e5d` | Status |
+| --- | --- | --- |
+| O5 exchange/revision/endorsement contradiction | Exchange capability and UX now permit discussion/reference only; revision and endorsement/review remain separate canonical artifacts. | Patched; follow-up review required |
+| O7 incomplete transition matrix | Replaced compressed rows with exact directed transitions, authority artifacts, terminal/reopen rules, exact revision/source-state binding, stale/conflict rejection, and a separate tombstone overlay. | Patched; follow-up review required |
+| O10 unresolved layout/canonicalization | Made the displayed v1 layout final; selected RFC 8785 JCS plus NFC/safe-number/text rules and domain-separated SHA-256; added a concrete digest test vector and removed those open decisions. | Patched; follow-up review required |
+| S7 harassment and unlawful content | Content policy now prohibits harassment and illegal/unlawful content; Gate 2 rejects or non-exportably quarantines it; hostile fixtures require reason/authority/appeal/audit evidence. | Patched; follow-up review required |
+| P1 request lifecycle event contract | Added immutable `ExchangeRequestEventV1`, one-recipient directed requests, actor/delegation authority, answer references, idempotency/supersession/conflict rules, deterministic state, and actor indexes/fixtures. | Patched; follow-up review required |
+
 Remaining blockers:
 
-1. choose and test-vector canonical JSON and domain-separated hashing;
-2. complete the Gate 0 compiler/parser/resource fixes and reproducible package;
-3. prove the credentialless-origin and nested-worker topology on the intended deployment target;
-4. calibrate the fixed security ceilings without raising the current profile;
-5. name the repository RFC maintainer role and decision evidence;
-6. choose the canonical repository artifact layout; and
-7. obtain fresh exact-head technical, security/privacy, and product/governance verdicts on the patched RFC.
+1. complete the Gate 0 compiler/parser/resource fixes and reproducible package;
+2. prove the credentialless-origin and nested-worker topology on the intended deployment target;
+3. calibrate the fixed security ceilings without raising the current profile;
+4. define the community RFC maintainer policy and decision evidence; and
+5. obtain follow-up exact-head ontology, security/authority, and product/workflow approval on the post-`cef7e5d` corrections.
 
 ## Final review disposition
 
-**REQUEST CHANGES remains in force.** The current draft incorporates the initial findings but is not accepted. Acceptance requires the remaining blockers, fresh review, and an immutable repository decision record. Acceptance would authorize issue decomposition only—not implementation, merge, deployment, credentials, Matrix access, funding, or governance action.
+**REQUEST CHANGES remains in force.** The Issue #16 feature design incorporates the findings but is not approved. Approval requires the remaining blockers, follow-up review, and explicit repository-maintainer approval on Issue #16/PR #17. Approval would authorize implementation issue decomposition only—not implementation, merge, deployment, credentials, Matrix access, funding, or governance action.
