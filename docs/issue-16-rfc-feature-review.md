@@ -95,7 +95,47 @@ Focused review batch `deleg_2d387995` completed with three `REQUEST CHANGES` ver
 - [Focused security and authority review](reviews/issue-16-problem-exchange-security-review.md)
 - [Focused product and workflow review](reviews/issue-16-problem-exchange-product-review.md)
 
-At checkpoint, canonical root ownership and part of the immutable revision, solution-claim, threading, request, lifecycle, and delegation model had been corrected in the feature-design working tree. The remaining findings are intentionally unresolved. Resume by reconciling every focused report finding into this ledger, then run exact-head review and verification. Do not infer the inaccessible X post's contents.
+At checkpoint `1153420`, canonical root ownership and part of the immutable revision, solution-claim, threading, request, lifecycle, and delegation model had been corrected. Work resumed after the ontology correction that development stays issue-framed and RFC identifiers are reserved for community feature artifacts. The design now addresses every focused finding below, but those resolutions remain provisional until fresh exact-head reviewers approve them. Do not infer the inaccessible X post's contents.
+
+### Focused ontology resolution ledger
+
+| Finding | Resolution in feature design | Status |
+| --- | --- | --- |
+| O1 canonical ownership | Multi-target solution claims, exchanges, events, decisions, and tombstones each have one canonical top-level file; indexes are generated. | Design-resolved; re-review required |
+| O2 mutable projections in immutable revisions | Problem/RFC revisions contain authored content and forward semantics only; lifecycle, backlinks, attention, review, and decision state are generated. | Design-resolved; re-review required |
+| O3 solution-claim revision safety | Added immutable claim revision/digest, problem digest, canonical path/commit, same-ID supersession, and decision-derived status. | Design-resolved; re-review required |
+| O4 mixed solution semantics | Split `coverage` from `approach_role`; bound coverage to exact criterion IDs. | Design-resolved; re-review required |
+| O5 exchange/entity duplication | Exchange is message-only and references canonical claims/revisions/reviews/events/decisions rather than recreating them. | Design-resolved; re-review required |
+| O6 underconstrained threading | Added thread ID, root subject, zero-or-one parent, same-root rule, and acyclic same-author correction edges. | Design-resolved; re-review required |
+| O7 lifecycle/attention conflation | Added decision-backed disposition/assessment dimensions, derived attention facets, and a complete transition-authority matrix. | Design-resolved; re-review required |
+| O8 attribution/delegation ambiguity | Separated authors, submitter, committer, signer, automation, principal, delegation evidence, and standing snapshot; delegation fails closed. | Design-resolved; re-review required |
+| O9 inaccessible external exchange | Added `ExternalExchangeSourceV1`; unavailable content remains source-only and semantically unclassified. | Design-resolved; re-review required |
+| O10 relation/route/layout determinism | Added canonical relation directions, immutable routes, normative layout manifest, path/ID/hash/no-symlink rules, strict CI, and fixtures. | Design-resolved; re-review required |
+
+### Focused security and authority resolution ledger
+
+| Finding | Resolution in feature design | Status |
+| --- | --- | --- |
+| S1 acting-for impersonation | Principal attribution requires independently verifiable scoped, time-bound, revocable delegation evidence; otherwise explicitly self-declared only. | Design-resolved; re-review required |
+| S2 invitation harassment | Recipients are inert structured references; Gate 2 never notifies or emits active mentions; consent, opt-out, blocking, quotas, and audit gate any future notification. | Design-resolved; re-review required |
+| S3 spam/Sybil and attention capture | Added artifact/bundle ceilings, deduplication, principal-level abuse accounting, quarantine/moderation policy, and no rank/trend/recommend aggregation. | Design-resolved; re-review required |
+| S4 lifecycle authority | All consequential state is generated from typed decisions/events; close does not imply solved and authors cannot launder status. | Design-resolved; re-review required |
+| S5 replay/stale/graph confusion | Added repository authority, globally scoped IDs, digests, idempotency, exact targets, acyclic rules, stale-target rejection, and deterministic projections. | Design-resolved; re-review required |
+| S6 cross-repository authority | Split local canonical refs from external citations; no auto-fetch or lifecycle effect; imports require separate authority. | Design-resolved; re-review required |
+| S7 content safety/moderation | Gate 2 is public-only, bounded, no remote embeds, hostile-render tested, visibly unreviewed, and governed by quarantine/moderation/appeal/audit policy. | Design-resolved; re-review required |
+| S8 redaction/takedown | Distinguished correction, withdrawal, hiding, redaction, tombstone, emergency purge, derivative invalidation, and fork-recall limits. | Design-resolved; re-review required |
+| S9 route overclaim | Gate 2 only drafts/validates/previews/downloads a `Not published` bundle; no mutation endpoint, credential, PR, branch, or notification. | Design-resolved; re-review required |
+| S10 X-source authority | Recorded unavailable versus mirror-transcribed provenance, no identity/consent/authority inference, and synthetic inert fixture actor. | Design-resolved; re-review required |
+
+### Focused product and workflow resolution ledger
+
+| Finding | Resolution in feature design | Status |
+| --- | --- | --- |
+| P1 directed requests | Added open/directed mode, inert addressees, voluntary acknowledge/answer/decline lifecycle, and end-to-end fixtures. | Design-resolved; re-review required |
+| P2 competing solution representations | `ProblemSolutionClaimV1` is sole canonical assertion; exchange only references it; assessment is decision-derived; UI says “RFC claims to address.” | Design-resolved; re-review required |
+| P3 comparison workflow | Added problem-scoped exact-revision comparison across criteria, evidence, risks, challenges, decisions, and dissent without ranking. | Design-resolved; re-review required |
+| P4 immutable navigation | Added immutable problem/RFC/solution/exchange/review/decision routes; latest aliases and old dissent remain resolvable. | Design-resolved; re-review required |
+| P5 publication overclaim and overloaded routes | Reframed Gate 2 as local draft/validate/preview/download, added intent-specific routes/action chooser, and dependency-complete PR bundles. | Design-resolved; re-review required |
 
 Remaining blockers:
 
