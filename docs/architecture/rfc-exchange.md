@@ -114,6 +114,270 @@ This architecture and its read-only Docs route do not implement or prove:
 - current availability or execution of an embeddable WMT package, remote model calls, Matrix access, private-content processing, or persistence; or
 - recall of already-forked copies after moderation or redaction.
 
+## UML/C4 diagram conventions
+
+Every edge label has the form **authority · direction / data**. `Repository policy` means deterministic validation under accepted repository configuration; `accepted decision authority` means the exact authority snapshot carried by a valid decision. `local user action` is not publication authority. Dashed WMT edges carry non-authoritative evidence only.
+
+## C4 system context
+
+```mermaid
+flowchart TB
+  Reader[Reader or local drafter]
+  Castalia[Castalia Web RFC exchange]
+  Repo[Canonical community repository]
+  Maintainer[Repository maintainer or scoped decision authority]
+  WMT[External packaged WMT engine prerequisite]
+
+  Reader -->|local user authority · browser input / public drafts and read requests| Castalia
+  Castalia -->|repository policy · repository to browser / validated artifacts and projections| Reader
+  Repo -->|repository acceptance authority · repository to Castalia / canonical artifacts events decisions indexes| Castalia
+  Castalia -->|local user authority only · browser to user / Not published PR bundle download| Reader
+  Maintainer -->|accepted decision authority · maintainer to repository / reviewed decisions through protected workflow| Repo
+  Repo -->|repository evidence authority · repository to maintainer / exact revisions reviews and dissent| Maintainer
+  Castalia -.->|no authority · browser to WMT worker / closed reviewed typed IR| WMT
+  WMT -.->|computational evidence only · worker to browser / bounded analysis result| Castalia
+```
+
+**Text alternative.** A reader supplies local public drafts or read requests to Castalia. The canonical repository supplies accepted artifacts and projections under repository acceptance authority. Castalia can return validated views or a local **Not published** download, never publication. A scoped maintainer contributes decisions only through the protected repository workflow. A future credentialless worker may send closed typed IR to a separately packaged WMT engine and receive non-authoritative computational evidence.
+
+## C4 containers and components
+
+```mermaid
+flowchart LR
+  subgraph Browser[Browser boundary]
+    Docs[Read-only architecture Docs route]
+    Views[Problem Board and RFC views]
+    Draft[Local draft and exact-diff preview]
+    Bundle[Dependency-complete bundle builder]
+    Analysis[Credentialless analysis frame and bounded workers]
+  end
+  subgraph Repository[Community repository boundary]
+    Canon[Canonical authored artifact paths]
+    Policy[Normative schemas layout and policies]
+    Validate[Fail-closed repository validator]
+    Decisions[Accepted event and decision processor]
+    Project[Deterministic projection generator]
+    Tomb[Tombstone-aware view overlay]
+  end
+  Package[Pinned WMT package prerequisite]
+
+  Docs -->|repository source authority · bundled source to browser / architecture content| Views
+  Views -->|local user authority · view to draft / selected exact revisions| Draft
+  Draft -->|repository policy · draft to validator / bounded canonical candidate bytes| Validate
+  Validate -->|repository policy · validation to draft / typed pass reject or quarantine| Draft
+  Draft -->|local user authority · approved preview to builder / validated dependency closure| Bundle
+  Bundle -->|local user authority only · builder to browser / Not published download| Views
+  Canon -->|repository acceptance authority · canonical paths to validator / authored artifacts| Validate
+  Policy -->|repository configuration authority · policy to validator / schemas layout ceilings| Validate
+  Canon -->|repository acceptance authority · artifacts to decisions / exact source state| Decisions
+  Decisions -->|accepted decision authority · accepted events to projections / effective transitions| Project
+  Canon -->|repository acceptance authority · artifacts to projections / immutable graph| Project
+  Policy -->|repository configuration authority · policy to projections / deterministic rules| Project
+  Project -->|derived no independent authority · indexes to views / lifecycle assessment attention backlinks| Views
+  Decisions -->|moderation authority snapshot · decisions to overlay / tombstone or restoration decision| Tomb
+  Canon -->|repository acceptance authority · unsafe revision digest to overlay / graph identity| Tomb
+  Tomb -->|moderation projection authority · safe replacement to views / tombstone projection| Views
+  Draft -.->|no authority · reviewed typed IR to analysis frame / closed projected input| Analysis
+  Analysis -.->|no authority · pinned local call to package / bounded solver request| Package
+  Package -.->|computational evidence only · package to analysis frame / typed stop or semantic result| Analysis
+  Analysis -.->|computational evidence only · frame to views / labelled analysis evidence| Views
+```
+
+**Text alternative.** The Docs route is bundled read-only source. Future product views can pass exact revisions into local drafting; repository policy validates candidates before exact-diff preview and local bundle download. Canonical artifacts, normative policy, accepted decisions, deterministic projections, and moderation overlays remain repository components with separate ownership. The optional analysis frame receives only reviewed typed IR and returns labelled evidence without authority.
+
+## Artifact graph and ownership
+
+```mermaid
+flowchart TB
+  Problem[Problem revision — authored immutable]
+  RFC[RFC revision — authored immutable]
+  Claim[ProblemSolutionClaim revision — authored immutable]
+  Exchange[ExchangeEntry revision — authored immutable]
+  ReqEvent[ExchangeRequestEvent — accepted event]
+  Review[Review revision — authored immutable]
+  Decision[DecisionRecord — accepted authority artifact]
+  Index[Generated indexes — reproducible projection]
+  ModDecision[Moderation or restoration decision — accepted authority artifact]
+  Tombstone[Tombstone — safe terminal overlay]
+  Analysis[WMT analysis — non-authoritative evidence]
+
+  Problem -->|author provenance · problem to claim / exact revision and digest| Claim
+  RFC -->|author provenance · RFC to claim / exact revision and digest| Claim
+  Problem -->|author provenance · problem to exchange / exact root or related reference| Exchange
+  RFC -->|author provenance · RFC to exchange / exact root or related reference| Exchange
+  Claim -->|author provenance · claim to exchange / exact related reference| Exchange
+  Exchange -->|repository actor policy · request to event / exact request revision and digest| ReqEvent
+  RFC -->|reviewer attribution · RFC to review / exact revision claim set and digest| Review
+  Claim -->|reviewer attribution · claim to review / exact criterion-bound target| Review
+  Review -->|accepted decision policy · evidence to decision / required review reference| Decision
+  Problem -->|accepted decision authority · exact source to decision / expected problem state| Decision
+  RFC -->|accepted decision authority · exact source to decision / expected RFC state| Decision
+  Claim -->|accepted decision authority · exact source to decision / expected claim state| Decision
+  Exchange -->|accepted resolution authority · exact source to decision / expected exchange state| Decision
+  Problem -->|repository projection rules · canonical problem to indexes / forward refs| Index
+  RFC -->|repository projection rules · canonical RFC to indexes / forward refs| Index
+  Claim -->|repository projection rules · canonical claim to indexes / many-to-many edge| Index
+  Exchange -->|repository projection rules · canonical exchange to indexes / thread refs| Index
+  ReqEvent -->|repository projection rules · accepted event to indexes / request transition| Index
+  Decision -->|repository projection rules · accepted decision to indexes / lifecycle assessment resolution| Index
+  Problem -->|moderation authority snapshot · exact unsafe revision to moderation decision / digest| ModDecision
+  RFC -->|moderation authority snapshot · exact unsafe revision to moderation decision / digest| ModDecision
+  Claim -->|moderation authority snapshot · exact unsafe revision to moderation decision / digest| ModDecision
+  Exchange -->|moderation authority snapshot · exact unsafe revision to moderation decision / digest| ModDecision
+  ModDecision -->|moderation authority · accepted decision to tombstone / safe reason and provenance| Tombstone
+  Tombstone -->|repository projection rules · overlay to indexes / replace unsafe payload in every view| Index
+  RFC -.->|no authority · reviewed formalization to analysis / exact typed claim set| Analysis
+  Analysis -.->|computational evidence only · analysis to review / optional cited result digest| Review
+```
+
+**Text alternative.** Problems and RFCs bind into one canonical solution claim. Problems, RFCs, and claims can be referenced by one stored exchange. Accepted request events change only request projections. Reviews may provide evidence to a decision, but only a valid decision changes lifecycle or assessment. Every canonical artifact contributes to reproducible indexes. Moderation decisions create tombstones that replace unsafe payloads in all projections while preserving graph identity. WMT analysis can be cited by a review but cannot become a review or decision.
+
+## Problem publication and view sequence
+
+```mermaid
+sequenceDiagram
+  actor User as Local drafter
+  participant UI as Gate 2 browser UI
+  participant Validator as Contract and policy validator
+  participant Bundle as Local bundle builder
+  participant Repo as Community repository
+  participant Projection as Projection generator
+
+  User->>UI: local user authority · enter public problem draft
+  UI->>Validator: repository policy · candidate canonical bytes and exact refs
+  Validator-->>UI: repository policy · pass, reject, or non-exportable quarantine
+  UI-->>User: local user authority · exact diff preview labelled Not published
+  User->>Bundle: local user authority · explicit download consent
+  Bundle-->>User: local user authority only · dependency-complete PR bundle
+  Note over User,Repo: Human submission and repository review occur outside Castalia Web
+  Repo->>Projection: repository acceptance authority · accepted problem plus publish decision
+  Projection-->>UI: derived no independent authority · open problem view and attention indexes
+  UI-->>User: repository evidence authority · immutable problem permalink and decision provenance
+```
+
+**Text alternative.** Local drafting is validated and can end only in a user-authorized **Not published** bundle download. Human submission and repository review happen outside Castalia Web. Only after repository acceptance of the problem and publish decision can projection generation expose an open problem view.
+
+## RFC and solution-claim sequence
+
+```mermaid
+sequenceDiagram
+  actor Author as Local RFC author
+  participant UI as Gate 2 browser UI
+  participant Validator as Contract graph and policy validator
+  participant Bundle as Local bundle builder
+  participant Repo as Community repository
+  participant Projection as Projection generator
+
+  Author->>UI: local author authority · RFC draft plus optional bounded claim drafts
+  UI->>Validator: repository policy · exact RFC problem and claim revision bindings
+  Validator-->>UI: repository policy · typed validity and dependency closure
+  UI-->>Author: local user authority · neutral preview saying RFC claims to address this problem
+  Author->>Bundle: local user authority · explicit bundle download consent
+  Bundle-->>Author: local user authority only · Not published RFC and claim bundle
+  Note over Author,Repo: No branch PR or publication is created by the browser
+  Repo->>Projection: repository acceptance authority · accepted RFC claim and publish decisions
+  Projection-->>UI: derived no independent authority · RFC and Problem Board backlinks
+  UI-->>Author: repository evidence authority · exact revisions coverage role criteria and unreviewed state
+```
+
+**Text alternative.** An RFC author can locally draft an RFC and optional solution claims, but validation preserves exact problem/RFC revision bindings and never defaults coverage to full. Download does not publish. Accepted canonical artifacts and decisions later generate backlinks visible from both Problem Board and RFC views without storing a second claim.
+
+## Exchange and challenge sequence
+
+```mermaid
+sequenceDiagram
+  actor Respondent as Local respondent
+  participant UI as Gate 2 browser UI
+  participant Validator as Contract actor and policy validator
+  participant Bundle as Local bundle builder
+  participant Repo as Community repository
+  participant Projection as Projection generator
+
+  Respondent->>UI: local author authority · critique counterexample evidence rebuttal or dissent
+  UI->>Validator: repository policy · immutable thread root parent target attribution and refs
+  Validator-->>UI: repository policy · pass or fail closed without repairing prose
+  UI-->>Respondent: local author authority · exact diff preview labelled Not published
+  Respondent->>Bundle: local user authority · explicit download consent
+  Bundle-->>Respondent: local user authority only · dependency-complete exchange bundle
+  Note over Respondent,Repo: Submission moderation and acceptance remain external repository actions
+  Repo->>Projection: repository acceptance authority · accepted exchange and any later resolution decision
+  Projection-->>UI: derived no independent authority · chronology response edges unresolved dissent and disposition
+  UI-->>Respondent: repository evidence authority · prior and superseding entries remain reachable
+```
+
+**Text alternative.** A respondent locally authors an append-only exchange against exact targets. Validation checks thread and attribution invariants. Browser output is only a local bundle. Repository acceptance later allows deterministic chronology, response, correction, resolution, and dissent views; no correction hides prior prose.
+
+## Request lifecycle sequence
+
+```mermaid
+sequenceDiagram
+  actor Inviter
+  actor Recipient as Requested actor or verified delegate
+  actor OpenActor as Repository-policy-authorized open respondent
+  participant Repo as Community repository
+  participant Validator as Request-event validator
+  participant Projection as Request projection
+
+  Inviter->>Repo: author provenance · directed request with exactly one inert actor ref or open request with none
+  Repo->>Validator: repository acceptance authority · exact accepted request revision and digest
+  alt Directed request
+    Recipient->>Validator: requested-actor authority · acknowledge answer or decline event plus delegation evidence
+    Validator-->>Repo: repository actor policy · accepted event or fail-closed rejection
+  else Open request
+    OpenActor->>Validator: repository submission authority · answer event and exact answer-exchange ref
+    Validator-->>Repo: repository actor policy · accepted answer or fail-closed rejection
+  end
+  Inviter->>Validator: inviter authority · withdraw event for exact request
+  Validator->>Projection: repository policy · accepted non-conflicting event sequence
+  Projection-->>Repo: derived no independent authority · open acknowledged answered declined withdrawn or superseded state
+```
+
+**Text alternative.** A directed request binds exactly one inert recipient, while an open request binds none. The requested actor or verified delegate may acknowledge, answer, or decline a directed request. An authorized repository actor may answer an open request but cannot acknowledge or decline it. The inviter or moderator may withdraw. Stale, unauthorized, malformed, duplicated-different, or conflicting terminal events fail closed. Silence has no effect.
+
+## Decision lifecycle sequence
+
+```mermaid
+sequenceDiagram
+  actor Authority as Scoped decision actor
+  participant Policy as Repository lifecycle policy
+  participant Repo as Protected repository history
+  participant Validator as Decision validator
+  participant Projection as Lifecycle projection
+  participant View as Read-only views
+
+  Authority->>Policy: authority-snapshot evidence · proposed exact transition and rationale
+  Policy->>Validator: repository configuration authority · allowed source-to-target row and evidence requirements
+  Repo->>Validator: repository acceptance authority · exact target revision digest source state and first-parent position
+  Validator-->>Repo: accepted decision authority · accept identical replay or reject stale conflict absent transition
+  Repo->>Projection: repository acceptance authority · accepted artifacts events and decisions
+  Projection->>View: derived no independent authority · disposition assessment resolution and preserved dissent
+  View-->>Authority: repository evidence authority · exact decision provenance and unresolved evidence
+```
+
+**Text alternative.** A scoped actor proposes a transition, but repository policy and exact accepted history determine whether the decision is valid. The validator rejects stale targets, source mismatch, conflicts, and transitions absent from the exhaustive matrix. Projections display the accepted result and provenance. Authors, activity counts, and WMT output never set state.
+
+## Moderation and tombstone overlay
+
+```mermaid
+sequenceDiagram
+  actor Moderator as Scoped moderator
+  participant Policy as Content and moderation policy
+  participant Repo as Canonical repository
+  participant Validator as Moderation validator
+  participant Tombstone as Tombstone projection
+  participant Views as Views search caches and exports
+
+  Moderator->>Policy: moderation authority evidence · reason scope appeal and exact unsafe digest
+  Policy->>Validator: repository configuration authority · permitted action and safe audit fields
+  Repo->>Validator: repository acceptance authority · exact target revision and current overlay state
+  Validator-->>Repo: moderation authority snapshot · accepted tombstone decision or fail-closed rejection
+  Repo->>Tombstone: repository acceptance authority · decision plus safe provenance and digest
+  Tombstone->>Views: moderation projection authority · safe replacement while preserving graph edges
+  Views-->>Moderator: repository evidence authority · tombstone reason appeal state and non-recall warning
+```
+
+**Text alternative.** A scoped moderator supplies an exact digest, reason, scope, appeal state, and authority evidence. Accepted policy creates a safe tombstone projection. Every view, search result, cache, and later export uses the replacement while graph edges and safe provenance remain. The overlay cannot be reopened through lifecycle state; restoration requires a new authorized decision and clean artifact revision. Already-forked copies cannot be recalled.
+
 ## Diagram and decision index
 
-The version-controlled UML/C4, artifact, sequence, decision, moderation, ADR, and verification maps are added below in the following architecture commits. Every visual diagram is paired with a prose or table alternative for accessibility and review without Mermaid rendering.
+The diagrams above are version-controlled Mermaid source with adjacent text alternatives. The ADR and verification map below binds their contracts to owning packages and downstream nodes.
