@@ -223,11 +223,12 @@ All displayed state is regenerated from immutable content plus accepted events a
 | Solution assessment | `partially_supported` to `unreviewed` | `reopen_solution_assessment` decision | Same authority scope; reason and invalidated evidence required. |
 | Solution assessment | `supported_under_criteria` to `unreviewed` | `reopen_solution_assessment` decision | Same authority scope; reason and invalidated evidence required. |
 | Solution assessment | `rejected_under_criteria` to `unreviewed` | `reopen_solution_assessment` decision | Same authority scope; reason and invalidated evidence required. |
-| Request state | `open` to `acknowledged` | `ExchangeRequestEventV1(acknowledge)` | Exact requested actor or verified delegate; nonterminal. |
-| Request state | `open` to `answered` | `ExchangeRequestEventV1(answer)` | Exact requested actor/delegate plus answer-exchange ref; terminal. |
-| Request state | `acknowledged` to `answered` | `ExchangeRequestEventV1(answer)` | Exact requested actor/delegate plus answer-exchange ref; terminal. |
-| Request state | `open` to `declined` | `ExchangeRequestEventV1(decline)` | Exact requested actor/delegate; terminal. |
-| Request state | `acknowledged` to `declined` | `ExchangeRequestEventV1(decline)` | Exact requested actor/delegate; terminal. |
+| Directed-request state | `open` to `acknowledged` | `ExchangeRequestEventV1(acknowledge)` | Sole requested actor or request-scoped verified delegate; nonterminal. |
+| Directed-request state | `open` to `answered` | `ExchangeRequestEventV1(answer)` | Sole requested actor or request-scoped verified delegate plus answer-exchange ref; terminal. |
+| Open-request state | `open` to `answered` | `ExchangeRequestEventV1(answer)` | Repository-policy-authorized submitting actor or that actor's verified delegate plus answer-exchange ref; terminal. |
+| Directed-request state | `acknowledged` to `answered` | `ExchangeRequestEventV1(answer)` | Sole requested actor or request-scoped verified delegate plus answer-exchange ref; terminal. |
+| Directed-request state | `open` to `declined` | `ExchangeRequestEventV1(decline)` | Sole requested actor or request-scoped verified delegate; terminal. |
+| Directed-request state | `acknowledged` to `declined` | `ExchangeRequestEventV1(decline)` | Sole requested actor or request-scoped verified delegate; terminal. |
 | Request state | `open` to `withdrawn` | `ExchangeRequestEventV1(withdraw)` | Inviter or authorized moderator; terminal. |
 | Request state | `acknowledged` to `withdrawn` | `ExchangeRequestEventV1(withdraw)` | Inviter or authorized moderator; terminal. |
 | Request state | `open` to `superseded` | same-author corrected request revision | Exact successor; prior request retained; terminal. |
@@ -650,7 +651,7 @@ Deferred. Requires its own accepted privacy, provider, credential, and authority
 The implementation issue train must include:
 
 - end-to-end repository fixtures where a proof-system hardness problem is drafted and opened; an inert synthetic specialist receives a non-notifying single-recipient directed request; separate immutable `ExchangeRequestEventV1` artifacts exercise acknowledgement, answer with exact answer-exchange reference, decline, inviter withdrawal, and same-author supersession; open-request answers exercise repository actor/delegate authority; human-authored and agent-authored responses remain distinguishable; an RFC submits a bounded solution claim; a counterexample contests it; at least two exact solution-claim revisions are neutrally compared; a candidate revision responds; preserved dissent remains reachable; and only final decision artifacts change problem/RFC/solution assessment state;
-- hostile request-event fixtures for stale targets, unauthorized actors/delegates, conflicting terminal events, source-state races, duplicate IDs with different bytes, cross-author supersession, malformed answer references, non-linear history, and idempotent replay; after repository acceptance, deterministic projections must match from problem, request-thread, and actor-oriented “addressed to me”/“unanswered” views;
+- positive request-event fixtures must prove an authorized open-request answer and its answer-exchange binding; hostile fixtures must prove unauthorized open-request answers, stale targets, unauthorized directed actors/delegates, conflicting terminal events, source-state races, duplicate IDs with different bytes, cross-author supersession, malformed answer references, non-linear history, and idempotent replay fail closed; after repository acceptance, deterministic projections must match from problem, request-thread, and actor-oriented “addressed to me”/“unanswered” views;
 - graph round-trip tests proving one canonical solution claim and exchange can be discovered from both problem and RFC views without duplicate storage;
 - native WMT tests that require the exact pinned Z3 version;
 - signed provenance, reproducible-build, SBOM, artifact-digest, license, and vulnerability checks;

@@ -169,13 +169,23 @@ Review batch `deleg_25180eab` returned one `APPROVE` and two `REQUEST CHANGES` v
 | P1 incomplete fixtures | Added immutable event artifacts for acknowledge/answer/decline/withdraw/supersede, hostile stale/authority/conflict/replay fixtures, and post-acceptance problem/thread/actor projections. | Patched; final review required |
 | S1–S10 | Follow-up security review found no High security/authority blocker. | Approved at `77fd75f` |
 
+## Final review of `069a1ca`
+
+Review batch `deleg_4c36a8d1` returned two `APPROVE` verdicts and one narrow `REQUEST CHANGES` verdict. Preserved reports:
+
+- [Ontology review](reviews/issue-16-final-ontology-review-069a1ca.md) — `APPROVE`
+- [Security review](reviews/issue-16-final-security-review-069a1ca.md) — `APPROVE`
+- [Product review](reviews/issue-16-final-product-review-069a1ca.md) — `REQUEST CHANGES`
+
+The final product blocker was a matrix/prose mismatch only: the general `open → answered` row required a requested actor even though open requests have none. The matrix now has separate directed-request and open-request rows, with repository-policy actor/delegate authority for the open case. Positive authorized-open-answer and hostile unauthorized-open-answer fixtures are explicit. A final exact-head product confirmation is required.
+
 Remaining blockers:
 
 1. complete the Gate 0 compiler/parser/resource fixes and reproducible package;
 2. prove the credentialless-origin and nested-worker topology on the intended deployment target;
 3. calibrate the fixed security ceilings without raising the current profile;
 4. define the community RFC maintainer policy and decision evidence; and
-5. obtain final exact-head ontology and product/workflow approval on the post-`77fd75f` corrections.
+5. obtain final exact-head product/workflow confirmation of the post-`069a1ca` matrix correction.
 
 ## Final review disposition
 
