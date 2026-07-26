@@ -1,8 +1,8 @@
 # Issue #16 design — RFC and Problem Board exchanges with World Model Trajectories peer review
 
 - Issue: `ZenithResearch/castalia-web#16`
-- Design status: In review
-- Review posture: Changes requested; acceptance blockers remain
+- Design status: Peer-reviewed; awaiting repository-owner approval
+- Review posture: Independent reviews approve; implementation gates remain
 - Scope: Product and integration contract only
 - Target repository: `ZenithResearch/castalia-web`
 - Engine source: `bananawalnut/world-model-trajectories`

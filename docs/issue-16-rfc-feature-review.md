@@ -179,14 +179,17 @@ Review batch `deleg_4c36a8d1` returned two `APPROVE` verdicts and one narrow `RE
 
 The final product blocker was a matrix/prose mismatch only: the general `open → answered` row required a requested actor even though open requests have none. The matrix now has separate directed-request and open-request rows, with repository-policy actor/delegate authority for the open case. Positive authorized-open-answer and hostile unauthorized-open-answer fixtures are explicit. A final exact-head product confirmation is required.
 
+## Product confirmation of `714a282`
+
+[The final product confirmation](reviews/issue-16-final-product-confirmation-714a282.md) from batch `deleg_0ff5bd52` returned `APPROVE`. It verified the corrected directed/open answer authority, positive and hostile fixtures, P1–P5, and the paired Problem Board/community RFC solution-claim requirement. No peer-review blocker remains.
+
 Remaining blockers:
 
 1. complete the Gate 0 compiler/parser/resource fixes and reproducible package;
 2. prove the credentialless-origin and nested-worker topology on the intended deployment target;
 3. calibrate the fixed security ceilings without raising the current profile;
-4. define the community RFC maintainer policy and decision evidence; and
-5. obtain final exact-head product/workflow confirmation of the post-`069a1ca` matrix correction.
+4. define the community RFC maintainer policy and decision evidence.
 
 ## Final review disposition
 
-**REQUEST CHANGES remains in force.** The Issue #16 feature design incorporates the findings but is not approved. Approval requires the remaining blockers, follow-up review, and explicit repository-maintainer approval on Issue #16/PR #17. Approval would authorize implementation issue decomposition only—not implementation, merge, deployment, credentials, Matrix access, funding, or governance action.
+**INDEPENDENT PEER REVIEW APPROVES THE DESIGN FOR OWNER DECISION AND IMPLEMENTATION ISSUE DECOMPOSITION.** Ontology review approved at `069a1ca`, security/authority review approved at `069a1ca`, and product/workflow review approved at `714a282`. The remaining items are implementation gates, not unresolved design-review findings. Explicit repository-owner approval on Issue #16/PR #17 is still required; peer-review approval does not close the issue or authorize implementation, merge, deployment, credentials, Matrix access, funding, or governance action.
