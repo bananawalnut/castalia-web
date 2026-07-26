@@ -1,9 +1,10 @@
-# RFC 0001 focused product and workflow review
+# Issue #16 focused product and workflow review
 
 - Delegation batch: `deleg_2d387995`
 - Verdict: Request changes
 - Preservation: Verbatim independent review report
-- Status: Resolution paused at checkpoint; findings remain authoritative inputs to the draft RFC
+- Status: Resolution paused at checkpoint; findings remain authoritative inputs to the feature design
+- Naming note: the reviewed development artifact was then mislabeled “RFC 0001”; it is now the Issue #16 feature design. The report below is preserved verbatim.
 
 # REQUEST CHANGES
 

@@ -1,6 +1,7 @@
-# RFC 0001 — Problem-board and RFC exchanges with World Model Trajectories peer review
+# Issue #16 design — RFC and Problem Board exchanges with World Model Trajectories peer review
 
-- Status: Draft
+- Issue: `ZenithResearch/castalia-web#16`
+- Design status: In review
 - Review posture: Changes requested; acceptance blockers remain
 - Scope: Product and integration contract only
 - Target repository: `ZenithResearch/castalia-web`
@@ -86,10 +87,10 @@ A WMT analysis can support a review. It cannot constitute a review by itself.
 
 ### Authority
 
-This RFC does not change the current Castalia Web authority ledger.
+This issue design does not change the current Castalia Web authority ledger.
 
 - Matrix remains canonical for Matrix state.
-- Castalia Control/Dregg authority remains outside this RFC.
+- Castalia Control/Dregg authority remains outside this issue design.
 - The repository remains canonical for the RFC revision and checked-in peer-review artifacts in the first slice.
 - WMT output is reproducible computational evidence for the supplied formalization, engine, solver, profile, and budgets. It is not an authority source.
 - Humans and the community's accepted process remain authoritative for formalization acceptance, RFC disposition, and every consequential action.
@@ -245,7 +246,7 @@ Git is the revision system. Substantive changes use branches and pull requests; 
 
 ## Proposed artifact contracts
 
-The schemas below are normative field sets for later JSON Schema work. They are not implemented by this RFC.
+The schemas below are normative field sets for later JSON Schema work. They are not implemented by this issue design.
 
 ### `RfcClaimSetV1`
 
@@ -311,7 +312,7 @@ This nondeterministic envelope binds one semantic-result digest to start/end tim
 
 Required fields include review ID; declared author identity; repository URL; immutable commit SHA or pull-request review ID; author-versus-committer distinction; signature-verification state; exact RFC/claim-set bindings; optional verified analysis digest; cited claims/locators; rationale; model-assistance and conflict-of-interest disclosures; and optional candidate-revision reference.
 
-Individual dispositions are `comment`, `request_revision`, `recommend_approve_formalization`, `recommend_reject_formalization`, `recommend_approve_rfc`, and `recommend_reject_rfc`. Only a separate repository decision record created by the authorized RFC maintainer can transition RFC status. Git attribution is provenance only: **Git-attributed; community standing not established.**
+Individual dispositions are `comment`, `request_revision`, `recommend_approve_formalization`, `recommend_reject_formalization`, `recommend_approve_rfc`, and `recommend_reject_rfc`. Only a separate repository decision record created by the authorized community RFC maintainer can transition a feature RFC's status. Git attribution is provenance only: **Git-attributed; community standing not established.**
 
 Reviews also carry `responds_to`, `supersedes`, `status`, `resolution`, `resolution_rationale`, and `preserved_as_dissent`. Computed compatible subsets remain separate from attributed human positions. Accepted RFCs retain unresolved and preserved dissent with neutral ordering; no computed subset or human position is ranked or called defeated without an authorized governance artifact.
 
@@ -548,9 +549,9 @@ The implementation issue train must include:
 - exact copy checks for the non-authoritative claim boundary; and
 - independent exact-head technical, security/privacy, and product/governance reviews.
 
-## Acceptance criteria for this RFC
+## Acceptance criteria for the Issue #16 design
 
-This RFC is ready to move from Draft to Accepted only when:
+The Issue #16 design is ready for implementation decomposition only when:
 
 - Gate 0's source fixes, reproducible release, and runnable browser topology pass; maintainer confirmation alone is insufficient;
 - technical review confirms the proposed contracts map to actual WMT behavior;
@@ -559,27 +560,27 @@ This RFC is ready to move from Draft to Accepted only when:
 - the current Castalia authority ledger is not broadened;
 - problem, RFC, solution-claim, and exchange schemas preserve the many-to-many graph and prohibit self-asserted solution/decision status;
 - every peer-review finding is resolved, explicitly deferred with an owner/gate, or preserved as minority dissent; and
-- the authorized Castalia Web RFC maintainer records acceptance in an immutable repository decision artifact.
+- the authorized Castalia Web repository maintainer explicitly approves the issue/PR design boundary.
 
-Acceptance authorizes issue decomposition. It does not authorize implementation, merge, deployment, model calls, credentials, Matrix access, or governance actions.
+Design approval authorizes implementation issue decomposition. It does not authorize implementation, merge, deployment, model calls, credentials, Matrix access, or governance actions.
 
-## RFC lifecycle
+## Community RFC lifecycle
 
 The repository lifecycle is `Draft → In Review → Accepted | Rejected | Withdrawn → Superseded`. A substantive RFC, claim-set, profile, or budget change creates a new immutable revision, marks earlier analyses stale, and resets affected review readiness.
 
-The Castalia Web RFC maintainer may create a repository decision record that transitions this repository's implementation-contract status after required reviews. That decision does not establish community governance approval. Every decision record names the actor, authority scope, source revision, required reviews, unresolved or preserved dissent, rationale, timestamp, and immutable GitHub evidence. A merged status-header edit without that record has no transition effect.
+The community RFC repository maintainer may create a repository decision record that transitions a feature RFC's repository status after required reviews. That decision does not establish broader community governance approval. Every decision record names the actor, authority scope, source revision, required reviews, unresolved or preserved dissent, rationale, timestamp, and immutable repository evidence. A merged status-header edit without that record has no transition effect.
 
 ## Remaining acceptance decisions
 
 1. Select and test-vector the canonical JSON and domain-separated hash algorithms.
 2. Confirm the dedicated credentialless analysis origin and production COOP/COEP deployment target through Gate 0.
 3. Calibrate the fixed security ceilings against supported devices without raising them in the current profile.
-4. Name the initial Castalia Web RFC maintainer role and repository evidence for its decisions.
+4. Define the community RFC maintainer policy and repository evidence required for feature RFC decisions.
 5. Confirm the canonical repository structure specified in this revision or record an explicit replacement decision.
 
 ## Explicit non-claims
 
-This RFC does not prove or authorize:
+This issue design does not prove or authorize:
 
 - truth, factual accuracy, community consensus, RFC acceptance, reviewer standing, funding eligibility, or governance validity;
 - natural-language-to-logic faithfulness without human review;
@@ -598,9 +599,9 @@ This RFC does not prove or authorize:
 - `crate/src/lib.rs` in that commit for the typed IR and Wasm facade
 - `site/app.js` in that commit for current Z3 driving, trajectory persistence, optional OpenRouter path, and browser behavior
 - Castalia Web `README.md`, `docs/product-boundary.md`, `docs/authority-and-claims.md`, and `docs/verification.md` at base `6852185`
-- `https://x.com/DreggNet/status/2081060089079746851` as the user-specified canonical example for RFC exchange behavior; exact post text was not retrievable because the official API returned `CreditsDepleted` and the public fallback was denied, so this RFC does not invent or quote it
+- `https://x.com/DreggNet/status/2081060089079746851` as the user-specified canonical example for RFC exchange behavior; exact post text was not retrievable because the official API returned `CreditsDepleted` and the public fallback was denied, so this issue design does not invent or quote it
 - `https://x.com/DreggNet/status/2080506484304072910` as the canonical problem-board routing example: “hi @math__street it would be really meaningful if you could attack the hardness of approximate query / search based proof systems.” Expanded through a public mirror after the official API returned `CreditsDepleted`; the original X URL remains canonical
 
 ## Peer-review record
 
-See [RFC 0001 peer-review record](0001-peer-review-record.md). All three independent reviews requested changes. The RFC remains Draft until the recorded acceptance blockers and remaining decisions are closed and freshly reviewed.
+See the [Issue #16 feature-design peer-review record](issue-16-rfc-feature-review.md). All focused independent reviews requested changes. The issue and PR remain open and in review until the recorded blockers and remaining decisions are closed and freshly reviewed.

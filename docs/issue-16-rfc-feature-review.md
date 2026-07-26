@@ -1,6 +1,7 @@
-# RFC 0001 peer-review record
+# Issue #16 RFC-feature peer-review record
 
-- RFC: [World Model Trajectories for RFC peer review](0001-world-model-trajectories-peer-review.md)
+- Feature design: [RFC and Problem Board exchanges with World Model Trajectories peer review](issue-16-rfc-feature-design.md)
+- Ontology correction: this development artifact was originally mislabeled “RFC 0001”; Issue #16 and PR #17 are the canonical development controls, while RFC identifiers are reserved for community feature artifacts.
 - Reviewed draft commit: `9e68ac802943212ec64c625fd216a8e2044d9426`
 - Review date: 2026-07-25
 - Overall initial disposition: **REQUEST CHANGES**
@@ -90,11 +91,11 @@ The RFC now adds `ProblemEntryV1`, `RfcMetadataV1`, `ProblemSolutionClaimV1`, an
 
 Focused review batch `deleg_2d387995` completed with three `REQUEST CHANGES` verdicts. Resolution began, then paused at the user's checkpoint request. The complete reports are preserved verbatim:
 
-- [Focused ontology review](reviews/0001-problem-exchange-ontology-review.md)
-- [Focused security and authority review](reviews/0001-problem-exchange-security-review.md)
-- [Focused product and workflow review](reviews/0001-problem-exchange-product-review.md)
+- [Focused ontology review](reviews/issue-16-problem-exchange-ontology-review.md)
+- [Focused security and authority review](reviews/issue-16-problem-exchange-security-review.md)
+- [Focused product and workflow review](reviews/issue-16-problem-exchange-product-review.md)
 
-At checkpoint, canonical root ownership and part of the immutable revision, solution-claim, threading, request, lifecycle, and delegation model had been corrected in the RFC working tree. The remaining findings are intentionally unresolved. Resume by reconciling every focused report finding into this ledger, then run exact-head review and verification. Do not infer the inaccessible X post's contents.
+At checkpoint, canonical root ownership and part of the immutable revision, solution-claim, threading, request, lifecycle, and delegation model had been corrected in the feature-design working tree. The remaining findings are intentionally unresolved. Resume by reconciling every focused report finding into this ledger, then run exact-head review and verification. Do not infer the inaccessible X post's contents.
 
 Remaining blockers:
 

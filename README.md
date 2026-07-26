@@ -54,7 +54,7 @@ Browser downloads, reports, temporary files, and performance outputs honor `PLAY
 
 See [documentation verification](docs/verification.md) and [repository bootstrap evidence](docs/repository-evidence.md) for the narrower I01 historical evidence.
 
-Draft product and integration proposals live in the [RFC index](docs/rfcs/README.md). RFCs are non-implementing review surfaces until explicitly accepted and decomposed into their own evidence-backed issues.
+Active product development is tracked through GitHub issues and evidence-backed pull requests. Issue #16's [RFC and Problem Board feature design](docs/issue-16-rfc-feature-design.md) defines a future community-facing RFC surface; it is not itself an RFC entry.
 
 ## Fixture-only non-goals
 
