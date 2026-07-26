@@ -153,13 +153,29 @@ Fresh review batch `deleg_603a0786` returned three `REQUEST CHANGES` verdicts. V
 | S7 harassment and unlawful content | Content policy now prohibits harassment and illegal/unlawful content; Gate 2 rejects or non-exportably quarantines it; hostile fixtures require reason/authority/appeal/audit evidence. | Patched; follow-up review required |
 | P1 request lifecycle event contract | Added immutable `ExchangeRequestEventV1`, one-recipient directed requests, actor/delegation authority, answer references, idempotency/supersession/conflict rules, deterministic state, and actor indexes/fixtures. | Patched; follow-up review required |
 
+## Follow-up review of `77fd75f`
+
+Review batch `deleg_25180eab` returned one `APPROVE` and two `REQUEST CHANGES` verdicts. Preserved reports:
+
+- [Ontology review](reviews/issue-16-follow-up-ontology-review-77fd75f.md) — `REQUEST CHANGES`
+- [Security review](reviews/issue-16-follow-up-security-review-77fd75f.md) — `APPROVE`
+- [Product review](reviews/issue-16-follow-up-product-review-77fd75f.md) — `REQUEST CHANGES`
+
+| Finding | Correction after `77fd75f` | Status |
+| --- | --- | --- |
+| O7 tombstone/disposition contradiction | Removed `tombstoned` from exchange disposition, retained it solely as a moderation overlay, and removed “terminal except tombstone” wording. | Patched; final review required |
+| O7 concurrent event ordering | Defined protected first-parent acceptance order, canonical-path/digest tie-breaking, and fail-closed same-source/incompatible concurrency. | Patched; final review required |
+| P1 open-request answer authority | Open answers now require a repository-authorized actor or verified delegate; acknowledgement/decline are invalid for open requests. | Patched; final review required |
+| P1 incomplete fixtures | Added immutable event artifacts for acknowledge/answer/decline/withdraw/supersede, hostile stale/authority/conflict/replay fixtures, and post-acceptance problem/thread/actor projections. | Patched; final review required |
+| S1–S10 | Follow-up security review found no High security/authority blocker. | Approved at `77fd75f` |
+
 Remaining blockers:
 
 1. complete the Gate 0 compiler/parser/resource fixes and reproducible package;
 2. prove the credentialless-origin and nested-worker topology on the intended deployment target;
 3. calibrate the fixed security ceilings without raising the current profile;
 4. define the community RFC maintainer policy and decision evidence; and
-5. obtain follow-up exact-head ontology, security/authority, and product/workflow approval on the post-`cef7e5d` corrections.
+5. obtain final exact-head ontology and product/workflow approval on the post-`77fd75f` corrections.
 
 ## Final review disposition
 

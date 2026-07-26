@@ -165,7 +165,7 @@ Every exchange is append-only and addressable. Required fields:
 - prose body, cited source locators, and typed evidence/artifact references; and
 - optional same-author `supersedes` correction reference.
 
-An exchange is a message only. It may reference but never recreate a solution claim, candidate RFC revision, review, resolution, withdrawal, endorsement, decision, or tombstone. Parent and child share one thread root. `supersedes` is an acyclic same-author correction edge and never hides the prior entry. Generated request state is `open`, `acknowledged`, `answered`, `declined`, `withdrawn`, or `superseded`; acknowledgement and decline are voluntary response events and create no assignment, obligation, endorsement, standing, or authority. Generated exchange disposition is `open`, `resolved`, `withdrawn`, `superseded`, or `tombstoned`. Resolution and moderation are separate immutable artifacts; an exchange never rewrites itself to claim resolution.
+An exchange is a message only. It may reference but never recreate a solution claim, candidate RFC revision, review, resolution, withdrawal, endorsement, decision, or tombstone. Parent and child share one thread root. `supersedes` is an acyclic same-author correction edge and never hides the prior entry. Generated request state is `open`, `acknowledged`, `answered`, `declined`, `withdrawn`, or `superseded`; acknowledgement and decline are voluntary response events and create no assignment, obligation, endorsement, standing, or authority. Generated exchange disposition is only `open`, `resolved`, `withdrawn`, or `superseded`. Tombstoning is a separate moderation overlay, never an exchange disposition. Resolution and moderation are separate immutable artifacts; an exchange never rewrites itself to claim resolution.
 
 Inviting a named person or agent to attack a problem is routing, not assignment or endorsement. Recipient references are inert data, never active mentions. An agent entry must not bind or be attributed to a principal unless independently verifiable delegation evidence binds principal identity, agent identity, repository authority, permitted entry kinds/targets, validity interval, and revocation state. Verification fails closed at ingestion. Otherwise the UI says “self-declared agent; no principal authority established.” No agent may claim human identity, reviewer independence, community standing, or decision authority through Git attribution alone.
 
@@ -173,9 +173,9 @@ Inviting a named person or agent to attack a problem is routing, not assignment 
 
 The first version constrains a directed request to exactly one inert requested actor; an open request has none. Request lifecycle uses a separate canonical immutable event with globally scoped event ID, revision/digest, repository-authority ID, canonical path, commit SHA, exact request revision/digest, `event_kind: acknowledge | answer | decline | withdraw`, actor attribution/delegation evidence, idempotency key, and optional same-author supersession. `answer` requires an exact answer-exchange revision reference.
 
-Acknowledgement, answer, and decline must come from the requested actor or a policy-verified delegate authorized for that request. Withdrawal must come from the inviter or an authorized moderator. Same-author correction is the only supersession path. Stale request targets, duplicate IDs with different bytes, multiple effective events of the same kind, conflicting terminal events, unauthorized actors, and answer events without a valid answer exchange fail closed. Identical replay is idempotent.
+For a directed request, acknowledgement, answer, and decline must come from the requested actor or a policy-verified delegate authorized for that request. For an open request, acknowledgement and decline are invalid; an answer may come from any actor whose repository identity and submission authority pass repository policy, or that actor's policy-verified delegate. Withdrawal must come from the inviter or an authorized moderator. Same-author correction is the only supersession path. Stale request targets, duplicate IDs with different bytes, multiple effective events of the same kind, conflicting terminal events, unauthorized actors, and answer events without a valid answer exchange fail closed. Identical replay is idempotent.
 
-The generated request state is deterministic: open requests are `open` until a valid answer or inviter withdrawal; directed requests are `open`, `acknowledged`, `answered`, `declined`, `withdrawn`, or `superseded` according to the latest valid non-superseded event sequence. `answered`, `declined`, and `withdrawn` are terminal for that request revision. A new request requires a new exchange revision. Actor-oriented indexes derive “addressed to me” and “unanswered” only from verified actor/delegation matching.
+The generated request state is deterministic: open requests are `open` until a valid authorized answer, inviter withdrawal, or same-author supersession; directed requests are `open`, `acknowledged`, `answered`, `declined`, `withdrawn`, or `superseded` according to the accepted non-superseded event sequence. `answered`, `declined`, `withdrawn`, and `superseded` are terminal for that request revision. A new request requires a new exchange revision. Actor-oriented indexes derive “addressed to me” and “unanswered” only from verified actor/delegation matching.
 
 ### Exchange invariants
 
@@ -197,12 +197,12 @@ All displayed state is regenerated from immutable content plus accepted events a
 | Problem disposition | `draft` to `open` | `publish_problem` decision | Repository maintainer; exact draft revision; safety validation passed. |
 | Problem disposition | `open` to `closed` | `close_problem` decision | Maintainer; bounded reason; does not imply solved. |
 | Problem disposition | `closed` to `open` | `reopen_problem` decision | Maintainer; exact closed revision and rationale. |
-| Problem disposition | `draft` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; terminal except tombstone. |
-| Problem disposition | `open` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained; terminal except tombstone. |
-| Problem disposition | `closed` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained; terminal except tombstone. |
-| Problem disposition | `draft` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; terminal except tombstone. |
-| Problem disposition | `open` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; prior permalink retained; terminal except tombstone. |
-| Problem disposition | `closed` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; prior permalink retained; terminal except tombstone. |
+| Problem disposition | `draft` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; terminal disposition. |
+| Problem disposition | `open` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained; terminal disposition. |
+| Problem disposition | `closed` to `withdrawn` | request plus `withdraw_problem` decision | Author request or moderator authority; dissent retained; terminal disposition. |
+| Problem disposition | `draft` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; terminal disposition. |
+| Problem disposition | `open` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; prior permalink retained; terminal disposition. |
+| Problem disposition | `closed` to `superseded` | `supersede_problem` decision | Maintainer; exact successor; prior permalink retained; terminal disposition. |
 | Problem assessment | `unassessed` to `solved_under_criteria` | `assess_problem_solved` decision | Named assessment authority; exact criteria/evidence/counterevidence/dissent. |
 | Problem assessment | `solved_under_criteria` to `unassessed` | `reopen_problem_assessment` decision | Same authority scope; reason and invalidated evidence required. |
 | Community RFC disposition | absent to `Draft` | RFC revision | Author-created local draft; not published. |
@@ -213,10 +213,10 @@ All displayed state is regenerated from immutable content plus accepted events a
 | Community RFC disposition | `In Review` to `Withdrawn` | request plus `withdraw_rfc` decision | Author request or moderator authority; may reopen. |
 | Community RFC disposition | `Rejected` to `In Review` | `reopen_rfc_review` decision | Maintainer; new rationale/review requirements. |
 | Community RFC disposition | `Withdrawn` to `In Review` | `reopen_rfc_review` decision | Author request plus maintainer decision. |
-| Community RFC disposition | `Accepted` to `Superseded` | `supersede_rfc` decision | Exact successor RFC revision; terminal except tombstone. |
+| Community RFC disposition | `Accepted` to `Superseded` | `supersede_rfc` decision | Exact successor RFC revision; terminal disposition. |
 | Solution disposition | absent to `submitted` | claim revision plus `publish_solution_claim` decision | Claimant drafts; maintainer publishes exact revision. |
-| Solution disposition | `submitted` to `withdrawn` | request plus `withdraw_solution_claim` decision | Claimant request or moderator authority; terminal except tombstone. |
-| Solution disposition | `submitted` to `superseded` | `supersede_solution_claim` decision | Exact successor claim revision; terminal except tombstone. |
+| Solution disposition | `submitted` to `withdrawn` | request plus `withdraw_solution_claim` decision | Claimant request or moderator authority; terminal disposition. |
+| Solution disposition | `submitted` to `superseded` | `supersede_solution_claim` decision | Exact successor claim revision; terminal disposition. |
 | Solution assessment | `unreviewed` to `partially_supported` | `assess_solution_partial` decision | Named assessment authority; policy evidence and criterion IDs. |
 | Solution assessment | `unreviewed` to `supported_under_criteria` | `assess_solution_supported` decision | Named assessment authority; policy evidence and criterion IDs. |
 | Solution assessment | `unreviewed` to `rejected_under_criteria` | `assess_solution_rejected` decision | Named assessment authority; policy evidence and criterion IDs. |
@@ -235,12 +235,12 @@ All displayed state is regenerated from immutable content plus accepted events a
 | Exchange disposition | absent to `open` | exchange revision | Repository publish decision after validation. |
 | Exchange disposition | `open` to `resolved` | resolution decision | Named resolver scope; may reopen. |
 | Exchange disposition | `resolved` to `open` | reopen-resolution decision | Named resolver scope; reason required. |
-| Exchange disposition | `open` to `withdrawn` | request plus withdrawal decision | Author request or moderator authority; terminal except tombstone. |
-| Exchange disposition | `resolved` to `withdrawn` | request plus withdrawal decision | Author request or moderator authority; terminal except tombstone. |
-| Exchange disposition | `open` to `superseded` | same-author correction plus publish decision | Exact successor; terminal except tombstone. |
-| Exchange disposition | `resolved` to `superseded` | same-author correction plus publish decision | Exact successor; terminal except tombstone. |
+| Exchange disposition | `open` to `withdrawn` | request plus withdrawal decision | Author request or moderator authority; terminal disposition. |
+| Exchange disposition | `resolved` to `withdrawn` | request plus withdrawal decision | Author request or moderator authority; terminal disposition. |
+| Exchange disposition | `open` to `superseded` | same-author correction plus publish decision | Exact successor; terminal disposition. |
+| Exchange disposition | `resolved` to `superseded` | same-author correction plus publish decision | Exact successor; terminal disposition. |
 
-Every decision/event includes expected source state, exact target revision/digest, repository-authority ID, authority snapshot, and idempotency key. CI applies accepted artifacts in canonical repository order. A source-state mismatch, stale target, decision for a newer/latest alias rather than an exact revision, conflicting transition, or attempted transition from a terminal state fails closed. Reopening always uses the explicit row above; absent rows are forbidden.
+Every decision/event includes expected source state, exact target revision/digest, repository-authority ID, authority snapshot, and idempotency key. Accepted history is the protected branch's linear first-parent commit chain. An artifact's acceptance position is the first commit on that chain containing its canonical path and digest; artifacts first accepted in the same commit are ordered by UTF-8 canonical-path bytes and then digest bytes. Two non-idempotent events in one commit that consume the same source state or produce incompatible effective states invalidate the entire commit rather than winning by order. A source-state mismatch, stale target, decision for a latest alias rather than an exact revision, conflicting transition, non-linear accepted history, or attempted transition from a terminal state fails closed. Reopening always uses the explicit row above; absent rows are forbidden.
 
 Tombstoning is a terminal moderation overlay rather than a disposition transition. An authorized moderation/redaction decision may overlay any published artifact revision, after which its unsafe payload is unavailable and only the safe audit tombstone remains. No lifecycle row may remove or reopen that overlay; reversal requires a new independently authorized restoration decision and a new clean artifact revision.
 
@@ -649,7 +649,8 @@ Deferred. Requires its own accepted privacy, provider, credential, and authority
 
 The implementation issue train must include:
 
-- end-to-end repository fixtures where a proof-system hardness problem is drafted and opened; an inert synthetic specialist receives a non-notifying directed request; the addressee voluntarily acknowledges, answers, or declines; human-authored and agent-authored responses remain distinguishable; an RFC submits a bounded solution claim; a counterexample contests it; at least two exact solution-claim revisions are neutrally compared; a candidate revision responds; preserved dissent remains reachable; and only final decision artifacts change problem/RFC/solution assessment state;
+- end-to-end repository fixtures where a proof-system hardness problem is drafted and opened; an inert synthetic specialist receives a non-notifying single-recipient directed request; separate immutable `ExchangeRequestEventV1` artifacts exercise acknowledgement, answer with exact answer-exchange reference, decline, inviter withdrawal, and same-author supersession; open-request answers exercise repository actor/delegate authority; human-authored and agent-authored responses remain distinguishable; an RFC submits a bounded solution claim; a counterexample contests it; at least two exact solution-claim revisions are neutrally compared; a candidate revision responds; preserved dissent remains reachable; and only final decision artifacts change problem/RFC/solution assessment state;
+- hostile request-event fixtures for stale targets, unauthorized actors/delegates, conflicting terminal events, source-state races, duplicate IDs with different bytes, cross-author supersession, malformed answer references, non-linear history, and idempotent replay; after repository acceptance, deterministic projections must match from problem, request-thread, and actor-oriented “addressed to me”/“unanswered” views;
 - graph round-trip tests proving one canonical solution claim and exchange can be discovered from both problem and RFC views without duplicate storage;
 - native WMT tests that require the exact pinned Z3 version;
 - signed provenance, reproducible-build, SBOM, artifact-digest, license, and vulnerability checks;
