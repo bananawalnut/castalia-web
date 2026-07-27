@@ -69,3 +69,15 @@ Verified on stacked head `09feb9fc3b70a594c7b49b6e7e8506d86cf0301d`:
 The first local full run reached the browser gate before the configured temporary Playwright browser root had been populated. Chromium was installed into that temporary root and the unchanged exact head then passed all browser and full verification gates. Earlier Vitest worker timeouts were traced to a stale shell-level `NODE_ENV=production`; rerunning under the repository’s intended test environment passed without a source workaround. Neither local environment condition is represented as a product defect or tracked code change.
 
 Hosted checks and independent reviews remain pending. Issue #12 still governs hosted CodeQL and dependency-review availability; issue #14 cannot claim those gates are green without successful exact-head checks.
+
+## July 27 follow-up advisories
+
+A fresh live audit before merge disclosed three later HIGH advisories that were not present during the original issue #14 verification:
+
+| Advisory | Affected package | Installed | Patched target |
+| --- | --- | --- | --- |
+| 1124282 / GHSA-qwww-vcr4-c8h2 | `react-router` | `7.18.0` | `8.3.0` |
+| 1124288 / GHSA-r28c-9q8g-f849 | `postcss` | `8.5.17` | `8.5.18` |
+| 1124334 / GHSA-mh99-v99m-4gvg | `brace-expansion` | `1.1.16`, `2.1.2` | `5.0.8` |
+
+The merge gate remained fail closed. The direct router dependency advances to the first patched major compatible with the repository's pinned Node 24 runtime. The transitive `postcss` and `brace-expansion` lines are resolved to patched releases through explicit pnpm overrides, with the complete static, unit, contract, policy, build, browser, startup, artifact, and live-audit gates required to detect incompatibility. No dependency-policy exception or severity waiver is added.
