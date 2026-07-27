@@ -381,3 +381,39 @@ sequenceDiagram
 ## Diagram and decision index
 
 The diagrams above are version-controlled Mermaid source with adjacent text alternatives. The ADR and verification map below binds their contracts to owning packages and downstream nodes.
+
+## Architecture decision and verification map
+
+| Decision | Locked contract | Owning implementation surface | Verification gate | Downstream node |
+| --- | --- | --- | --- | --- |
+| One exchange graph, two primary views | Problem Board and RFC browsing project the same canonical artifact graph. | `packages/contracts`, repository validator, `apps/web` | schema round trips, graph projection fixtures, route/browser tests | A2–A7 |
+| One canonical solution assertion | `ProblemSolutionClaimV1` is the only artifact that links exact problem and RFC revisions; exchanges only reference it. | `packages/contracts`, repository validator | duplicate-representation rejection and bidirectional discovery fixtures | A2–A5 |
+| Immutable authored revisions | Authored artifacts contain forward semantic references, not mutable state or generated backlinks. | schemas and canonical repository paths | unknown-field and mutable-status negative fixtures | A2, A3 |
+| Decision-derived lifecycle | Only accepted exact-target events and decisions can change disposition or assessment. | decision processor and projection generator | exhaustive source-to-target transition fixtures and stale/conflict rejection | A3, A5, A8 |
+| Request authority is mode-specific | Directed requests bind one inert recipient; open requests bind none; answer authority follows the accepted policy for that mode. | request-event schema, actor/delegation verifier, projections | authorized and unauthorized directed/open response fixtures | A2, A3, A4 |
+| Tombstone is an overlay | Moderation hides unsafe payloads through a terminal overlay without rewriting lifecycle disposition or graph identity. | moderation processor and generated views | tombstone, appeal, restoration, cache, search, and export fixtures | A3, A5, A9 |
+| Canonical bytes and identity | RFC 8785 JCS, approved text normalization, and `castalia.sha256-jcs.v1` bind exact bytes under domain separation. | `packages/contracts` and repository validator | published digest vector, one-byte mutation, Unicode, number, and self-digest tests | A2, A3 |
+| Local export is not publication | Gate 2 may draft, validate, preview, and download only; it has no repository credentials or mutation endpoint. | `apps/web` and bundle builder | no-network/no-persistence browser tests, exact-diff tests, `405 Unavailable` mutation checks | A4, A7 |
+| WMT is optional evidence | Only a pinned reproducible package may run in credentialless bounded workers; output is about confirmed formalization consistency, not truth. | analysis adapter and isolated worker origin | provenance, limit, cancellation, malformed-output, no-network, and reproducibility tests | A6 after external Gate 0 |
+| Dissent remains reachable | Supersession and decisions never erase prior revisions, unresolved counterevidence, or preserved dissent. | canonical paths, indexes, routes | immutable permalink and historical dissent browser/graph tests | A3, A5 |
+
+### Failure semantics
+
+Validation fails closed before rendering, projection, or export when governed input has an unknown schema field, invalid or stale revision reference, digest mismatch, path violation, unsupported request mode, unauthorized actor/delegate, conflicting transition, forbidden cycle, non-linear accepted history, unsafe content, or resource-limit breach. A failure never falls back to latest aliases, repairs authored prose, downgrades authority, publishes a partial bundle, or emits a partial WMT result.
+
+### Documentation and claim gates
+
+- `scripts/verify-docs.sh` requires this architecture source, its diagram families, the decision map, the read-only route inventory, and the explicit non-claims.
+- `scripts/check-routes-and-claims.mjs` must continue to reject routes or primary actions whose copy implies capabilities absent from the fixture shell.
+- A2/A3 contract work must preserve closed enums, exact revision identity, canonicalization, and hostile fixtures before A6/A7 product routes can consume repository data.
+- A6/A7 UI work may promote only claims proven by its own tests; fixture and static Docs routes remain visibly non-live.
+- A8/A9 authority and moderation work cannot infer standing from Git attribution, agent self-description, invitation counts, endorsements, WMT output, or activity.
+
+## Implementation order
+
+1. A1 and A2 define architecture and UX in parallel.
+2. A2 contracts and A8 authority policy can proceed after this ownership map stabilizes.
+3. A3 repository validation follows canonical contracts.
+4. A6 browsing and A7 local export depend on approved UX, contracts, and projections.
+5. A6 WMT integration also waits for an immutable external Gate 0 package.
+6. A9 performs integrated exact-head review and preview-deployment verification without authorizing production.
