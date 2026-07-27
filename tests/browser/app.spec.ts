@@ -10,6 +10,7 @@ const routes = [
   "/docs",
   "/docs/api",
   "/docs/specs",
+  "/docs/architecture/rfc-exchange",
   "/missing",
 ];
 const primary = ["Communities", "Zenith forum", "Create community", "Docs"];
@@ -17,7 +18,7 @@ for (const route of routes) {
   test(`${route} has bounded semantics, privacy, responsiveness, and no serious axe findings`, async ({
     page,
   }) => {
-    const external = [];
+    const external: string[] = [];
     page.on("request", (request) => {
       if (new URL(request.url()).origin !== "http://127.0.0.1:4173")
         external.push(request.url());

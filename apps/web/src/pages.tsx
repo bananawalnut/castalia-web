@@ -83,7 +83,10 @@ export function Docs() {
         behavior.
       </p>
       <Link to="/docs/api">API</Link>{" "}
-      <Link to="/docs/specs">Specifications</Link>
+      <Link to="/docs/specs">Specifications</Link>{" "}
+      <Link to="/docs/architecture/rfc-exchange">
+        RFC exchange architecture
+      </Link>
     </>
   );
 }

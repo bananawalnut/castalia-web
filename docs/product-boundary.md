@@ -29,6 +29,7 @@ The route inventory is:
 - `/docs`
 - `/docs/api`
 - `/docs/specs`
+- `/docs/architecture/rfc-exchange`
 
 The fixture implementation of every route provides keyboard-accessible navigation to Communities (`/`), the selected forum (`/community/:slug/forum` when one is selected), Create community (`/create`), and Docs (`/docs`), plus an explicit unavailable session state. An unavailable or blocked destination remains visible and clearly labelled unavailable; it does not imply that the upstream capability works.
 

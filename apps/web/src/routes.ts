@@ -6,6 +6,10 @@ export const routes = [
   { path: "/docs", label: "Docs" },
   { path: "/docs/api", label: "API reference" },
   { path: "/docs/specs", label: "Contract specifications" },
+  {
+    path: "/docs/architecture/rfc-exchange",
+    label: "RFC exchange architecture",
+  },
 ] as const;
 
 export const navigation = [
