@@ -52,7 +52,7 @@ Browser downloads, reports, temporary files, and performance outputs honor `PLAY
 - Security policy gates fail closed for unavailable/malformed dependency reports, denied or unreviewed licenses, secret scanners, contaminated emitted artifacts, and unsafe workflow changes. Synthetic negative tests prove those failure paths.
 - GitHub workflows declare stable check names for CI, dependency review/policy, secrets, and CodeQL. Configuration is not evidence that hosted checks ran; absent or entitlement-blocked checks remain unavailable, not green.
 
-See [documentation verification](docs/verification.md) and [repository bootstrap evidence](docs/repository-evidence.md) for the narrower I01 historical evidence.
+See [documentation verification](docs/verification.md), [repository bootstrap evidence](docs/repository-evidence.md), and [dependency security evidence](docs/dependency-security.md) for bounded verification records.
 
 ## Fixture-only non-goals
 
