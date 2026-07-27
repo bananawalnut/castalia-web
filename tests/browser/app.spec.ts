@@ -11,6 +11,7 @@ const routes = [
   "/docs",
   "/docs/api",
   "/docs/specs",
+  "/docs/architecture/rfc-exchange",
   "/missing",
 ];
 const primary = ["Rooms", "Zenith", "Create room", "Docs"];

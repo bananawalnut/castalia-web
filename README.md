@@ -56,7 +56,7 @@ Browser downloads, reports, temporary files, and performance outputs honor `PLAY
 
 See [documentation verification](docs/verification.md), [repository and implementation evidence](docs/repository-evidence.md), the historical [community registry authority decision](docs/community-registry-authority.md), [dependency security evidence](docs/dependency-security.md), and [router dependency security evidence](docs/router-dependency-security.md) for bounded verification records.
 
-Active product development is tracked through GitHub issues and evidence-backed pull requests. Issue #16's [RFC and Problem Board feature design](docs/issue-16-rfc-feature-design.md) defines a future community-facing RFC surface; it is not itself an RFC entry.
+Active product development is tracked through GitHub issues and evidence-backed pull requests. Issue #16's [RFC and Problem Board feature design](docs/issue-16-rfc-feature-design.md) defines a future community-facing RFC surface; it is not itself an RFC entry. The [RFC exchange architecture and authority map](docs/architecture/rfc-exchange.md) is the implementation entry point for component ownership, canonical versus generated state, Gate 2's local-export-only boundary, and the external WMT prerequisite.
 
 ## Fixture-only non-goals
 

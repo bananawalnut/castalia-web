@@ -1,0 +1,162 @@
+.architecture-docs {
+  display: grid;
+  gap: 2.5rem;
+  max-width: 72rem;
+}
+
+.architecture-docs__hero {
+  align-items: flex-start;
+  background: linear-gradient(135deg, #0b1736, #183c70);
+  border: 1px solid #315b91;
+  border-radius: 1rem;
+  color: #f8fbff;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  padding: clamp(1.5rem, 5vw, 3.5rem);
+}
+
+.architecture-docs__hero h1 {
+  font-size: clamp(2rem, 6vw, 3.75rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 0.4rem 0 1rem;
+}
+
+.architecture-docs__eyebrow {
+  color: #9dd7ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.architecture-docs__lede {
+  color: #dceaff;
+  font-size: 1.1rem;
+  margin: 0;
+  max-width: 44rem;
+}
+
+.architecture-docs__hero .status {
+  flex: 0 0 auto;
+}
+
+.architecture-docs__notice {
+  background: #e7f4ff;
+  border-left: 0.3rem solid #1769aa;
+  border-radius: 0.3rem;
+  color: #123251;
+  padding: 1rem 1.2rem;
+}
+
+.architecture-docs section {
+  scroll-margin-top: 1rem;
+}
+
+.architecture-docs section > h2 {
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+  margin: 0 0 1rem;
+}
+
+.architecture-docs__grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.architecture-docs__card,
+.architecture-docs__split > div {
+  background: #fff;
+  border: 1px solid #ced9e7;
+  border-radius: 0.75rem;
+  padding: 1.2rem;
+}
+
+.architecture-docs__card h3,
+.architecture-docs__flow h3,
+.architecture-docs__split h3 {
+  margin: 0 0 0.45rem;
+}
+
+.architecture-docs__card p,
+.architecture-docs__flow p,
+.architecture-docs__split p {
+  margin: 0;
+}
+
+.architecture-docs__exclusion {
+  border-top: 1px solid #dce4ee;
+  color: #4a5668;
+  margin-top: 1rem !important;
+  padding-top: 1rem;
+}
+
+.architecture-docs__artifact-list {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  list-style: none;
+  padding: 0;
+}
+
+.architecture-docs__artifact-list li {
+  background: #eef3f9;
+  border-radius: 0.4rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  padding: 0.75rem 0.9rem;
+}
+
+.architecture-docs__flow {
+  display: grid;
+  gap: 0.75rem;
+  list-style: none;
+  padding: 0;
+}
+
+.architecture-docs__flow li {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ced9e7;
+  border-radius: 0.75rem;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: auto 1fr;
+  padding: 1rem;
+}
+
+.architecture-docs__flow li > span {
+  align-items: center;
+  background: #173e73;
+  border-radius: 999px;
+  color: #fff;
+  display: inline-flex;
+  font-weight: 800;
+  height: 2.25rem;
+  justify-content: center;
+  width: 2.25rem;
+}
+
+.architecture-docs__split {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.architecture-docs code {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .architecture-docs__hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .architecture-docs__grid,
+  .architecture-docs__artifact-list,
+  .architecture-docs__split {
+    grid-template-columns: 1fr;
+  }
+}
