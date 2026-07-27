@@ -152,7 +152,7 @@ Quarantined and invalid states never render a download control. Loading has a ca
 | `ExchangeEntryCard` | Kind, exact revision, attribution, target, chronology, reply edge, body, evidence links, request state. |
 | `DissentPanel` | Permanently discoverable heading and attributed entries; no “defeated” state without a separate authorized artifact. |
 | `ComparisonField` | One field across exact claims with identical labels/order; links to challenges, decisions, counterexamples, dissent; no aggregate score. |
-| `WmtEvidencePanel` | Readiness, semantic status, completeness, exclusions, logic profile, limits, engine/solver identities, source digest, non-authority copy; text/table alternative. |
+| `WmtEvidencePanel` | Attributed person, personal bucket identity and pre/post versions, candidate propositions, consistency result, insertion or conflict receipt, optional separately versioned RFC-bucket receipt, logic profile, limits, engine/solver identities, source digest, and non-authority copy; text/table alternative. |
 | `StatePanel` | `empty`, `loading`, `invalid`, `quarantined`, `unavailable`; heading, bounded explanation, recovery action, live announcement policy. |
 | `ErrorSummary` | Focused after failed validation; links each error to its field; pluralized count; no data leaves page. |
 | `BundlePreview` | **Not published**, fixed filename, canonical path list, generated deltas, exact diff, byte/artifact ceilings, explicit local-only disclosure. |
@@ -167,8 +167,10 @@ Quarantined and invalid states never render a download control. Loading has a ca
 | Invalid | Fail-closed summary; hide dependent projections and exports. | Return to source / correct named fields. | No partial acceptance. |
 | Quarantined | Safe metadata and reason class only; unsafe body and bundle absent. | Review policy / discard local draft. | No moderation verdict beyond supplied authority artifact. |
 | Unavailable | Source/review remains usable; state names missing capability. | Continue without analysis / retry locally if permitted. | Unknown is not consistent; absence is not failure of RFC. |
-| WMT exploratory evidence | Labels unconfirmed formalization and exclusions on every result. | Inspect formalization. | No approval/rejection or truth claim. |
-| WMT verified evidence | Displays exact locked regeneration evidence. | Inspect provenance. | Still no approval/rejection, truth, consensus, or recommendation. |
+| WMT person-scoped evidence | Labels the attributed person, selected bucket, exact pre-run version, formalization, and exclusions on every result. | Inspect formalization and bucket scope. | No approval/rejection, truth, consensus, or claim about another bucket. |
+| WMT insertion receipt | Displays consistent propositions and the exact personal or RFC bucket version transition. Personal and RFC receipts remain separate. | Inspect propositions and version transition. | Consistency means insertable in that bucket only; it is not peer review or authority. |
+| WMT conflict receipt | Displays conflicting propositions and confirms that the named bucket version did not change. | Inspect conflict set. | No silent insertion, cross-bucket inference, approval/rejection, or truth claim. |
+| WMT reproduced receipt | Displays exact locked regeneration evidence beside the original person and bucket scope. | Inspect provenance. | Reproduction verifies bytes and computation only; it does not create truth, consensus, recommendation, or decision authority. |
 | Superseded | Prior revision and successor link both remain. | Open exact successor. | Prior text is not erased. |
 | Preserved dissent | Attributed entry remains in default traversal. | Read exact dissent revision. | Not defeated, resolved, or lower-ranked. |
 

@@ -6,7 +6,7 @@ Status: synthetic product-design fixtures for Issue #19. They are not accepted c
 
 All names, identifiers, revisions, digests, exchanges, decisions, and evidence below are checked-in synthetic examples. Preview code may read them in memory and change local view state only. It must not fetch, submit, persist, notify, mention, authenticate, or invoke WMT.
 
-Every preview surface displays **Fixture only** and **Not published**. A recipient reference is inert. WMT states are explanatory evidence states with no authority.
+Every preview surface displays **Fixture only** and **Not published**. A recipient reference is inert. WMT states are subjective, attributed bucket-evidence fixtures with no exchange or decision authority.
 
 ## Shared fixture graph
 
@@ -106,13 +106,15 @@ Two local presentation states are available:
 
 The default state says **Analysis unavailable** because no pinned worker-safe WMT package is installed. There is no run control, credential field, network request, retry loop, or fallback result.
 
-### Evidence example
+### Person and RFC bucket examples
 
-A local view-state toggle may reveal a checked-in example labelled **Synthetic evidence example — not executed**. It displays exact engine/profile/budget digest labels, `unknown` as the stop result, and the statement: “WMT output is evidence about the supplied formalization only.”
+A local view-state toggle may reveal checked-in examples labelled **Synthetic bucket evidence — not executed**. The first identifies fixture person `ACT-ADA`, personal bucket `BKT-ADA` version 3, two candidate propositions, a consistent result, and an insertion receipt for version 3 → 4. The second checks the same propositions against RFC bucket `RFC-BKT-0042` version 1, records a conflict receipt, and states that version 1 is unchanged.
 
-It must not display consistent, verified, true, accepted, supported, solved, winner, or recommended as an artifact or community verdict.
+The panel says: **Subjective bucket evidence from ACT-ADA. Consistency applies only to the named bucket. Personal and RFC buckets are separate. This evidence decides nothing for the exchange.**
 
-Future test target: `preview labels synthetic WMT evidence without execution or authority`.
+It may say **consistent in this person's bucket** or **conflict in this RFC bucket** only beside the exact bucket identity, version, and receipt. It must not display consistent, verified, true, accepted, supported, solved, winner, or recommended as an artifact, social, or community verdict.
+
+Future test targets: `preview scopes synthetic WMT evidence to one person and bucket`; `preview separates personal and RFC bucket receipts`; and `preview changes no bucket on conflict`.
 
 ## Journey fixture E — local export preview
 
@@ -135,7 +137,7 @@ Future test target: `preview exposes exact files while download and publication 
 | Problem Board | one-column cards, no horizontal overflow | tabs or view controls use native buttons with visible focus | one H1, labelled preview navigation, attention labels include text |
 | RFC comparison | rows stack by candidate rather than clipping | candidate anchors and headings preserve reading order | exact revision included in candidate heading or description |
 | Exchange thread | chronology remains top-to-bottom | every local view control is reachable; no inert actor styled as a link | request mode, recipient, and no-notification disclosure are announced |
-| WMT evidence | unavailable state appears before example | local example toggle exposes state with `aria-expanded` | synthetic/not-executed and authority boundary are adjacent to evidence |
+| WMT evidence | unavailable state appears before examples | local example toggle exposes state with `aria-expanded` | synthetic/not-executed, person, bucket identity/version, receipt, scope separation, and no-authority copy are adjacent to evidence |
 | Export preview | file paths wrap within container | disabled download is natively disabled | Not published status precedes file list and disabled action |
 
 All dynamic local view-state changes preserve focus, use semantic headings, and avoid unsolicited live-region announcements. Reduced-motion removes nonessential transitions.

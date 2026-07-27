@@ -18,10 +18,13 @@ Normative product copy and WCAG 2.2 AA interaction requirements for Issue #19 an
 | Immutable route | **Immutable revision** |
 | Agent without verified delegation | **Self-declared agent; no principal authority established.** |
 | Git-attributed review | **Git-attributed; community standing not established.** |
-| WMT evidence | **Consistency of the confirmed formalization, not truth or community consensus.** |
+| WMT evidence | **Subjective bucket evidence from {person}, checked against {bucket} version {version}; not truth or community consensus.** |
+| WMT personal insertion | **Consistent in this person's bucket — propositions inserted as version {before} → {after}.** |
+| WMT RFC-bucket insertion | **Consistent in this RFC's separate bucket — propositions inserted as version {before} → {after}.** |
+| WMT conflict | **Conflict in {bucket}; no propositions inserted and version {version} is unchanged.** |
 | WMT subsets | **Computed compatible subsets are not human or minority positions.** |
 | WMT unknown | **Unknown is not consistent.** |
-| WMT action boundary | **This analysis does not approve, reject, fund, or execute the RFC.** |
+| WMT action boundary | **This evidence decides nothing for another person, the RFC exchange, peer review, lifecycle, funding, or governance.** |
 | WMT unavailable | **Analysis unavailable. Continue with source and human review; no remote fallback was attempted.** |
 | Local download completion | **Downloaded locally — not submitted or published.** |
 
