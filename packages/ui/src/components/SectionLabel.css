@@ -1,0 +1,26 @@
+/* Adapted from the canonical ZenithUI SectionLabel atom. */
+.sl-label {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.sl-label--eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--color-base-content);
+}
+
+.sl-label--marker {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--color-base-content);
+}
+
+.sl-label--atom {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--color-base-content);
+}

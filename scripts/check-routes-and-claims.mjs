@@ -9,6 +9,7 @@ const [routes, pages, layout, app] = await Promise.all([
 ]);
 const requiredRoutes = [
   "/",
+  "/room/:slug",
   "/community/:slug/forum",
   "/create",
   "/create/:requestId",
@@ -16,26 +17,16 @@ const requiredRoutes = [
   "/docs/api",
   "/docs/specs",
 ];
-const requiredLabels = [
-  "Communities",
-  "Zenith forum",
-  "Create community",
-  "Docs",
-];
+const requiredLabels = ["Rooms", "Zenith", "Create room", "Docs"];
 const requiredCopy = [
-  "Choose a community",
-  "fixture-only preview",
-  "Community access is not connected",
-  "View Zenith forum",
-  "Fixture only — not submitted",
-  "Forum unavailable",
-  "Messages, membership, sign-in, and posting are unavailable",
-  "No Matrix",
-  "connection was attempted",
-  "Back to communities",
-  "Read the documentation",
-  "Community unavailable",
-  "Requests unavailable",
+  "Castalia // Fixture Preview",
+  "Group chats and rooms are listed below",
+  "Members unavailable",
+  "Messages unavailable",
+  "live Synapse room adapter",
+  "Back to rooms",
+  "Create a room",
+  "does not accept or store room-creation input",
   "Request not found",
   "Contract source only",
   "Fixture schemas",
@@ -52,9 +43,9 @@ for (const value of requiredCopy)
     failures.push(`missing bounded route copy: ${value}`);
 for (const value of [
   "<main",
-  '<nav aria-label="Primary"',
+  'aria-label="Primary"',
   "Skip to content",
-  "mainRef.current?.focus()",
+  "mainRef.current?.focus({ preventScroll: true })",
 ])
   if (!layout.includes(value))
     failures.push(`missing layout contract ${value}`);
@@ -68,6 +59,10 @@ for (const pattern of [
 ])
   if (pattern.test(pages + layout + app))
     failures.push(`forbidden browser surface: ${pattern}`);
+for (const pattern of [/\bcommunities?\b/i, /\bforums?\b/i]) {
+  if (pattern.test(pages + layout))
+    failures.push(`forbidden visible terminology: ${pattern}`);
+}
 if (failures.length)
   throw new Error(`route/claim policy failed:\n${failures.join("\n")}`);
 console.log(

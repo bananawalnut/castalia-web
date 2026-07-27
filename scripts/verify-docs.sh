@@ -6,7 +6,7 @@ fail() {
   exit 1
 }
 
-required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md'
+required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md'
 for file in $required; do
   test -f "$file" || fail "missing required file: $file"
 done
@@ -45,6 +45,10 @@ done
 
 for phrase in 'Issue #2' 'fixture implementation' 'pnpm verify'; do
   grep -Fiq "$phrase" docs/verification.md || fail "missing current verification phrase: $phrase"
+done
+
+for phrase in 'HOLD — authority unresolved' 'Negative search results are not proof' 'Missing authority evidence' 'Proposed consumer requirements' 'not an accepted provider contract' 'Unlock condition'; do
+  grep -Fiq "$phrase" docs/community-registry-authority.md || fail "missing registry authority-decision phrase: $phrase"
 done
 
 if grep -Fq 'The current repository state. Contracts and non-claims are recorded; no application is scaffolded.' docs/product-boundary.md; then

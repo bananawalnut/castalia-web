@@ -2,8 +2,9 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 const routes = [
   "/",
+  "/room/zenith",
+  "/room/other",
   "/community/zenith/forum",
-  "/community/other/forum",
   "/create",
   "/create/example-request",
   "/create/missing",
@@ -12,12 +13,12 @@ const routes = [
   "/docs/specs",
   "/missing",
 ];
-const primary = ["Communities", "Zenith forum", "Create community", "Docs"];
+const primary = ["Rooms", "Zenith", "Create room", "Docs"];
 for (const route of routes) {
   test(`${route} has bounded semantics, privacy, responsiveness, and no serious axe findings`, async ({
     page,
   }) => {
-    const external = [];
+    const external: string[] = [];
     page.on("request", (request) => {
       if (new URL(request.url()).origin !== "http://127.0.0.1:4173")
         external.push(request.url());
@@ -37,6 +38,7 @@ for (const route of routes) {
       route === "/" ||
       route === "/create" ||
       route === "/docs" ||
+      route === "/room/zenith" ||
       route === "/community/zenith/forum"
         ? 1
         : 0;
@@ -84,11 +86,13 @@ test("keyboard navigation, visible focus, route focus, and unavailable controls"
   }
   await expect(page.locator(".skip-link")).toBeFocused();
   await expect(page.locator(".skip-link")).toHaveCSS("outline-style", "solid");
-  await page.getByRole("link", { name: "Create community" }).focus();
+  await page.getByRole("link", { name: "Create room" }).focus();
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/create$/);
   await expect(page.locator("main")).toBeFocused();
-  await expect(page.locator("h1")).toHaveText("Create a community");
-  await expect(page.getByLabel("Example name (fixture-only)")).toBeDisabled();
+  await expect(page.locator("h1")).toHaveText("Create a room");
+  await expect(
+    page.getByText(/does not accept or store room-creation input/),
+  ).toBeVisible();
   await expect(page.getByText("Session unavailable")).toBeVisible();
 });
