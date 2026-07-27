@@ -471,12 +471,12 @@ body {
   animation: angel-hover 4.8s steps(8, end) infinite;
 }
 
-.bitmap-warrior {
+.bitmap-merlin {
   bottom: -1px;
   left: 2%;
   width: clamp(360px, 36vw, 560px);
   transform-origin: 36% 100%;
-  animation: warrior-ready 3.6s steps(6, end) infinite;
+  animation: merlin-conjure 3.6s steps(6, end) infinite;
 }
 
 @keyframes angel-hover {
@@ -502,7 +502,7 @@ body {
   }
 }
 
-@keyframes warrior-ready {
+@keyframes merlin-conjure {
   0%,
   100% {
     transform: translate(0, 0) rotate(0deg);
@@ -872,7 +872,7 @@ body {
     margin-top: 1.5rem;
   }
 
-  .bitmap-warrior {
+  .bitmap-merlin {
     bottom: 0;
     left: -90px;
     width: 330px;

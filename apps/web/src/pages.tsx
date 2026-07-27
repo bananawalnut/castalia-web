@@ -49,8 +49,8 @@ export function Rooms() {
         aria-hidden="true"
       />
       <img
-        className="bitmap-figure bitmap-warrior"
-        src="/bitmap/warrior.png"
+        className="bitmap-figure bitmap-merlin"
+        src="/bitmap/merlin.png"
         alt=""
         aria-hidden="true"
       />
