@@ -6,12 +6,16 @@ fail() {
   exit 1
 }
 
-required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md docs/issue-16-rfc-feature-design.md docs/issue-16-rfc-feature-review.md'
+required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md docs/issue-16-rfc-feature-design.md docs/issue-16-rfc-feature-review.md docs/architecture/rfc-exchange.md'
 for file in $required; do
   test -f "$file" || fail "missing required file: $file"
 done
 
-for route in '/' '/community/:slug/forum' '/create' '/create/:requestId' '/docs' '/docs/api' '/docs/specs'; do
+for phrase in 'C4 system context' 'C4 containers and components' 'Artifact graph and ownership' 'Problem publication and view sequence' 'RFC and solution-claim sequence' 'Exchange and challenge sequence' 'Request lifecycle sequence' 'Decision lifecycle sequence' 'Moderation and tombstone overlay' 'Architecture decision and verification map' 'Failure semantics' 'Explicit non-claims'; do
+  grep -Fiq "$phrase" docs/architecture/rfc-exchange.md || fail "missing RFC exchange architecture contract phrase: $phrase"
+done
+
+for route in '/' '/community/:slug/forum' '/create' '/create/:requestId' '/docs' '/docs/api' '/docs/specs' '/docs/architecture/rfc-exchange'; do
   grep -Fq "\`$route\`" docs/product-boundary.md || fail "missing canonical route: $route"
 done
 

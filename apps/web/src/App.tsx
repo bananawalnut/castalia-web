@@ -5,6 +5,7 @@ import {
   useParams,
 } from "react-router";
 import { Layout } from "./Layout.js";
+import { RfcArchitectureDocs } from "./rfcArchitectureDocs.js";
 import {
   ApiDocs,
   Create,
@@ -28,6 +29,10 @@ export const router = createBrowserRouter([
       { path: "/docs", element: <Docs /> },
       { path: "/docs/api", element: <ApiDocs /> },
       { path: "/docs/specs", element: <Specs /> },
+      {
+        path: "/docs/architecture/rfc-exchange",
+        element: <RfcArchitectureDocs />,
+      },
       { path: "*", element: <NotFound /> },
     ],
   },

@@ -3,6 +3,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { Layout } from "../src/Layout.js";
 import { Rooms, Room, NotFound } from "../src/pages.js";
+import { RfcArchitectureDocs } from "../src/rfcArchitectureDocs.js";
 afterEach(cleanup);
 function at(path: string) {
   return render(
@@ -14,6 +15,10 @@ function at(path: string) {
             children: [
               { path: "/", element: <Rooms /> },
               { path: "/room/:slug", element: <Room /> },
+              {
+                path: "/docs/architecture/rfc-exchange",
+                element: <RfcArchitectureDocs />,
+              },
               { path: "*", element: <NotFound /> },
             ],
           },
@@ -58,5 +63,19 @@ describe("route shell", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(screen.getByText("Skip to content")).toBeInTheDocument();
+  });
+  it("renders RFC exchange architecture within the Castalia docs shell", () => {
+    at("/docs/architecture/rfc-exchange");
+    expect(
+      screen.getByRole("heading", {
+        level: 1,
+        name: "RFC exchange architecture",
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Design documentation only")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: "Authority boundaries" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
   });
 });

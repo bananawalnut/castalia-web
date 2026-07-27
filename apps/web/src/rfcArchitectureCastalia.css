@@ -1,0 +1,127 @@
+/* Keep architecture inside the Merlin + Angel Castalia visual system. */
+.architecture-docs {
+  max-width: 76rem;
+  min-height: calc(100vh - 34px);
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  color: var(--castalia-paper);
+}
+
+.architecture-docs__hero {
+  position: relative;
+  min-height: 20rem;
+  overflow: hidden;
+  color: var(--castalia-paper);
+  background: rgb(6 61 147 / 34%);
+  border: 4px dotted var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 7px 7px 0 var(--castalia-shadow);
+}
+
+.architecture-docs__hero > div,
+.architecture-docs__hero > .status {
+  position: relative;
+  z-index: 2;
+}
+
+.architecture-docs__hero > div {
+  max-width: 68%;
+}
+
+.architecture-docs__hero h1,
+.architecture-docs section > h2,
+.architecture-docs h3 {
+  color: var(--castalia-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.architecture-docs__eyebrow,
+.architecture-docs__lede,
+.architecture-docs__exclusion {
+  color: var(--castalia-paper);
+}
+
+.architecture-docs a {
+  color: var(--castalia-paper);
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.architecture-docs__hero .status {
+  padding: 0.5rem 0.7rem;
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border: 2px solid var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.architecture-docs__figure {
+  position: absolute;
+  right: 3rem;
+  bottom: -3.5rem;
+  z-index: 1;
+  display: block;
+  width: clamp(155px, 22vw, 285px);
+  height: auto;
+  opacity: 0.78;
+  pointer-events: none;
+  user-select: none;
+  image-rendering: pixelated;
+  filter: drop-shadow(6px 8px 0 rgb(2 37 108 / 28%));
+  animation: angel-hover 4.8s steps(8, end) infinite;
+}
+
+.architecture-docs__notice {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border: 2px solid var(--castalia-paper);
+  border-left-width: 8px;
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--castalia-shadow);
+}
+
+.architecture-docs__card,
+.architecture-docs__split > div,
+.architecture-docs__flow li,
+.architecture-docs__artifact-list li {
+  color: var(--castalia-paper);
+  background: rgb(6 61 147 / 34%);
+  border: 3px dotted var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 5px 5px 0 var(--castalia-shadow);
+}
+
+.architecture-docs__exclusion {
+  border-color: rgb(255 253 245 / 72%);
+}
+
+.architecture-docs__flow li > span {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border-radius: 0;
+}
+
+@media (max-width: 720px) {
+  .architecture-docs {
+    padding: 1rem;
+  }
+
+  .architecture-docs__hero {
+    min-height: 28rem;
+    padding: 1.4rem;
+  }
+
+  .architecture-docs__hero > div {
+    max-width: 100%;
+  }
+
+  .architecture-docs__figure {
+    right: -1rem;
+    bottom: -2rem;
+    width: 165px;
+    opacity: 0.52;
+  }
+}
