@@ -1,8 +1,8 @@
 # Castalia Web
 
-Private, fixture-only scaffold for the planned Castalia community selector, Matrix forum shell, community request/status flow, and contract documentation.
+Private, fixture-only scaffold for the planned Castalia collective selector, Matrix forum shell, Castalia Control request/status flow, and contract documentation.
 
-The repository now contains an executable local fixture shell and BFF. It does **not** provide live Matrix access, authentication, community or room provisioning, deployment evidence, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md) and [claim ledger](docs/authority-and-claims.md).
+The repository now contains an executable local fixture shell and BFF. It does **not** provide live Matrix access, wallet authentication, Dregg capability presentation, Castalia Control connectivity, community or room provisioning, deployment evidence, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
 
 ## Architecture
 
@@ -11,6 +11,8 @@ The repository now contains an executable local fixture shell and BFF. It does *
 - `packages/contracts` — authoritative OpenAPI 3.1 and JSON Schema 2020-12 sources, fixtures, checked-in generated TypeScript, and drift checks.
 - `packages/ui` — small local UI primitives used by the fixture shell.
 - `packages/matrix-client` — network-free, read-only interface and unavailable fixture; no Matrix SDK or privileged operations.
+
+The planned live composition keeps responsibilities separate: Castalia Control owns Dregg authorization, challenge/replay policy, admission policy/status, and authority receipts; an infrastructure provisioner owns cloud/DNS/Synapse/federation credentials and executes separately authorized mutations; Matrix remains canonical for Matrix state; Castalia Web remains unprivileged. None of those live integrations is implemented here.
 
 ## Exact toolchain
 
@@ -56,4 +58,4 @@ See [documentation verification](docs/verification.md), [repository bootstrap ev
 
 ## Fixture-only non-goals
 
-This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, registration/join/posting/redaction, registry lookup or mutation, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, deployment/rollback/signing, branch-rule binding, or production readiness. `/health` proves only that the local fixture process is responding.
+This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, wallet proof, `dga1_` custody/presentation, Castalia Control lookup or mutation, registration/join/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, deployment/rollback/signing, branch-rule binding, or production readiness. `/health` proves only that the local fixture process is responding.
