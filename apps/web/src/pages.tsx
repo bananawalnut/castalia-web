@@ -288,11 +288,24 @@ export function Docs() {
           <h3>RFC exchange architecture</h3>
           <p>
             Authority boundaries, canonical artifacts, lifecycle flows, and the
-            non-authoritative WMT evidence boundary.
+            subjective personal / RFC bucket evidence boundary.
           </p>
           <div style={{ marginTop: "var(--space-3)" }}>
             <ActionLink to="/docs/architecture/rfc-exchange" size="sm">
               View architecture
+            </ActionLink>
+          </div>
+        </Card>
+
+        <Card variant="interactive" className="docs-card">
+          <h3>Problem Board / RFC exchange</h3>
+          <p>
+            Fixture-only visual draft for problems, competing RFC claims,
+            critique, evidence, and local export preview.
+          </p>
+          <div style={{ marginTop: "var(--space-3)" }}>
+            <ActionLink to="/docs/rfc-exchange/preview" size="sm">
+              Review UI draft
             </ActionLink>
           </div>
         </Card>

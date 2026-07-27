@@ -12,6 +12,7 @@ const routes = [
   "/docs/api",
   "/docs/specs",
   "/docs/architecture/rfc-exchange",
+  "/docs/rfc-exchange/preview",
   "/missing",
 ];
 const primary = ["Rooms", "Zenith", "Create room", "Docs"];
@@ -96,4 +97,52 @@ test("keyboard navigation, visible focus, route focus, and unavailable controls"
     page.getByText(/does not accept or store room-creation input/),
   ).toBeVisible();
   await expect(page.getByText("Session unavailable")).toBeVisible();
+});
+
+test("RFC exchange preview keeps fixture boundaries while its local views work", async ({
+  page,
+}) => {
+  const external: string[] = [];
+  page.on("request", (request) => {
+    if (new URL(request.url()).origin !== "http://127.0.0.1:4173")
+      external.push(request.url());
+  });
+  await page.goto("/docs/rfc-exchange/preview");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Problem Board" }),
+  ).toBeVisible();
+  await expect(page.getByText("Fixture only — Not published")).toBeVisible();
+  await expect(page.locator('img[src="/bitmap/angel.png"]')).toBeVisible();
+  await expect(page.locator('img[src="/bitmap/merlin.png"]')).toBeVisible();
+
+  await page.getByRole("button", { name: "Compare RFCs" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Neutral RFC comparison" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Exchange thread" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Directed specialist request" }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "WMT evidence" }).click();
+  await page
+    .getByRole("button", { name: "Show synthetic bucket evidence" })
+    .click();
+  await expect(page.getByText("BKT-ADA · version 3 → 4")).toBeVisible();
+  await expect(
+    page.getByText("RFC-BKT-0042 · version 1 unchanged"),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/This evidence decides nothing for the exchange/),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Export preview" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Exchange response files" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", {
+      name: "Download unavailable in design preview",
+    }),
+  ).toBeDisabled();
+  await expect(page.getByText(/0 remote operations/)).toBeVisible();
+  expect(external).toEqual([]);
 });

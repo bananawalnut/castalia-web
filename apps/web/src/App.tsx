@@ -6,6 +6,8 @@ import {
 } from "react-router";
 import { Layout } from "./Layout.js";
 import { RfcArchitectureDocs } from "./rfcArchitectureDocs.js";
+import { RfcExchangePreview } from "./rfcExchangePreview.js";
+import "./rfcExchangeCastalia.css";
 import {
   ApiDocs,
   Create,
@@ -32,6 +34,10 @@ export const router = createBrowserRouter([
       {
         path: "/docs/architecture/rfc-exchange",
         element: <RfcArchitectureDocs />,
+      },
+      {
+        path: "/docs/rfc-exchange/preview",
+        element: <RfcExchangePreview />,
       },
       { path: "*", element: <NotFound /> },
     ],

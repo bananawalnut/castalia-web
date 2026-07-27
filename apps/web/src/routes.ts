@@ -11,6 +11,7 @@ export const routes = [
     path: "/docs/architecture/rfc-exchange",
     label: "RFC exchange architecture",
   },
+  { path: "/docs/rfc-exchange/preview", label: "RFC exchange preview" },
 ] as const;
 
 export const navigation = [
