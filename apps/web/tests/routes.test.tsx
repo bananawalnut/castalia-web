@@ -63,6 +63,13 @@ describe("route shell", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("main")).toBeInTheDocument();
     expect(screen.getByText("Skip to content")).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { level: 1, name: "Castalia" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: "Rooms" }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Members unavailable")).not.toBeInTheDocument();
   });
   it("renders RFC exchange architecture within the Castalia docs shell", () => {
     at("/docs/architecture/rfc-exchange");

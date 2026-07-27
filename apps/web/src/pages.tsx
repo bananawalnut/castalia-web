@@ -41,7 +41,7 @@ function ActionLink({
 
 export function Rooms() {
   return (
-    <div className="bitmap-scene">
+    <div className="bitmap-scene bitmap-landing">
       <img
         className="bitmap-figure bitmap-angel"
         src="/bitmap/angel.png"
@@ -55,50 +55,9 @@ export function Rooms() {
         aria-hidden="true"
       />
 
-      <header className="page-header bitmap-message">
-        <SectionLabel variant="eyebrow">
-          Castalia // Fixture Preview
-        </SectionLabel>
-        <h1>Rooms are ready.</h1>
-        <p className="bitmap-declaration">The line is not.</p>
+      <header className="bitmap-title">
+        <h1>Castalia</h1>
       </header>
-
-      <section className="rooms-window" aria-labelledby="rooms-heading">
-        <div className="window-titlebar">
-          <h2 id="rooms-heading">Rooms</h2>
-          <span>01 found</span>
-        </div>
-        <p className="window-intro">
-          Group chats and rooms are listed below. Live Matrix connection is
-          unavailable in fixture mode.
-        </p>
-        <div className="room-list">
-          {rooms.map((room) => (
-            <Card key={room.slug} variant="interactive" className="room-card">
-              <div>
-                <SectionLabel variant="marker">Group chat</SectionLabel>
-                <h3>{room.name}</h3>
-                <p>{room.description}</p>
-              </div>
-              <div className="room-card-footer">
-                <Badge variant="default">Members unavailable</Badge>
-                <ActionLink to={`/room/${room.slug}`} size="sm">
-                  Enter
-                </ActionLink>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section className="bitmap-status" aria-labelledby="status-heading">
-        <h2 id="status-heading">Connection</h2>
-        <StatusBadge label="Fixture" meta="disconnected" tone="warning" />
-        <p>
-          No Matrix session active. Messages, sign-in, and posting are
-          unavailable.
-        </p>
-      </section>
     </div>
   );
 }

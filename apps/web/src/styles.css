@@ -451,6 +451,36 @@ body {
   mix-blend-mode: screen;
 }
 
+.bitmap-landing {
+  min-height: calc(100svh - 34px);
+}
+
+.bitmap-title {
+  position: absolute;
+  top: 9%;
+  left: 5%;
+  z-index: 3;
+  width: auto;
+  margin: 0;
+  color: var(--castalia-paper);
+  text-align: left;
+}
+
+.bitmap-title h1 {
+  margin: 0;
+  color: inherit;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  text-shadow:
+    2px 0 0 var(--castalia-paper),
+    0 2px 0 var(--castalia-paper),
+    5px 5px 0 var(--castalia-shadow);
+}
+
 .bitmap-figure {
   position: absolute;
   z-index: 1;
@@ -775,6 +805,10 @@ body {
     min-height: 1120px;
   }
 
+  .bitmap-landing {
+    min-height: calc(100svh - 34px);
+  }
+
   .rooms-window {
     top: 44%;
     left: 34%;
@@ -827,6 +861,21 @@ body {
     padding: 2rem 1rem 25rem;
   }
 
+  .bitmap-landing {
+    min-height: calc(100svh - 34px);
+    padding: 0;
+  }
+
+  .bitmap-title {
+    top: 7%;
+    left: 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  .bitmap-title h1 {
+    font-size: clamp(2.8rem, 16vw, 4.4rem);
+  }
+
   .bitmap-message {
     position: relative;
     top: auto;
@@ -848,6 +897,11 @@ body {
     right: -18px;
     width: 155px;
     opacity: 0.92;
+  }
+
+  .bitmap-landing .bitmap-angel {
+    top: 20%;
+    right: -12px;
   }
 
   .rooms-window {
@@ -877,6 +931,10 @@ body {
     left: -90px;
     width: 330px;
     opacity: 0.86;
+  }
+
+  .bitmap-landing .bitmap-merlin {
+    bottom: -1px;
   }
 
   .app-main > .page-header,
