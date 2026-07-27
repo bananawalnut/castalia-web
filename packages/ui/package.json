@@ -3,8 +3,14 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "exports": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.tsx",
+      "default": "./src/index.tsx"
+    },
+    "./tokens.css": "./src/tokens.css"
+  },
+  "types": "./src/index.tsx",
   "peerDependencies": {
     "react": "19.2.3"
   },
