@@ -287,8 +287,8 @@ export function Docs() {
         <Card variant="interactive" className="docs-card">
           <h3>RFC exchange architecture</h3>
           <p>
-            Authority boundaries, canonical artifacts, lifecycle flows, and
-            the non-authoritative WMT evidence boundary.
+            Authority boundaries, canonical artifacts, lifecycle flows, and the
+            non-authoritative WMT evidence boundary.
           </p>
           <div style={{ marginTop: "var(--space-3)" }}>
             <ActionLink to="/docs/architecture/rfc-exchange" size="sm">

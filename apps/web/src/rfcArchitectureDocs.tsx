@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { Status } from "@castalia/ui";
 import "./rfcArchitectureDocs.css";
+import "./rfcArchitectureCastalia.css";
 
 const boundaries = [
   {
@@ -64,6 +65,12 @@ export function RfcArchitectureDocs() {
   return (
     <article className="architecture-docs">
       <header className="architecture-docs__hero">
+        <img
+          className="architecture-docs__figure"
+          src="/bitmap/angel.png"
+          alt=""
+          aria-hidden="true"
+        />
         <div>
           <p className="architecture-docs__eyebrow">Castalia architecture</p>
           <h1>RFC exchange architecture</h1>
