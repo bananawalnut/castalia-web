@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@castalia/contracts": "workspace:*",
-    "@castalia/matrix-client": "workspace:*",
     "@fastify/cors": "11.2.0",
     "@fastify/helmet": "13.0.2",
     "@fastify/sensible": "6.0.3",

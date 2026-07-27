@@ -4,11 +4,11 @@ import cors from "@fastify/cors";
 import helmet from "@fastify/helmet";
 import sensible from "@fastify/sensible";
 import type {
+  FixtureCommunity,
   FixtureCommunityRequest,
   FixtureSession,
   operations,
 } from "@castalia/contracts";
-import { createFixtureSynapseUserRegistry } from "@castalia/matrix-client";
 import { loadServerEnv, redactForLog } from "./runtime.js";
 import type { SafeLogEntry, ServerRuntimeConfig } from "./runtime.js";
 
@@ -44,13 +44,9 @@ const sessionFixture = {
   status: "unavailable",
   fixtureMode: true,
 } satisfies FixtureSession;
-const communityRegistry = createFixtureSynapseUserRegistry([
-  {
-    userId: "@zenith:fixture.invalid",
-    displayName: "Zenith",
-    publicCommunity: true,
-  },
-]);
+const communityFixtures = [
+  { slug: "zenith", name: "Zenith", availability: "unavailable" },
+] satisfies FixtureCommunity[];
 const requestFixture = {
   id: "example-request",
   label: "Example request",
@@ -176,7 +172,7 @@ export function buildApp(options: BuildAppOptions = {}): FastifyInstance {
 
   app.get("/health", () => healthFixture);
   app.get("/api/v1/session", () => sessionFixture);
-  app.get("/api/v1/communities", () => communityRegistry.listCommunities());
+  app.get("/api/v1/communities", () => communityFixtures);
   app.get("/api/v1/community-requests/example-request", () => requestFixture);
 
   return app;

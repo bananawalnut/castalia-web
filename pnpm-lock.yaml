@@ -47,9 +47,6 @@ importers:
       '@castalia/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@castalia/matrix-client':
-        specifier: workspace:*
-        version: link:../../packages/matrix-client
       '@fastify/cors':
         specifier: 11.2.0
         version: 11.2.0
