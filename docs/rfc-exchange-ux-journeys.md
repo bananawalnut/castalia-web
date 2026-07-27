@@ -68,3 +68,7 @@ No step requests credentials, creates a branch or pull request, calls a remote e
 - Thread navigation offers **Parent**, **Thread root**, **Previous by chronology**, and **Next by chronology** independently.
 - Filters may alter local view state but may not hide preserved dissent by default.
 - Every count names what is counted (for example, **2 candidate RFC claims**) and is never styled as a quality score.
+
+## Acceptance fixture handoff
+
+The shared synthetic graph and state-by-state A6/A7 test targets are defined in [RFC exchange usability acceptance fixtures](rfc-exchange-usability-fixtures.md).
