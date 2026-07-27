@@ -39,4 +39,3 @@ describe("fixture Matrix read port", () => {
     );
   });
 });
-
