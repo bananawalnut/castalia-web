@@ -56,6 +56,8 @@ Browser downloads, reports, temporary files, and performance outputs honor `PLAY
 
 See [documentation verification](docs/verification.md), [repository and implementation evidence](docs/repository-evidence.md), the historical [community registry authority decision](docs/community-registry-authority.md), [dependency security evidence](docs/dependency-security.md), and [router dependency security evidence](docs/router-dependency-security.md) for bounded verification records.
 
+Active product development is tracked through GitHub issues and evidence-backed pull requests. Issue #16's [RFC and Problem Board feature design](docs/issue-16-rfc-feature-design.md) defines a future community-facing RFC surface; it is not itself an RFC entry.
+
 ## Fixture-only non-goals
 
 This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, wallet proof, `dga1_` custody/presentation, Castalia Control lookup or mutation, registration/join/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, deployment/rollback/signing, branch-rule binding, or production readiness. `/health` proves only that the local fixture process is responding.

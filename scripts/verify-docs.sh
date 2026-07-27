@@ -6,7 +6,7 @@ fail() {
   exit 1
 }
 
-required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md'
+required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md docs/issue-16-rfc-feature-design.md docs/issue-16-rfc-feature-review.md'
 for file in $required; do
   test -f "$file" || fail "missing required file: $file"
 done
@@ -67,7 +67,7 @@ for phrase in 'Independently owned canonical community registry' 'independently 
   fi
 done
 
-doc_files='README.md docs/'\*.md
+doc_files='README.md docs/'\*.md' docs/reviews/'\*.md
 for file in $doc_files; do
   links=$(perl -ne 'while (/\[[^]]+\]\(([^)#]+)(?:#[^)]+)?\)/g) { print "$1\n" unless $1 =~ m{^(?:https?://|mailto:|/)} }' "$file")
   if test -n "$links"; then
