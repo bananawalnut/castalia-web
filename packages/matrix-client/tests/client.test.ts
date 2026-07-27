@@ -93,7 +93,7 @@ describe("fixture Synapse-user registry mock", () => {
     },
     {
       name: "unexpected credential field",
-      users: [{ ...publicUser, accessToken: "fixture-secret" }],
+      users: [{ ...publicUser, accessToken: "x" }],
       error: "unexpected fields",
     },
     {
