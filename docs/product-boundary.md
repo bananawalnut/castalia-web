@@ -16,7 +16,7 @@ Under current evidence, the Zenith forum posture remains **visible unavailable**
 
 ## Current fixture implementation
 
-Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. Issue #7 adds an offline registry mock that maps an explicitly public synthetic Synapse user fixture to the same unavailable Zenith community descriptor. The route surfaces below render deterministic fixture or unavailable states. They do not perform Matrix, registry, provisioning, authentication, or production network operations.
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The route surfaces below render deterministic fixture or unavailable states. They do not perform Matrix, registry, provisioning, authentication, or production network operations.
 
 ## Canonical routes and navigation
 
