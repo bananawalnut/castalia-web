@@ -1,0 +1,129 @@
+/* Adapted from the canonical ZenithUI Button atom. */
+.zn-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  transition:
+    background var(--transition-base),
+    color var(--transition-base),
+    border-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+  text-decoration: none;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* Sizes */
+.zn-button--sm {
+  font-size: 12px;
+  padding: 6px 12px;
+  height: 32px;
+}
+.zn-button--md {
+  font-size: 13px;
+  padding: 10px 20px;
+  height: 40px;
+}
+.zn-button--lg {
+  font-size: 14px;
+  padding: 12px 24px;
+  height: 48px;
+}
+
+/* Variants */
+.zn-button--primary {
+  background: var(--color-primary);
+  color: var(--color-primary-content);
+  border: none;
+}
+.zn-button--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.zn-button--secondary {
+  background: var(--color-secondary);
+  color: var(--color-secondary-content);
+  border: none;
+}
+.zn-button--secondary:hover:not(:disabled) {
+  background: var(--color-secondary-hover);
+}
+
+.zn-button--ghost {
+  background: var(--color-base-300);
+  color: var(--color-base-content);
+  border: 1px solid var(--color-neutral-hover);
+}
+.zn-button--ghost:hover:not(:disabled) {
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+}
+
+.zn-button--destructive {
+  background: var(--color-error);
+  color: var(--color-error-content);
+  border: none;
+}
+.zn-button--destructive:hover:not(:disabled) {
+  background: var(--color-error-hover);
+  color: var(--color-error-content);
+}
+
+.zn-button--warm {
+  background: var(--color-secondary);
+  color: var(--color-secondary-content);
+  border: none;
+}
+.zn-button--warm:hover:not(:disabled) {
+  background: var(--color-secondary-hover);
+}
+
+/* Active state */
+.zn-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Disabled */
+.zn-button--disabled,
+.zn-button:disabled {
+  background: var(--color-disabled) !important;
+  color: var(--color-disabled-content) !important;
+  border: 1px solid var(--color-neutral-hover) !important;
+  cursor: not-allowed;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Loading spinner */
+.zn-button__spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: var(--radius-full);
+  animation: zn-spin 0.6s linear infinite;
+}
+
+.zn-button__loading-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@keyframes zn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,45 +1,42 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #172033;
-  background: #f8fafc;
-  line-height: 1.5;
-}
-* {
+/* ZenithUI Design Tokens */
+@import "@castalia/ui/tokens.css";
+
+/* Base */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
-}
-body {
   margin: 0;
-  min-width: 320px;
-  overflow-x: hidden;
+  padding: 0;
 }
-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 1rem;
-  background: #fff;
-  border-bottom: 1px solid #ccd5e0;
+
+html,
+body,
+#root {
+  min-height: 100%;
 }
-nav {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+
+body {
+  font-family: var(--font-mono);
+  font-size: var(--text-body);
+  line-height: var(--leading-normal);
+  color: var(--color-base-content);
+  background-color: var(--color-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
-a {
-  color: #174ea6;
-  text-underline-offset: 0.2em;
+
+/* Global focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
-nav a[aria-current="page"] {
-  font-weight: 700;
-  text-decoration-thickness: 0.2em;
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
-a:focus-visible,
-input:focus-visible,
-main:focus-visible {
-  outline: 3px solid #f59e0b;
-  outline-offset: 3px;
-}
+
+/* Skip link */
 .skip-link {
   position: absolute;
   left: -10000px;
@@ -47,30 +44,857 @@ main:focus-visible {
 .skip-link:focus {
   left: 1rem;
   top: 1rem;
-  background: #fff;
-  padding: 0.5rem;
-  z-index: 2;
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+  padding: var(--space-2) var(--space-3);
+  z-index: 100;
+  border-radius: var(--radius);
+  text-decoration: none;
 }
-main {
-  max-width: 56rem;
-  margin: auto;
-  padding: clamp(1rem, 4vw, 3rem);
+
+/* App layout */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-base-200);
+  border-bottom: 1px solid var(--color-base-border);
+  flex-wrap: wrap;
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
 .brand {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
   font-weight: 700;
+  color: var(--color-brand-text);
+  text-decoration: none;
+  letter-spacing: -0.02em;
 }
-.status {
-  display: inline-block;
-  border: 2px solid currentColor;
-  border-radius: 0.25rem;
-  padding: 0.2rem 0.5rem;
+
+.brand:hover {
+  color: var(--color-brand-hover);
 }
-@media (max-width: 420px) {
-  header {
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.app-nav a {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-base-content);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius);
+  transition:
+    background var(--transition-base),
+    color var(--transition-base);
+}
+
+.app-nav a:hover {
+  background: var(--color-base-300);
+  color: var(--color-brand-text);
+}
+
+.app-nav a[aria-current="page"] {
+  background: var(--color-brand-subtle);
+  color: var(--color-brand-text);
+  font-weight: 500;
+}
+
+.session-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--color-base-muted);
+  white-space: nowrap;
+}
+
+/* Main content */
+.app-main {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.app-main:focus {
+  outline: none;
+}
+
+/* Page header */
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-base-content);
+  margin-bottom: var(--space-2);
+}
+
+.page-header p {
+  color: var(--color-base-muted);
+  font-size: var(--text-body);
+}
+
+/* Room list */
+.room-list {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.room-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.room-card h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-base-content);
+}
+
+.room-card p {
+  color: var(--color-base-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+.room-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-3);
+}
+
+/* Room detail */
+.room-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.room-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.room-header h1 {
+  font-size: var(--text-2xl);
+  font-weight: 600;
+}
+
+.unavailable-notice {
+  background: var(--color-base-200);
+  border: 1px solid var(--color-base-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: center;
+}
+
+.unavailable-notice h2 {
+  font-size: var(--text-xl);
+  font-weight: 500;
+  color: var(--color-base-content);
+  margin-bottom: var(--space-3);
+}
+
+.unavailable-notice p {
+  color: var(--color-base-muted);
+  font-size: var(--text-body);
+  margin-bottom: var(--space-4);
+}
+
+/* Docs section */
+.docs-grid {
+  display: grid;
+  gap: var(--space-4);
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.docs-card h3 {
+  font-size: var(--text-md);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+  color: var(--color-base-content);
+}
+
+.docs-card p {
+  color: var(--color-base-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-header-left {
+    flex-direction: column;
     align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .app-nav {
+    gap: var(--space-2);
+  }
+
+  .app-main {
+    padding: var(--space-4);
+  }
+
+  .room-list {
+    grid-template-columns: 1fr;
+  }
+
+  .room-header {
     flex-direction: column;
   }
-  nav {
+}
+
+/* Castalia bitmap scene — adapted from the user-supplied blue-and-white reference. */
+:root {
+  --castalia-cobalt: #064dbd;
+  --castalia-cobalt-deep: #063d93;
+  --castalia-paper: #fffdf5;
+  --castalia-ink: #062c72;
+  --castalia-shadow: rgba(0, 26, 92, 0.42);
+}
+
+body {
+  color: var(--castalia-paper);
+  background: var(--castalia-cobalt);
+  font-family: "Courier New", Courier, monospace;
+  image-rendering: pixelated;
+}
+
+:focus-visible {
+  outline-color: var(--castalia-paper);
+}
+
+.app-layout {
+  background: var(--castalia-cobalt);
+}
+
+.app-header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  position: relative;
+  z-index: 20;
+  min-height: 28px;
+  padding: 0.18rem clamp(0.55rem, 1.2vw, 1.1rem);
+  color: var(--castalia-ink);
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    var(--castalia-paper) 58%,
+    #d9e4f7 100%
+  );
+  border-top: 1px solid #111;
+  border-bottom: 2px solid var(--castalia-ink);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    inset 0 -1px 0 rgba(6, 77, 189, 0.4),
+    0 2px 0 #021f52,
+    0 5px 0 rgba(0, 24, 82, 0.28);
+}
+
+.app-header-left {
+  display: contents;
+}
+
+.brand,
+.app-nav a {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  color: var(--castalia-ink);
+  border-radius: 0;
+  line-height: 1;
+  text-shadow:
+    1px 1px 0 #fff,
+    1px 2px 0 rgba(6, 77, 189, 0.28);
+}
+
+.brand {
+  font-size: clamp(0.68rem, 0.8vw, 0.76rem);
+  letter-spacing: -0.05em;
+}
+
+.brand:hover,
+.app-nav a:hover {
+  color: var(--castalia-cobalt);
+  background: transparent;
+}
+
+.app-nav {
+  justify-content: flex-start;
+  gap: clamp(0.5rem, 1vw, 0.9rem);
+  margin-left: clamp(0.65rem, 1.3vw, 1.2rem);
+}
+
+.app-nav a {
+  padding: 0.08rem 0.14rem;
+  font-size: clamp(0.5rem, 0.58vw, 0.68rem);
+}
+
+.app-nav a[aria-current="page"] {
+  color: var(--castalia-cobalt);
+  background: transparent;
+  box-shadow:
+    inset 0 -1px 0 var(--castalia-cobalt),
+    0 1px 0 #fff,
+    0 2px 0 rgba(6, 44, 114, 0.2);
+}
+
+.session-status {
+  color: var(--castalia-ink);
+  font-weight: 700;
+  font-size: 0.48rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.skip-link:focus {
+  color: var(--castalia-paper);
+  background: var(--castalia-ink);
+  border-radius: 0;
+}
+
+.app-main {
+  max-width: none;
+  padding: 0;
+  color: var(--castalia-paper);
+  background: var(--castalia-cobalt);
+}
+
+.bitmap-scene {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - 34px);
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 48% 42%,
+      rgba(255, 255, 255, 0.7) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 72% 72%,
+      rgba(255, 255, 255, 0.72) 0 2px,
+      transparent 3px
+    ),
+    radial-gradient(
+      circle at 88% 36%,
+      rgba(255, 255, 255, 0.45) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 62% 83%,
+      rgba(255, 255, 255, 0.45) 0 1px,
+      transparent 2px
+    ),
+    var(--castalia-cobalt);
+  background-size:
+    181px 173px,
+    277px 263px,
+    149px 137px,
+    223px 211px,
+    auto;
+}
+
+.bitmap-scene::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  pointer-events: none;
+  opacity: 0.22;
+  background-image: linear-gradient(
+    rgba(255, 255, 255, 0.14) 1px,
+    transparent 1px
+  );
+  background-size: 100% 4px;
+  mix-blend-mode: screen;
+}
+
+.bitmap-figure {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  image-rendering: pixelated;
+  filter: drop-shadow(5px 5px 0 rgba(2, 37, 108, 0.3));
+  will-change: transform, filter;
+}
+
+.bitmap-angel {
+  top: 10%;
+  right: 7%;
+  width: clamp(190px, 20vw, 300px);
+  transform-origin: 50% 72%;
+  animation: angel-hover 4.8s steps(8, end) infinite;
+}
+
+.bitmap-merlin {
+  bottom: -1px;
+  left: 2%;
+  width: clamp(360px, 36vw, 560px);
+  transform-origin: 36% 100%;
+  animation: merlin-conjure 3.6s steps(6, end) infinite;
+}
+
+@keyframes angel-hover {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    filter: drop-shadow(5px 5px 0 rgba(2, 37, 108, 0.3)) brightness(1);
+  }
+
+  25% {
+    transform: translate(-2px, -6px);
+    filter: drop-shadow(7px 9px 0 rgba(2, 37, 108, 0.24)) brightness(1.08);
+  }
+
+  50% {
+    transform: translate(1px, -10px);
+    filter: drop-shadow(8px 12px 0 rgba(2, 37, 108, 0.2)) brightness(1.16);
+  }
+
+  75% {
+    transform: translate(3px, -5px);
+    filter: drop-shadow(6px 8px 0 rgba(2, 37, 108, 0.26)) brightness(1.06);
+  }
+}
+
+@keyframes merlin-conjure {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+    filter: drop-shadow(5px 5px 0 rgba(2, 37, 108, 0.3)) brightness(1);
+  }
+
+  32% {
+    transform: translate(1px, -2px) rotate(-0.2deg);
+    filter: drop-shadow(6px 7px 0 rgba(2, 37, 108, 0.27)) brightness(1.04);
+  }
+
+  62% {
+    transform: translate(-1px, -4px) rotate(0.2deg);
+    filter: drop-shadow(7px 9px 0 rgba(2, 37, 108, 0.23)) brightness(1.1);
+  }
+
+  82% {
+    transform: translate(0, -2px) rotate(0deg);
+    filter: drop-shadow(6px 7px 0 rgba(2, 37, 108, 0.26)) brightness(1.04);
+  }
+}
+
+.bitmap-message {
+  position: absolute;
+  top: 10%;
+  left: 5%;
+  z-index: 3;
+  width: min(52vw, 660px);
+  margin: 0;
+  padding: clamp(2rem, 4vw, 4rem);
+  text-align: center;
+  border: 4px dotted rgba(255, 255, 255, 0.82);
+  box-shadow: 7px 7px 0 var(--castalia-shadow);
+}
+
+.bitmap-message .sl-label,
+.bitmap-scene .sl-label {
+  color: var(--castalia-paper);
+}
+
+.bitmap-message h1,
+.bitmap-declaration {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--castalia-paper);
+  text-wrap: balance;
+  text-shadow: 4px 4px 0 rgba(3, 43, 122, 0.38);
+}
+
+.bitmap-message h1 {
+  margin: 0.6rem 0 0;
+  font-size: clamp(2.15rem, 4.4vw, 4.8rem);
+  font-style: italic;
+  line-height: 1.05;
+}
+
+.bitmap-declaration {
+  margin-top: 0.35rem;
+  font-size: clamp(1.75rem, 3.7vw, 4rem) !important;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.rooms-window,
+.bitmap-status {
+  position: absolute;
+  z-index: 4;
+  color: var(--castalia-paper);
+  background: rgba(6, 77, 189, 0.88);
+  border: 3px dotted rgba(255, 255, 255, 0.88);
+  box-shadow: 7px 7px 0 var(--castalia-shadow);
+  backdrop-filter: none;
+}
+
+.rooms-window {
+  top: 49%;
+  left: 41%;
+  width: min(38vw, 500px);
+  padding: 1rem;
+}
+
+.window-titlebar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 2px solid var(--castalia-paper);
+}
+
+.window-titlebar h2,
+.bitmap-status h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.4rem, 2vw, 2rem);
+  color: var(--castalia-paper);
+}
+
+.window-titlebar span {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.window-intro {
+  margin: 0.85rem 0;
+  color: var(--castalia-paper);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.bitmap-scene .room-list {
+  display: block;
+}
+
+.bitmap-scene .room-card,
+.app-main .zn-card {
+  color: var(--castalia-paper);
+  background: transparent;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.bitmap-scene .room-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--castalia-paper);
+  transform: none;
+}
+
+.bitmap-scene .room-card h3,
+.app-main .room-card h2,
+.app-main .room-card h3,
+.room-header h1,
+.page-header h1,
+.unavailable-notice h2,
+.docs-card h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--castalia-paper);
+}
+
+.bitmap-scene .room-card p,
+.app-main .zn-card p,
+.page-header p,
+.unavailable-notice p,
+.docs-card p {
+  color: var(--castalia-paper) !important;
+}
+
+.bitmap-scene .zn-badge,
+.bitmap-scene .zn-status-badge,
+.app-main .zn-badge,
+.app-main .zn-status-badge {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border-color: var(--castalia-paper);
+  border-radius: 0;
+}
+
+.bitmap-scene .zn-status-badge__dot,
+.app-main .zn-status-badge__dot {
+  background: var(--castalia-cobalt);
+  box-shadow: none;
+}
+
+.bitmap-scene .zn-button,
+.app-main .zn-button {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border: 2px solid var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.bitmap-scene .zn-button:hover,
+.app-main .zn-button:hover {
+  color: var(--castalia-paper);
+  background: var(--castalia-ink);
+  border-color: var(--castalia-paper);
+  transform: translate(1px, 1px);
+  box-shadow: 2px 2px 0 var(--castalia-shadow);
+}
+
+.bitmap-status {
+  top: 64%;
+  right: 2%;
+  bottom: auto;
+  width: min(22vw, 330px);
+  padding: 1rem;
+}
+
+.bitmap-status h2 {
+  margin-bottom: 0.75rem;
+}
+
+.bitmap-status p {
+  margin-top: 0.75rem;
+  color: var(--castalia-paper);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.app-main > .page-header,
+.app-main > .actions,
+.app-main > .zn-card,
+.app-main > .docs-grid,
+.app-main > .room-detail,
+.app-main > h2,
+.app-main > p {
+  width: min(calc(100% - 2rem), 1100px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.app-main > h2,
+.app-main > p {
+  color: var(--castalia-paper) !important;
+}
+
+.app-main > h2 {
+  margin-top: 2rem;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.app-main > .page-header,
+.room-detail {
+  margin-top: clamp(2rem, 5vw, 5rem);
+}
+
+.app-main > .page-header {
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border: 3px dotted var(--castalia-paper);
+  box-shadow: 7px 7px 0 var(--castalia-shadow);
+}
+
+.app-main > .actions,
+.app-main > .zn-card,
+.app-main > .docs-grid {
+  margin-bottom: 2rem;
+}
+
+.room-detail {
+  padding-bottom: 3rem;
+}
+
+.unavailable-notice {
+  color: var(--castalia-paper);
+  background: transparent;
+  border: 3px dotted var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 7px 7px 0 var(--castalia-shadow);
+}
+
+@media (max-width: 900px) {
+  .app-header {
+    align-items: flex-start;
+  }
+
+  .app-header-left {
+    flex-wrap: wrap;
+  }
+
+  .session-status {
+    align-self: center;
+  }
+
+  .bitmap-message {
+    width: 58vw;
+  }
+
+  .bitmap-scene {
+    min-height: 1120px;
+  }
+
+  .rooms-window {
+    top: 44%;
+    left: 34%;
+    width: 60%;
+  }
+
+  .bitmap-status {
+    top: auto;
+    right: 3%;
+    bottom: 3%;
+    width: 42%;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    min-height: auto;
+    padding: 0.24rem 0.55rem 0.32rem;
+    align-items: center;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .app-header-left {
+    gap: 0.4rem;
+  }
+
+  .brand {
+    font-size: 0.75rem;
+  }
+
+  .app-nav {
+    width: auto;
+    gap: 0.3rem;
+    margin-left: 0.45rem;
+    overflow: visible;
+  }
+
+  .app-nav a {
+    flex: 0 0 auto;
+    font-size: 0.52rem;
+  }
+
+  .session-status {
+    align-self: center;
+    font-size: 0.42rem;
+  }
+
+  .bitmap-scene {
+    min-height: 1120px;
+    padding: 2rem 1rem 25rem;
+  }
+
+  .bitmap-message {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    padding: 1.5rem 1rem;
+  }
+
+  .bitmap-message h1 {
+    font-size: clamp(2.1rem, 11vw, 3.2rem);
+  }
+
+  .bitmap-declaration {
+    font-size: clamp(1.7rem, 9vw, 2.6rem) !important;
+  }
+
+  .bitmap-angel {
+    top: 245px;
+    right: -18px;
+    width: 155px;
+    opacity: 0.92;
+  }
+
+  .rooms-window {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    margin-top: 12rem;
+  }
+
+  .room-card-footer {
+    align-items: flex-start;
+    gap: 0.75rem;
     flex-direction: column;
+  }
+
+  .bitmap-status {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    margin-top: 1.5rem;
+  }
+
+  .bitmap-merlin {
+    bottom: 0;
+    left: -90px;
+    width: 330px;
+    opacity: 0.86;
+  }
+
+  .app-main > .page-header,
+  .app-main > .actions,
+  .app-main > .zn-card,
+  .app-main > .docs-grid,
+  .app-main > .room-detail {
+    width: min(calc(100% - 2rem), 1100px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
   }
 }
