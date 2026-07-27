@@ -11,9 +11,9 @@
 
 ## Summary
 
-Castalia Web should provide a paired problem board and RFC exchange surface. In Gate 2, people and agents can draft, validate, preview, and export problems, invitations to attack them, RFCs, claims that an RFC addresses one or more problems, challenges, evidence, counterexamples, and revisions. Publication occurs only after a human submits the export and the repository accepts its pull request. WMT can then inspect whether the confirmed formalization of an RFC can hold together, which minimal formalization conflicts exist, which maximal compatible claim subsets remain, and what a proposed revision changes. Human peer review and community decisions remain authoritative.
+Castalia Web should provide a paired problem board and RFC exchange surface. In Gate 2, people and agents can draft, validate, preview, and export problems, invitations to attack them, RFCs, claims that an RFC addresses one or more problems, challenges, evidence, counterexamples, and revisions. Publication occurs only after a human submits the export and the repository accepts its pull request. An author may use WMT as their own bucketing system to produce the logic attached to an RFC. The resulting evidence records that person's formalization and consistency result; it is subjective to that person and never decides for another person or for the RFC exchange.
 
-The minimum useful integration is a repository-backed problem/RFC exchange that can export drafts, solution claims, and reviews for human pull-request submission, paired with a read-only analysis instrument. It does not decide truth, mark a problem solved, approve an RFC, rank reviewers, allocate funds, mutate Matrix state, or execute governance. A model may propose a formalization only in a later, separately authorized phase. The initial path imports human-reviewed typed IR and exposes the natural-language-to-logic seam.
+The minimum useful integration is a repository-backed problem/RFC exchange that can export drafts, solution claims, reviews, and person-scoped WMT evidence for human pull-request submission. A consistent WMT result may simultaneously append its propositions to the submitting person's bucket; an inconsistent result leaves that bucket unchanged and records the conflicts. An RFC may also establish a distinct RFC-scoped bucket whose propositions are evaluated only against that bucket. Neither bucket is a truth, consensus, review, lifecycle, or decision authority. A model may propose a formalization only in a later, separately authorized phase. The initial path imports human-reviewed typed IR and exposes the natural-language source beside every formal claim.
 
 ## Objective
 
@@ -25,8 +25,8 @@ A reviewer should be able to:
 4. open a repository-backed RFC revision and traverse its linked problem, solution claim, and exchange thread;
 5. inspect each natural-language claim beside its source locator and plain-English back-translation;
 6. confirm or reject the formalization before analysis;
-7. run WMT locally;
-8. inspect consistency, minimal formalization conflicts, maximal compatible claim subsets, and consequences entailed by the confirmed formalization;
+7. run WMT locally against the person's selected bucket and, when present, the RFC-scoped bucket;
+8. inspect person-scoped consistency, bucket insertion or conflict receipts, minimal formalization conflicts, maximal compatible claim subsets, and consequences entailed by the confirmed formalization;
 9. challenge the RFC, its problem-solution claim, its evidence, or its formalization without erasing minority routes;
 10. fork a candidate revision without overwriting the accepted source;
 11. draft and export a peer-review artifact that cites the exact problem and RFC revisions, claim-set digest, engine commit, and analysis result; and
@@ -46,7 +46,7 @@ The reviewed fork already provides the relevant reasoning kernel:
 - state export/import and forkable trajectory snapshots; and
 - defeasible reasoning where a general default may yield to a more specific claim without hiding strict contradictions.
 
-The engine's claim is bounded: consistency of the formalization, not truth, social disagreement, consensus, or faithful natural-language interpretation. Castalia Web must preserve that boundary everywhere.
+The engine's claim is bounded: consistency of a person's formalization against a named bucket version, not truth, social disagreement, consensus, or faithful natural-language interpretation. Castalia Web must preserve that subjective, person-scoped boundary everywhere.
 
 ## Current evidence and limitations
 
@@ -70,7 +70,13 @@ Those last four facts prevent direct reuse of the current site shell. Castalia W
 
 An RFC remains a repository-backed artifact with immutable revision identity. The Markdown document is the human source. Its typed claim set is a sidecar bound to the exact document revision by digest.
 
-The WMT view is derived evidence. It cannot silently rewrite the RFC, replace peer-review prose, or become the canonical source of a community decision.
+The WMT view is attributed, person-scoped evidence from the author's own bucketing process. It cannot silently rewrite the RFC, replace peer-review prose, speak for another person's bucket, or become the canonical source of a community decision.
+
+### WMT evidence and buckets
+
+`WmtEvidenceV1` binds the submitting actor, exact RFC and claim-set revisions, WMT engine/profile/budget digests, the selected personal bucket and its pre-run version, candidate propositions, consistency result, and either a bucket-insertion receipt or a conflict receipt. Posting the evidence and updating the personal bucket are one attributed operation: if the candidate propositions are consistent with that bucket version, they are appended to the submitter's bucket; if they are inconsistent, the evidence may still be posted but the personal bucket remains unchanged.
+
+An RFC may create a separate RFC-scoped bucket with its own identity, version, definitions, and consistency history. Evidence may target the author's bucket, the RFC bucket, or both, but each result and receipt remains separate. Consistency in one bucket says nothing about consistency in another. A personal or RFC-scoped bucket records accepted propositions within that scope; it does not establish objective truth, community consensus, peer-review acceptance, RFC disposition, problem resolution, or governance authority.
 
 ### Peer review
 
@@ -92,7 +98,7 @@ This issue design does not change the current Castalia Web authority ledger.
 - Matrix remains canonical for Matrix state.
 - Castalia Control/Dregg authority remains outside this issue design.
 - The repository remains canonical for the RFC revision and checked-in peer-review artifacts in the first slice.
-- WMT output is reproducible computational evidence for the supplied formalization, engine, solver, profile, and budgets. It is not an authority source.
+- WMT evidence is the attributed person's subjective bucket-consistency record for the supplied formalization, engine, solver, profile, budgets, and named bucket version. Reproduction can verify the bytes and computation, not turn that person's evidence into authority.
 - Humans and the community's accepted process remain authoritative for formalization acceptance, RFC disposition, and every consequential action.
 
 ## Paired problem board and RFC exchange model
@@ -409,7 +415,7 @@ This deterministic artifact contains:
 - whether enumeration is exhaustive; and
 - consequences entailed by this formalization under this logic profile, each bound to its minimal witness claim IDs.
 
-It contains no timestamps or runtime telemetry. Canonical JSON and hash algorithms must be selected and test-vectored before acceptance. Browser-generated output is unverified derived evidence even when self-digested. It becomes verified computational evidence only after a locked CI job independently regenerates the same semantic bytes from reviewed source and signed release provenance.
+It contains no timestamps or runtime telemetry. Canonical JSON and hash algorithms must be selected and test-vectored before acceptance. Browser-generated output remains attributed person-scoped WMT evidence even when self-digested. A locked CI job may independently reproduce the same semantic bytes from reviewed source and signed release provenance, but that verifies the receipt's bytes and computation only; it does not promote one person's bucket evidence into objective or decision authority.
 
 The first slice emits no repair suggestion. A later contract may emit a conflict-local candidate or solver-verified global minimum-weight hitting set, but must state scope, verified restoration, whether optimality is proven, and whether the conflict collection was exhaustive.
 
@@ -637,7 +643,7 @@ Owned by `ZenithResearch/castalia-web`.
 
 ### Gate 3 — verified regeneration and repository lifecycle
 
-- Independently regenerate deterministic semantic artifacts in locked CI before labeling them verified computational evidence.
+- Independently regenerate deterministic semantic artifacts in locked CI before labeling their bytes and computation reproduced; preserve the person and bucket scope on every label.
 - Use repository/PR attribution only and display that community standing is not established.
 - Require an authorized repository decision record for every RFC state transition and preserve unresolved dissent.
 - Keep browser submission export-only until a separate live-mutation contract proves repository authentication, least-privilege writes, idempotency, review branches, moderation/redaction, spam/Sybil controls, notification consent, audit, and fail-closed recovery.

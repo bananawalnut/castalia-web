@@ -10,7 +10,7 @@ The architecture covers a read-only browser view and a future Gate 2 local-expor
 
 The community repository is the canonical authority boundary for accepted public artifacts, events, decisions, and generated projections. The protected branch's linear first-parent history determines acceptance order. Git supplies revision history; the repository layout does not duplicate historical revisions in a second directory tree.
 
-The external `bananawalnut/world-model-trajectories` fork is a prerequisite package boundary, not a component currently available in Castalia Web. It must first produce a signed, versioned, reproducible, worker-safe browser-engine release that excludes UI, provider calls, API-key storage, implicit persistence, and fail-open solver behavior. Even after that gate, WMT output is evidence about a supplied formalization only; it has no repository, review, lifecycle, moderation, truth, or governance authority.
+The external `bananawalnut/world-model-trajectories` fork is a prerequisite package boundary, not a component currently available in Castalia Web. It must first produce a signed, versioned, reproducible, worker-safe browser-engine release that excludes UI, provider calls, API-key storage, implicit persistence, and fail-open solver behavior. WMT is the participant's bucketing system: evidence posted with an RFC records that participant's formalization and consistency result against a named personal bucket version. A consistent result may append its propositions to that person's bucket in the same attributed operation; an inconsistent result posts a conflict receipt and leaves the bucket unchanged. An RFC may separately create and version its own RFC-scoped bucket. Neither scope has repository, review, lifecycle, moderation, truth, consensus, or governance authority.
 
 ## Component and data ownership
 
@@ -25,8 +25,8 @@ The external `bananawalnut/world-model-trajectories` fork is a prerequisite pack
 | Projection generator | Reproducible lifecycle/assessment/attention/thread/backlink indexes | Accepted canonical artifacts, events, decisions, tombstones | Authored meaning, irreversible source mutation, inferred authority | A5 |
 | Repository decision processor | Exact source-to-target transition validation and accepted authority snapshots | Accepted events/decisions and lifecycle policy | Automatic truth, solver authority, author-controlled status | A8 |
 | Moderation/redaction processor | Terminal tombstone overlay and safe audit projection | Authorized moderation/restoration decisions | Silent deletion, recall of forks, lifecycle rewriting | A9 |
-| Credentialless analysis origin and bounded workers (future) | Deterministic local projection to a pinned WMT package, cancellation, typed stop results | Public reviewed claim sets supplied by the user | Application credentials, persistence, network access, publication, review or decision authority | A6 after external Gate 0 |
-| External WMT package (prerequisite) | Typed reasoning over a confirmed formalization under explicit profiles and budgets | Closed projected input only | Natural-language interpretation, truth, consensus, ranking, publication, decisions | External Gate 0 |
+| Credentialless WMT origin and bounded workers (future) | Deterministic person-scoped consistency checks, cancellation, typed stop results, and insertion or conflict receipts | Public reviewed claim sets plus explicit personal and optional RFC bucket versions selected by the user | Application credentials, implicit persistence, network access, publication, review or decision authority | A6 after external Gate 0 |
+| External WMT package (prerequisite) | Typed reasoning over a participant's confirmed formalization and named bucket version under explicit profiles and budgets | Closed projected input only | Natural-language interpretation, another person's bucket, truth, consensus, ranking, publication, decisions | External Gate 0 |
 
 ### Canonical authored artifacts
 
@@ -37,6 +37,8 @@ The repository stores each multi-target artifact once at a schema-defined canoni
 - `ProblemSolutionClaimV1` — exact problem/RFC revision binding, `full | partial` coverage, approach role, criterion coverage, evidence, assumptions, limitations, risks, and falsifiers;
 - `ExchangeEntryV1` — append-only message with an immutable root subject, optional parent, attribution, request mode, and exact artifact references;
 - `ExchangeRequestEventV1` — immutable acknowledge, answer, decline, or withdraw event bound to the exact request revision and authorized actor evidence;
+- `WmtEvidenceV1` — attributed person-scoped formalization, exact pre-run bucket version, candidate propositions, consistency result, and insertion or conflict receipt;
+- `RfcBucketV1` — optional RFC-scoped proposition set with its own identity, version, definitions, and consistency history, separate from every participant's bucket;
 - peer/formalization reviews, repository events, decision records, actor/delegation evidence, external-source envelopes, and tombstones.
 
 Immutable authored revisions contain forward semantic references only. They never contain mutable status, backlink, review, exchange, decision, attention-counter, or generated-index arrays.
@@ -98,11 +100,11 @@ The future minimum product slice is browser-local and public-only until explicit
 
 Every step remains **Not published**. Unsupported mutation endpoints are absent or return `405 Unavailable`. The browser accepts no repository, Matrix, wallet, model-provider, reviewer, or application credentials. Recipient references remain inert and emit no active mention. No remote content is fetched. Prohibited content is rejected; ambiguous content enters non-exportable quarantine. A later authenticated mutation/notification design requires its own accepted issue.
 
-## External analysis boundary
+## Person-scoped WMT and bucket boundary
 
-If external Gate 0 is completed, Castalia may project a validated, reviewed typed claim envelope into the exact WMT input grammar. The credentialless analysis origin receives no ambient app authority, has no network or persistence, and runs pinned artifacts in bounded workers. Cancellation or failure terminates the complete worker tree and discards partial output. `unknown`, malformed output, timeout, cancellation, enumeration cap, and resource exhaustion remain distinct fail-closed results.
+If external Gate 0 is completed, Castalia may project a validated typed claim envelope and an explicitly selected bucket version into the exact WMT input grammar. The credentialless WMT origin receives no ambient app authority, has no network or implicit persistence, and runs pinned artifacts in bounded workers. Cancellation or failure terminates the complete worker tree and discards partial output. `unknown`, malformed output, timeout, cancellation, enumeration cap, and resource exhaustion remain distinct fail-closed results.
 
-An analysis binds exact RFC, claim-set, projected-input, engine, solver, logic-profile, and budget digests. Browser output remains unverified derived evidence until a locked job independently reproduces the deterministic semantic bytes from reviewed source and signed release provenance. Neither form can accept/reject an RFC, assess a solution claim, mark a problem solved, identify a social position, or constitute peer review.
+`WmtEvidenceV1` binds the submitting person, exact RFC and claim-set revisions, projected input, engine, solver, logic profile, budgets, selected bucket identity, and pre-run bucket version. If the candidate propositions are consistent, one attributed operation emits both the evidence and a receipt for the new personal bucket version. If inconsistent, it emits conflict evidence and no bucket mutation. The same candidate may be checked separately against an RFC-scoped bucket, producing a separate receipt and version. Reproduction verifies bytes and computation only; it cannot make subjective evidence objective, merge personal and RFC buckets, accept/reject an RFC, assess a solution claim, mark a problem solved, identify consensus, or constitute peer review.
 
 ## Explicit non-claims
 
@@ -134,11 +136,11 @@ flowchart TB
   Castalia -->|local user authority only · browser to user / Not published PR bundle download| Reader
   Maintainer -->|accepted decision authority · maintainer to repository / reviewed decisions through protected workflow| Repo
   Repo -->|repository evidence authority · repository to maintainer / exact revisions reviews and dissent| Maintainer
-  Castalia -.->|no authority · browser to WMT worker / closed reviewed typed IR| WMT
-  WMT -.->|computational evidence only · worker to browser / bounded analysis result| Castalia
+  Castalia -.->|person authority over own bucket · browser to WMT worker / typed IR plus named bucket version| WMT
+  WMT -.->|subjective bucket evidence only · worker to browser / insertion or conflict receipt| Castalia
 ```
 
-**Text alternative.** A reader supplies local public drafts or read requests to Castalia. The canonical repository supplies accepted artifacts and projections under repository acceptance authority. Castalia can return validated views or a local **Not published** download, never publication. A scoped maintainer contributes decisions only through the protected repository workflow. A future credentialless worker may send closed typed IR to a separately packaged WMT engine and receive non-authoritative computational evidence.
+**Text alternative.** A reader supplies local public drafts or read requests to Castalia. The canonical repository supplies accepted artifacts and projections under repository acceptance authority. Castalia can return validated views or a local **Not published** download, never publication. A scoped maintainer contributes decisions only through the protected repository workflow. A future credentialless worker may send typed IR plus a named personal or RFC bucket version to WMT and receive an attributed insertion or conflict receipt. That receipt is subjective bucket evidence, not a decision.
 
 ## C4 containers and components
 
@@ -179,11 +181,11 @@ flowchart LR
   Tomb -->|moderation projection authority · safe replacement to views / tombstone projection| Views
   Draft -.->|no authority · reviewed typed IR to analysis frame / closed projected input| Analysis
   Analysis -.->|no authority · pinned local call to package / bounded solver request| Package
-  Package -.->|computational evidence only · package to analysis frame / typed stop or semantic result| Analysis
-  Analysis -.->|computational evidence only · frame to views / labelled analysis evidence| Views
+  Package -.->|subjective bucket evidence only · package to analysis frame / typed stop or consistency result| Analysis
+  Analysis -.->|person-scoped evidence only · frame to views / insertion or conflict receipt| Views
 ```
 
-**Text alternative.** The Docs route is bundled read-only source. Future product views can pass exact revisions into local drafting; repository policy validates candidates before exact-diff preview and local bundle download. Canonical artifacts, normative policy, accepted decisions, deterministic projections, and moderation overlays remain repository components with separate ownership. The optional analysis frame receives only reviewed typed IR and returns labelled evidence without authority.
+**Text alternative.** The Docs route is bundled read-only source. Future product views can pass exact revisions into local drafting; repository policy validates candidates before exact-diff preview and local bundle download. Canonical artifacts, normative policy, accepted decisions, deterministic projections, and moderation overlays remain repository components with separate ownership. The optional WMT frame receives typed IR and an explicitly selected personal or RFC bucket version, then returns a labelled insertion or conflict receipt without authority over any other scope.
 
 ## Artifact graph and ownership
 
@@ -199,7 +201,9 @@ flowchart TB
   Index[Generated indexes — reproducible projection]
   ModDecision[Moderation or restoration decision — accepted authority artifact]
   Tombstone[Tombstone — safe terminal overlay]
-  Analysis[WMT analysis — non-authoritative evidence]
+  Analysis[WMT evidence — subjective and person-scoped]
+  PersonBucket[Personal bucket — participant-owned versioned propositions]
+  RfcBucket[RFC bucket — RFC-scoped versioned propositions]
 
   Problem -->|author provenance · problem to claim / exact revision and digest| Claim
   RFC -->|author provenance · RFC to claim / exact revision and digest| Claim
@@ -226,11 +230,15 @@ flowchart TB
   Exchange -->|moderation authority snapshot · exact unsafe revision to moderation decision / digest| ModDecision
   ModDecision -->|moderation authority · accepted decision to tombstone / safe reason and provenance| Tombstone
   Tombstone -->|repository projection rules · overlay to indexes / replace unsafe payload in every view| Index
-  RFC -.->|no authority · reviewed formalization to analysis / exact typed claim set| Analysis
-  Analysis -.->|computational evidence only · analysis to review / optional cited result digest| Review
+  RFC -.->|author provenance · formalization to WMT evidence / exact typed claim set| Analysis
+  PersonBucket -.->|person authority over own bucket · bucket to evidence / exact pre-run version| Analysis
+  RfcBucket -.->|RFC scope only · bucket to evidence / exact pre-run version| Analysis
+  Analysis -.->|consistency gate · evidence to personal bucket / append receipt or no mutation| PersonBucket
+  Analysis -.->|consistency gate · evidence to RFC bucket / separate append receipt or no mutation| RfcBucket
+  Analysis -.->|subjective evidence only · evidence to review / optional cited receipt digest| Review
 ```
 
-**Text alternative.** Problems and RFCs bind into one canonical solution claim. Problems, RFCs, and claims can be referenced by one stored exchange. Accepted request events change only request projections. Reviews may provide evidence to a decision, but only a valid decision changes lifecycle or assessment. Every canonical artifact contributes to reproducible indexes. Moderation decisions create tombstones that replace unsafe payloads in all projections while preserving graph identity. WMT analysis can be cited by a review but cannot become a review or decision.
+**Text alternative.** Problems and RFCs bind into one canonical solution claim. Problems, RFCs, and claims can be referenced by one stored exchange. Accepted request events change only request projections. A WMT evidence artifact is produced by a participant against an exact personal bucket version and may append consistent propositions to that bucket; an RFC bucket is checked and versioned separately. Reviews may cite either receipt, but only a valid decision changes lifecycle or assessment. Moderation decisions create tombstones while preserving graph identity. No bucket result becomes a review or decision.
 
 ## Problem publication and view sequence
 
@@ -394,7 +402,7 @@ The diagrams above are version-controlled Mermaid source with adjacent text alte
 | Tombstone is an overlay | Moderation hides unsafe payloads through a terminal overlay without rewriting lifecycle disposition or graph identity. | moderation processor and generated views | tombstone, appeal, restoration, cache, search, and export fixtures | A3, A5, A9 |
 | Canonical bytes and identity | RFC 8785 JCS, approved text normalization, and `castalia.sha256-jcs.v1` bind exact bytes under domain separation. | `packages/contracts` and repository validator | published digest vector, one-byte mutation, Unicode, number, and self-digest tests | A2, A3 |
 | Local export is not publication | Gate 2 may draft, validate, preview, and download only; it has no repository credentials or mutation endpoint. | `apps/web` and bundle builder | no-network/no-persistence browser tests, exact-diff tests, `405 Unavailable` mutation checks | A4, A7 |
-| WMT is optional evidence | Only a pinned reproducible package may run in credentialless bounded workers; output is about confirmed formalization consistency, not truth. | analysis adapter and isolated worker origin | provenance, limit, cancellation, malformed-output, no-network, and reproducibility tests | A6 after external Gate 0 |
+| WMT is subjective bucket evidence | Only a pinned reproducible package may run in credentialless bounded workers. Evidence binds one person and named bucket version; consistency may append to that person's bucket, while an RFC bucket is versioned separately. Neither scope implies truth or authority. | WMT adapter, bucket-version contract, and isolated worker origin | attribution, stale-version conflict, consistent insertion, inconsistent no-mutation, scope separation, provenance, limits, cancellation, malformed-output, no-network, and reproducibility tests | A6 after external Gate 0 |
 | Dissent remains reachable | Supersession and decisions never erase prior revisions, unresolved counterevidence, or preserved dissent. | canonical paths, indexes, routes | immutable permalink and historical dissent browser/graph tests | A3, A5 |
 
 ### Failure semantics

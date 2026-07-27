@@ -17,7 +17,7 @@ const boundaries = [
   },
   {
     name: "WMT package",
-    owns: "Bounded computation over a confirmed, typed formalization after external Gate 0.",
+    owns: "Person-scoped consistency checks and insertion or conflict receipts against named bucket versions after external Gate 0.",
     excludes:
       "Truth, ranking, natural-language interpretation, review, lifecycle, or decision authority.",
   },
@@ -105,9 +105,10 @@ export function RfcArchitectureDocs() {
           ))}
         </div>
         <p>
-          WMT output is evidence about the supplied formalization only. It
-          cannot accept an RFC, assess a solution, rank candidates, establish
-          truth, or exercise governance.
+          WMT evidence is subjective to the person and bucket that produced it.
+          A consistent run may append propositions to that person's bucket, and
+          an RFC may keep a separate bucket. Neither can accept an RFC, assess a
+          solution, establish consensus or truth, or exercise governance.
         </p>
       </section>
 
