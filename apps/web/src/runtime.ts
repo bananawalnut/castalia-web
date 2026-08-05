@@ -5,6 +5,7 @@ import { rfcCatalogView } from "./rfc-catalog.js";
 import { rfcDocumentView } from "./rfc-document.js";
 import { docsView, notFoundView } from "./retained-views.js";
 import { tenderCatalogView, tenderViewerView } from "./tenders.js";
+import { deployedPath, routePath } from "./base-path.js";
 
 export type CastaliaApp = {
   navigate(path: string): void;
@@ -38,11 +39,11 @@ function createShell(root: HTMLElement) {
   headerLeft.className = "app-header-left";
   const brand = document.createElement("a");
   brand.className = "brand";
-  brand.href = "/";
+  brand.href = deployedPath("/");
   brand.setAttribute("aria-label", "Castalia home");
   const logo = document.createElement("img");
   logo.className = "brand-logo";
-  logo.src = "/brand/castalia-crest.svg";
+  logo.src = deployedPath("/brand/castalia-crest.svg");
   logo.alt = "";
   brand.append(logo);
   const nav = document.createElement("nav");
@@ -50,7 +51,7 @@ function createShell(root: HTMLElement) {
   nav.setAttribute("aria-label", "Primary");
   for (const item of navigation) {
     const link = document.createElement("a");
-    link.href = item.to;
+    link.href = deployedPath(item.to);
     link.textContent = item.label;
     nav.append(link);
   }
@@ -71,17 +72,23 @@ export function mountCastaliaApp(root: HTMLElement): CastaliaApp {
 
   const render = () => {
     currentView?.destroy?.();
-    currentView = route(window.location.pathname);
+    const currentPath = routePath(window.location.pathname);
+    currentView = route(currentPath);
     main.replaceChildren(currentView.element);
-    const navigationPath = window.location.pathname.startsWith("/rfcs/")
+    for (const link of main.querySelectorAll<HTMLAnchorElement>("a[href]")) {
+      const href = link.getAttribute("href");
+      if (href?.startsWith("/") && !href.startsWith("//"))
+        link.href = deployedPath(href);
+    }
+    const navigationPath = currentPath.startsWith("/rfcs/")
       ? "/rfcs"
-      : window.location.pathname.startsWith("/tenders/")
+      : currentPath.startsWith("/tenders/")
         ? "/tenders"
-        : window.location.pathname;
+        : currentPath;
     for (const link of nav.querySelectorAll<HTMLAnchorElement>("a")) {
       if (
         ["/docs", "/rfcs", "/tenders"].includes(navigationPath) &&
-        link.pathname === navigationPath
+        routePath(link.pathname) === navigationPath
       )
         link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
@@ -91,10 +98,11 @@ export function mountCastaliaApp(root: HTMLElement): CastaliaApp {
 
   const navigate = (path: string) => {
     const target = new URL(path, window.location.href);
+    const pathname = deployedPath(routePath(target.pathname));
     window.history.pushState(
       null,
       "",
-      `${target.pathname}${target.search}${target.hash}`,
+      `${pathname}${target.search}${target.hash}`,
     );
     render();
   };

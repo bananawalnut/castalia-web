@@ -9,6 +9,7 @@ import {
 } from "./river.js";
 import type { View } from "./dom.js";
 import { createRiverCanvasView } from "./river-canvas.js";
+import { deployedPath } from "./base-path.js";
 
 const AQUARIUS_STARS = [
   ["Sadalsuud", 8, 18, true],
@@ -112,7 +113,7 @@ export function landingView(): View {
   ] as const) {
     const image = document.createElement("img");
     image.className = `bitmap-figure bitmap-${kind}`;
-    image.src = src;
+    image.src = deployedPath(src);
     image.alt = "";
     image.setAttribute("aria-hidden", "true");
     scene.append(image);

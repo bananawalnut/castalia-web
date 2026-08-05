@@ -1,5 +1,6 @@
 import type { View } from "./dom.js";
 import { ALL_RFC_FIXTURES } from "./rfcFixtures.js";
+import { deployedPath } from "./base-path.js";
 
 type RfcFixture = (typeof ALL_RFC_FIXTURES)[number];
 type RailTab = "Contents" | "Details" | "Comments" | "Updates";
@@ -44,7 +45,7 @@ function slug(rfc: RfcFixture): string {
 }
 
 function formatPath(rfc: RfcFixture, extension: "md" | "pdf" | "txt") {
-  return `/rfcs/${slug(rfc)}.${extension}`;
+  return deployedPath(`/rfcs/${slug(rfc)}.${extension}`);
 }
 
 function downloadLink(
