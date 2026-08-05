@@ -25,6 +25,10 @@ jobs:
         with:
           node-version: 24.18.0
       - run: corepack enable
+      - name: Install pinned Rust/WASM toolchain
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-pack --version 0.14.0 --locked
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:static
   contracts-and-unit:
@@ -39,6 +43,10 @@ jobs:
         with:
           node-version: 24.18.0
       - run: corepack enable
+      - name: Install pinned Rust/WASM toolchain
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-pack --version 0.14.0 --locked
       - run: pnpm install --frozen-lockfile
       - run: pnpm test
       - run: pnpm verify:contracts
@@ -54,6 +62,10 @@ jobs:
         with:
           node-version: 24.18.0
       - run: corepack enable
+      - name: Install pinned Rust/WASM toolchain
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-pack --version 0.14.0 --locked
       - run: pnpm install --frozen-lockfile
       - run: pnpm budgets:build
       - run: pnpm security:bundle
@@ -72,6 +84,10 @@ jobs:
         with:
           node-version: 24.18.0
       - run: corepack enable
+      - name: Install pinned Rust/WASM toolchain
+        run: |
+          rustup target add wasm32-unknown-unknown
+          cargo install wasm-pack --version 0.14.0 --locked
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm browser:a11y

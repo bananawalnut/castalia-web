@@ -190,6 +190,9 @@ describe("vanilla Castalia shell", () => {
         ".rfc-document__paper > .rfc-document__intro + .rfc-document__viewer-panel",
       ),
     ).not.toBeNull();
+    expect(
+      root.querySelector("#rfc-format-panel")?.getAttribute("tabindex"),
+    ).toBe("0");
     expect(root.querySelectorAll("main")).toHaveLength(1);
     expect(
       root.querySelectorAll(".rfc-document__layout > :not([hidden])"),

@@ -401,6 +401,7 @@ export function rfcDocumentView(identifier: string): View {
     },
   });
   const formatControls = document.createElement("div");
+  formatSet.panel.tabIndex = 0;
   formatControls.className = "rfc-document__format-controls";
   const viewerToggle = textElement("button", "View");
   viewerToggle.className = "rfc-document__viewer-toggle";

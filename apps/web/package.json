@@ -9,7 +9,7 @@
     "build": "pnpm wasm:build && vite build",
     "test": "pnpm wasm:build && NODE_ENV=test vitest run",
     "typecheck": "pnpm wasm:build && tsc -p tsconfig.json --noEmit",
-    "lint": "eslint \"src/**/*.ts\" \"tests/**/*.ts\" --ignore-pattern src/generated"
+    "lint": "pnpm wasm:build && eslint \"src/**/*.ts\" \"tests/**/*.ts\" --ignore-pattern src/generated"
   },
   "dependencies": {
     "@castalia/ui": "workspace:*",
