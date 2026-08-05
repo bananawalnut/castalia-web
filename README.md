@@ -2,11 +2,12 @@
 
 Private, fixture-only scaffold for the planned Castalia collective selector, Matrix forum shell, Castalia Control request/status flow, and contract documentation.
 
-The repository now contains an executable local fixture shell and BFF. It does **not** provide live Matrix access, wallet authentication, Dregg capability presentation, Castalia Control connectivity, community or room provisioning, deployment evidence, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
+The repository now contains an executable local fixture shell and BFF plus a fail-closed Rust/WASM validator for a future exact wallet-onboarding request envelope. It does **not** provide live Matrix access, wallet authentication or signing, Dregg capability presentation, Castalia Control connectivity, community or room provisioning, deployment evidence, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md), [wallet/WASM boundary](docs/vanilla-wasm-wallet-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
 
 ## Architecture
 
-- `apps/web` — React 19/Vite 7 declarative SPA with bounded fixture routes and visible unavailable states.
+- `apps/web` — Vanilla TypeScript/Vite 7 direct-DOM SPA with bounded history routes and visible unavailable states.
+- `crates/castalia-wallet-wasm` — Rust/WASM exact-envelope validator for a future injected canonical-wallet provider; it signs nothing and issues no session.
 - `apps/bff` — Fastify 5 fixture BFF with process-health/session/fixture reads, strict environment validation, exact-origin CORS, security headers, and allowlisted logs.
 - `packages/contracts` — authoritative OpenAPI 3.1 and JSON Schema 2020-12 sources, fixtures, checked-in generated TypeScript, and drift checks.
 - `packages/ui` — small local UI primitives used by the fixture shell.
@@ -16,7 +17,7 @@ The planned live composition keeps responsibilities separate: Castalia Control o
 
 ## Exact toolchain
 
-Node `24.18.0`, pnpm `11.12.0`, Turborepo `2.10.4`, ESM, and strict TypeScript are pinned by repository configuration and the frozen lockfile.
+Node `24.18.0`, pnpm `11.12.0`, Turborepo `2.10.4`, ESM, and strict TypeScript are pinned by repository configuration and the frozen lockfile. The wallet validator currently builds with Rust `1.96.0`, the `wasm32-unknown-unknown` target, and `wasm-pack` `0.14.0`.
 
 ```sh
 corepack enable
@@ -26,6 +27,8 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm --filter @castalia/web wasm:build
+cargo test -p castalia-wallet-wasm
 pnpm verify
 ```
 

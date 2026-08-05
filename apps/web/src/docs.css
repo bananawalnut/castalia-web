@@ -1,0 +1,209 @@
+.docs-hub {
+  --docs-line: rgb(255 253 245 / 48%);
+  width: min(100%, 72rem);
+  min-height: calc(100svh - 34px);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  color: var(--castalia-paper);
+}
+
+.docs-hub a {
+  color: var(--castalia-paper);
+  text-underline-offset: 0.24em;
+}
+
+.docs-hub a:focus-visible {
+  outline: 3px solid var(--castalia-paper);
+  outline-offset: 3px;
+}
+
+.docs-hub__header {
+  max-width: 48rem;
+  padding: 1.5rem 0 1.25rem;
+}
+
+.docs-hub__eyebrow,
+.docs-hub__jump,
+.docs-hub__section-heading span,
+.docs-hub__table,
+.docs-hub__definitions dt {
+  font-family: Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+}
+
+.docs-hub__eyebrow {
+  margin: 0;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.docs-hub h1 {
+  margin: 0.35rem 0 0.65rem;
+  color: var(--castalia-paper);
+  font:
+    500 clamp(2.2rem, 5vw, 3.5rem) Georgia,
+    "Times New Roman",
+    serif;
+  line-height: 1;
+}
+
+.docs-hub__header > p:last-child {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.docs-hub__jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  padding: 0.9rem 0;
+  border-block: 1px solid var(--docs-line);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.docs-hub__jump a {
+  min-height: 36px;
+  align-content: center;
+}
+
+.docs-hub__section {
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--docs-line);
+  scroll-margin-top: 3rem;
+}
+
+.docs-hub__section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.docs-hub__section-heading h2 {
+  margin: 0;
+  color: var(--castalia-paper);
+  font:
+    500 clamp(1.45rem, 3vw, 2rem) Georgia,
+    "Times New Roman",
+    serif;
+}
+
+.docs-hub__section-heading span {
+  font-size: 0.68rem;
+}
+
+.docs-hub__table {
+  border-top: 1px solid var(--docs-line);
+  font-size: 0.78rem;
+}
+
+.docs-hub__table-head,
+.docs-hub__table > a,
+.docs-hub__table > span[role="row"] {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.55fr) minmax(8rem, 0.6fr) minmax(
+      16rem,
+      1.4fr
+    );
+  gap: 1rem;
+  align-items: center;
+  min-height: 3.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--docs-line);
+}
+
+.docs-hub__table-head {
+  min-height: 2.5rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.docs-hub__table > a {
+  text-decoration: none;
+}
+
+.docs-hub__table > a:hover {
+  background: rgb(255 253 245 / 6%);
+}
+
+.docs-hub__table strong {
+  color: var(--castalia-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.docs-hub__table code {
+  color: var(--castalia-paper);
+  font: inherit;
+}
+
+.docs-hub__definitions {
+  margin: 0;
+}
+
+.docs-hub__definitions > div {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: 1rem 0;
+  border-top: 1px solid var(--docs-line);
+}
+
+.docs-hub__definitions dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.docs-hub__definitions dd {
+  max-width: 48rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.docs-hub__boundaries {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.docs-hub__boundaries li {
+  max-width: 52rem;
+  margin-bottom: 0.65rem;
+  line-height: 1.5;
+}
+
+/* Documentation is an operational index, not a marketing hero. */
+.docs-hub__header {
+  padding-block: 0.75rem 1rem;
+}
+
+.docs-hub h1 {
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
+}
+
+@media (max-width: 680px) {
+  .docs-hub {
+    padding: 1rem;
+  }
+
+  .docs-hub__table-head {
+    display: none;
+  }
+
+  .docs-hub__table > a,
+  .docs-hub__table > span[role="row"] {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+    padding: 1rem 0;
+  }
+
+  .docs-hub__definitions > div {
+    grid-template-columns: 1fr;
+    gap: 0.45rem;
+  }
+}

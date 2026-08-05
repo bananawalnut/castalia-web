@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Castalia — identity surface proofs</title>
+    <style>
+      :root {
+        --navy: #091f49;
+        --blue: #2b4d8d;
+        --green: #004225;
+        --cream: #f6efda;
+        --paper: #eee8d8;
+        --grey: #bfc1c0;
+        --ink-soft: #556173;
+        --line: rgb(9 31 73 / 18%);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: var(--navy);
+        background: var(--paper);
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      .page {
+        width: min(100% - 32px, 1440px);
+        margin-inline: auto;
+        padding: 32px 0 72px;
+      }
+
+      .masthead {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 0.44fr);
+        gap: clamp(32px, 7vw, 112px);
+        align-items: end;
+        padding: 22px 0 30px;
+        border-top: 1px solid var(--navy);
+        border-bottom: 1px solid var(--navy);
+      }
+
+      .kicker,
+      .proof-label,
+      .usage,
+      .meta {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 11px;
+      }
+
+      h1 {
+        max-width: 880px;
+        margin: 12px 0 0;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(42px, 7vw, 104px);
+        font-weight: 400;
+        line-height: 0.88;
+        letter-spacing: -0.055em;
+      }
+
+      .intro {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .proof-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .proof {
+        grid-column: span 6;
+        min-height: 570px;
+        margin: 0;
+        display: grid;
+        grid-template-rows: 1fr auto;
+        border: 1px solid var(--line);
+        overflow: hidden;
+      }
+
+      .proof--wide {
+        grid-column: span 8;
+      }
+      .proof--narrow {
+        grid-column: span 4;
+      }
+      .proof--full {
+        grid-column: 1 / -1;
+      }
+
+      .surface {
+        min-height: 480px;
+        padding: clamp(32px, 6vw, 80px);
+        display: grid;
+        place-items: center;
+        position: relative;
+        isolation: isolate;
+      }
+
+      .surface::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        opacity: 0.12;
+        background-image: repeating-linear-gradient(
+          0deg,
+          transparent 0 3px,
+          currentColor 3px 4px
+        );
+      }
+
+      .surface img {
+        width: min(100%, 640px);
+        max-height: 420px;
+        object-fit: contain;
+        image-rendering: pixelated;
+      }
+
+      .surface--paper {
+        background: var(--cream);
+      }
+      .surface--green {
+        background: var(--green);
+        color: var(--cream);
+      }
+      .surface--grey {
+        background: var(--grey);
+      }
+      .surface--navy {
+        background: var(--navy);
+        color: var(--cream);
+      }
+
+      .surface--gem img {
+        width: min(88%, 360px);
+      }
+      .surface--wordmark img {
+        width: min(100%, 720px);
+      }
+
+      figcaption {
+        min-height: 90px;
+        padding: 17px 19px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-content: start;
+        background: #f8f3e7;
+        border-top: 1px solid var(--line);
+      }
+
+      .usage {
+        grid-column: 1 / -1;
+        color: var(--ink-soft);
+        letter-spacing: 0.08em;
+      }
+
+      .download {
+        color: inherit;
+        text-underline-offset: 3px;
+      }
+
+      .scale-proof {
+        margin-top: 12px;
+        padding: clamp(28px, 5vw, 70px);
+        display: grid;
+        grid-template-columns: 0.7fr 1.3fr;
+        gap: 36px;
+        align-items: center;
+        color: var(--cream);
+        background: var(--navy);
+      }
+
+      .scale-proof h2 {
+        margin: 8px 0 12px;
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(30px, 4vw, 54px);
+        font-weight: 400;
+      }
+
+      .scale-row {
+        display: flex;
+        align-items: end;
+        justify-content: space-around;
+        gap: 28px;
+      }
+
+      .scale-item {
+        text-align: center;
+      }
+      .scale-item img {
+        margin: auto;
+        image-rendering: pixelated;
+      }
+      .scale-item span {
+        display: block;
+        margin-top: 12px;
+        font-size: 10px;
+      }
+
+      .notes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 28px;
+        margin-top: 42px;
+        padding-top: 24px;
+        border-top: 1px solid var(--navy);
+      }
+
+      .notes h3 {
+        margin: 0 0 10px;
+        font-size: 13px;
+      }
+      .notes p {
+        margin: 0;
+        color: var(--ink-soft);
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      @media (max-width: 820px) {
+        .masthead,
+        .scale-proof {
+          grid-template-columns: 1fr;
+        }
+        .proof,
+        .proof--wide,
+        .proof--narrow,
+        .proof--full {
+          grid-column: 1 / -1;
+        }
+        .surface {
+          min-height: 360px;
+        }
+        .notes {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header class="masthead">
+        <div>
+          <div class="kicker">Castalia identity system · surface proof A.1</div>
+          <h1>One crest,<br />seven working modes.</h1>
+        </div>
+        <p class="intro">
+          Every draft is derived from the approved transparent master. The
+          system adapts the mark to scale, contrast, substrate, and production
+          limits without merging the olive branches into the ouroboros or
+          changing the crest’s anatomy.
+        </p>
+      </header>
+
+      <section class="proof-grid" aria-label="Logo variants">
+        <figure class="proof proof--wide">
+          <div class="surface surface--paper">
+            <img
+              src="castalia-crest-primary.svg"
+              alt="Primary full-colour Castalia crest"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">01 · Primary crest</span>
+            <a class="download" href="castalia-crest-primary.svg" download
+              >SVG</a
+            >
+            <span class="usage"
+              >Website · editorial · packaging · campaign</span
+            >
+          </figcaption>
+        </figure>
+
+        <figure class="proof proof--narrow">
+          <div class="surface surface--grey surface--gem">
+            <img
+              src="castalia-gem-compact.svg"
+              alt="Compact Castalia faceted spring mark"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">02 · Compact gem</span>
+            <a class="download" href="castalia-gem-compact.svg" download>SVG</a>
+            <span class="usage">Avatar · favicon · woven label · social</span>
+          </figcaption>
+        </figure>
+
+        <figure class="proof">
+          <div class="surface surface--paper">
+            <img
+              src="castalia-crest-light-surface.svg"
+              alt="Castalia crest with navy lettering and olive branches for light surfaces"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">03 · Light-surface primary</span>
+            <a class="download" href="castalia-crest-light-surface.svg" download
+              >SVG</a
+            >
+            <span class="usage"
+              >White web · cream paper · pale grey · uncoated stock</span
+            >
+          </figcaption>
+        </figure>
+
+        <figure class="proof">
+          <div class="surface surface--green">
+            <img
+              src="castalia-crest-dark-surface.svg"
+              alt="Castalia crest with a keyline for dark surfaces"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">04 · Dark-surface keyline</span>
+            <a class="download" href="castalia-crest-dark-surface.svg" download
+              >SVG</a
+            >
+            <span class="usage">#004225 knit · navy web · photography</span>
+          </figcaption>
+        </figure>
+
+        <figure class="proof">
+          <div class="surface surface--paper surface--wordmark">
+            <img
+              src="castalia-wordmark-arched.svg"
+              alt="Arched Castalia wordmark"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">05 · Arched wordmark</span>
+            <a class="download" href="castalia-wordmark-arched.svg" download
+              >SVG</a
+            >
+            <span class="usage"
+              >Masthead · garment back · book spine · signage</span
+            >
+          </figcaption>
+        </figure>
+
+        <figure class="proof">
+          <div class="surface surface--paper">
+            <img
+              src="castalia-crest-one-colour-navy.svg"
+              alt="One-colour navy Castalia crest"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">06 · One-colour navy</span>
+            <a
+              class="download"
+              href="castalia-crest-one-colour-navy.svg"
+              download
+              >SVG</a
+            >
+            <span class="usage"
+              >Letterpress · rubber stamp · embroidery · ink</span
+            >
+          </figcaption>
+        </figure>
+
+        <figure class="proof proof--full">
+          <div class="surface surface--navy">
+            <img
+              src="castalia-crest-one-colour-cream.svg"
+              alt="One-colour cream Castalia crest"
+            />
+          </div>
+          <figcaption>
+            <span class="proof-label">07 · One-colour reverse</span>
+            <a
+              class="download"
+              href="castalia-crest-one-colour-cream.svg"
+              download
+              >SVG</a
+            >
+            <span class="usage"
+              >Dark textile · foil · signage · screen print</span
+            >
+          </figcaption>
+        </figure>
+      </section>
+
+      <section class="scale-proof" aria-labelledby="scale-title">
+        <div>
+          <div class="meta">Digital reduction check</div>
+          <h2 id="scale-title">The gem owns the smallest sizes.</h2>
+          <p class="intro">
+            Switch from the full crest to the compact mark below 96 px. Below 32
+            px, commission a manually simplified pixel master before production
+            use.
+          </p>
+        </div>
+        <div class="scale-row">
+          <div class="scale-item">
+            <img
+              src="castalia-gem-compact.svg"
+              width="128"
+              height="128"
+              alt=""
+            /><span>128 px</span>
+          </div>
+          <div class="scale-item">
+            <img
+              src="castalia-gem-compact.svg"
+              width="64"
+              height="64"
+              alt=""
+            /><span>64 px</span>
+          </div>
+          <div class="scale-item">
+            <img
+              src="castalia-gem-compact.svg"
+              width="32"
+              height="32"
+              alt=""
+            /><span>32 px</span>
+          </div>
+        </div>
+      </section>
+
+      <footer class="notes">
+        <div>
+          <h3>Clear space</h3>
+          <p>
+            Keep at least one letter-stem width around every lockup. Do not let
+            the crest touch a crop, seam, or browser edge.
+          </p>
+        </div>
+        <div>
+          <h3>Colour hierarchy</h3>
+          <p>
+            Navy and cream remain primary. Academy green, grey, and ruby are
+            surfaces or accents—not replacements for the blue crystal.
+          </p>
+        </div>
+        <div>
+          <h3>Production note</h3>
+          <p>
+            These SVGs preserve the approved raster artwork without redrawing
+            it. Convert the selected draft to true vector paths before engraving
+            or large-format fabrication.
+          </p>
+        </div>
+      </footer>
+    </main>
+  </body>
+</html>

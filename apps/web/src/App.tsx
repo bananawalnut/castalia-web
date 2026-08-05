@@ -1,47 +1,44 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-  useParams,
-} from "react-router";
+import { createBrowserRouter, RouterProvider } from "react-router";
+import { Docs } from "./Docs.js";
 import { Layout } from "./Layout.js";
-import { RfcArchitectureDocs } from "./rfcArchitectureDocs.js";
 import {
-  ApiDocs,
-  Create,
-  Docs,
-  NotFound,
-  Request,
-  Room,
-  Rooms,
-  Specs,
-} from "./pages.js";
+  ProblemViewer,
+  Problems,
+  ProposalViewer,
+  Proposals,
+  RfcViewer,
+  Rfcs,
+} from "./Rfcs.js";
+import {
+  CommonsRoom,
+  NewRoom,
+  NewSpace,
+  Spaces,
+  SpaceViewer,
+} from "./Spaces.js";
+import { NotFound, Rooms } from "./pages.js";
 
 export const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
       { path: "/", element: <Rooms /> },
-      { path: "/room/:slug", element: <Room /> },
-      { path: "/community/:slug/forum", element: <LegacyRoomRedirect /> },
-      { path: "/create", element: <Create /> },
-      { path: "/create/:requestId", element: <Request /> },
+      { path: "/room/zenith", element: <CommonsRoom /> },
+      { path: "/spaces", element: <Spaces /> },
+      { path: "/spaces/new", element: <NewSpace /> },
+      { path: "/spaces/:spaceId/rooms/new", element: <NewRoom /> },
+      { path: "/spaces/:spaceId", element: <SpaceViewer /> },
+      { path: "/rfcs", element: <Rfcs /> },
+      { path: "/rfcs/:rfcId", element: <RfcViewer /> },
+      { path: "/problems", element: <Problems /> },
+      { path: "/problems/:problemId", element: <ProblemViewer /> },
+      { path: "/proposals", element: <Proposals /> },
+      { path: "/proposals/:proposalId", element: <ProposalViewer /> },
       { path: "/docs", element: <Docs /> },
-      { path: "/docs/api", element: <ApiDocs /> },
-      { path: "/docs/specs", element: <Specs /> },
-      {
-        path: "/docs/architecture/rfc-exchange",
-        element: <RfcArchitectureDocs />,
-      },
       { path: "*", element: <NotFound /> },
     ],
   },
 ]);
-
-function LegacyRoomRedirect() {
-  const { slug } = useParams();
-  return <Navigate replace to={slug ? `/room/${slug}` : "/"} />;
-}
 
 export function App() {
   return <RouterProvider router={router} />;

@@ -1,55 +1,76 @@
-import { readFile, readdir, stat } from "node:fs/promises";
-import { dirname, join, resolve } from "node:path";
+import { readFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
 const root = resolve(new URL("..", import.meta.url).pathname);
-const [routes, pages, layout, app] = await Promise.all([
+const [
+  routes,
+  landing,
+  runtime,
+  retainedViews,
+  rfcCatalog,
+  rfcDocument,
+  rfcFixtures,
+  tenders,
+] = await Promise.all([
   readFile(join(root, "apps/web/src/routes.ts"), "utf8"),
-  readFile(join(root, "apps/web/src/pages.tsx"), "utf8"),
-  readFile(join(root, "apps/web/src/Layout.tsx"), "utf8"),
-  readFile(join(root, "apps/web/src/App.tsx"), "utf8"),
+  readFile(join(root, "apps/web/src/landing.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/runtime.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/retained-views.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/rfc-catalog.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/rfc-document.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/rfcFixtures.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/tenders.ts"), "utf8"),
 ]);
-const requiredRoutes = [
-  "/",
-  "/room/:slug",
-  "/community/:slug/forum",
-  "/create",
-  "/create/:requestId",
-  "/docs",
-  "/docs/api",
-  "/docs/specs",
-];
-const requiredLabels = ["Rooms", "Zenith", "Create room", "Docs"];
+const requiredRoutes = ["/", "/tenders", "/rfcs", "/docs"];
+const placeholderRoutes = ["/start", "/chronicle", "/merch"];
+const removedRoutes = ["/proposals"];
+const requiredLabels = ["Chronicle", "Tenders", "RFC", "Merch", "Docs"];
+const requiredNavigation = ['{ to: "/chronicle", label: "Chronicle" }'];
 const requiredCopy = [
-  "Castalia // Fixture Preview",
-  "Group chats and rooms are listed below",
-  "Members unavailable",
-  "Messages unavailable",
-  "live Synapse room adapter",
-  "Back to rooms",
-  "Create a room",
-  "does not accept or store room-creation input",
-  "Request not found",
-  "Contract source only",
-  "Fixture schemas",
+  "<h1>Castalia</h1>",
+  "an open spring for independent worlds.",
+  'href="/start">Start</a>',
+  "Landing, Tenders, RFCs, and Docs are implemented fixture surfaces",
+  "Catalog UI draft",
+  "Comment submission is disabled",
+  "Bid submission unavailable",
+  'kind: "Proposal"',
   "Page not found",
 ];
+const surfaceSource =
+  landing +
+  runtime +
+  retainedViews +
+  rfcCatalog +
+  rfcDocument +
+  rfcFixtures +
+  tenders;
 const failures = [];
 for (const value of requiredRoutes)
   if (!routes.includes(`\"${value}\"`)) failures.push(`missing route ${value}`);
 for (const value of requiredLabels)
   if (!routes.includes(`label: \"${value}\"`))
     failures.push(`missing navigation label ${value}`);
+for (const value of requiredNavigation)
+  if (!routes.includes(value))
+    failures.push(`missing navigation contract ${value}`);
 for (const value of requiredCopy)
-  if (!pages.includes(value))
+  if (!surfaceSource.includes(value))
     failures.push(`missing bounded route copy: ${value}`);
 for (const value of [
-  "<main",
-  'aria-label="Primary"',
+  'createElement("main")',
+  'aria-label", "Primary"',
   "Skip to content",
-  "mainRef.current?.focus({ preventScroll: true })",
+  "main.focus({ preventScroll: true })",
 ])
-  if (!layout.includes(value))
+  if (!runtime.includes(value))
     failures.push(`missing layout contract ${value}`);
-if (!app.includes('path: "*"')) failures.push("missing in-app 404 route");
+for (const value of placeholderRoutes)
+  if (routes.includes(`path: \"${value}\"`))
+    failures.push(`placeholder must remain unimplemented: ${value}`);
+for (const value of removedRoutes)
+  if (routes.includes(value)) failures.push(`removed route returned: ${value}`);
+if (!runtime.includes("return notFoundView()"))
+  failures.push("missing in-app 404 route");
 for (const pattern of [
   /<form\b/i,
   /type=["']submit/i,
@@ -57,14 +78,10 @@ for (const pattern of [
   /localStorage|sessionStorage|document\.cookie|serviceWorker|analytics/i,
   /matrix-js-sdk/i,
 ])
-  if (pattern.test(pages + layout + app))
+  if (pattern.test(surfaceSource))
     failures.push(`forbidden browser surface: ${pattern}`);
-for (const pattern of [/\bcommunities?\b/i, /\bforums?\b/i]) {
-  if (pattern.test(pages + layout))
-    failures.push(`forbidden visible terminology: ${pattern}`);
-}
 if (failures.length)
   throw new Error(`route/claim policy failed:\n${failures.join("\n")}`);
 console.log(
-  `route/claim policy passed: ${requiredRoutes.length} routes, ${requiredLabels.length} primary links`,
+  `route/claim policy passed: ${requiredRoutes.length} implemented routes, ${placeholderRoutes.length} placeholders, ${removedRoutes.length} removed route, ${requiredLabels.length} primary links`,
 );

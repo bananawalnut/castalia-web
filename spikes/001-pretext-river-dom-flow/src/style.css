@@ -1,0 +1,106 @@
+:root {
+  color: #fffdf5;
+  background: #0754be;
+  font-family: Menlo, "Courier New", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+}
+main {
+  min-height: 100vh;
+  padding: 24px;
+  overflow: hidden;
+}
+header {
+  position: fixed;
+  z-index: 3;
+  top: 18px;
+  left: 20px;
+  max-width: 430px;
+  padding: 16px;
+  color: #062c72;
+  background: rgb(255 253 245 / 94%);
+}
+header p {
+  margin: 0 0 8px;
+}
+h1 {
+  margin: 0 0 8px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 34px;
+}
+section {
+  min-width: 1000px;
+  padding: 90px 0 80px 36vw;
+}
+#river {
+  width: max-content;
+  font:
+    400 16px/21px Menlo,
+    "Courier New",
+    monospace;
+  white-space: pre;
+}
+.river-row {
+  height: 21px;
+  min-width: 1px;
+}
+.river--guided .river-row--stone {
+  outline: 1px dashed rgb(255 253 245 / 30%);
+}
+.river-row--stone::before {
+  position: absolute;
+  transform: translateX(-48px);
+  color: rgb(255 253 245 / 55%);
+  content: "r" attr(data-row);
+}
+.river-row a {
+  position: relative;
+  display: inline-block;
+  color: #fffdf5;
+  background: transparent;
+  text-decoration: none;
+  text-shadow: 1px 1px #062c72;
+}
+.river-row a:hover,
+.river-row a:focus-visible {
+  outline: 2px solid #fffdf5;
+  outline-offset: 2px;
+  text-decoration: underline;
+}
+#metrics {
+  position: fixed;
+  z-index: 3;
+  left: 16px;
+  bottom: 16px;
+  display: block;
+  max-width: 560px;
+  padding: 12px;
+  color: #062c72;
+  background: rgb(255 253 245 / 94%);
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+@media (max-width: 700px) {
+  header {
+    position: relative;
+    inset: auto;
+    max-width: none;
+  }
+  section {
+    min-width: 900px;
+    padding-left: 10px;
+  }
+  #metrics {
+    position: relative;
+    inset: auto;
+    margin-top: 20px;
+  }
+}

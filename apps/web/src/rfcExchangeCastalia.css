@@ -1,0 +1,244 @@
+/*
+ * Merlin + Angel shell integration for the RFC documentation surfaces.
+ * These routes extend Castalia's current cobalt bitmap/canvas language rather
+ * than introducing a second visual product.
+ */
+.rfc-preview {
+  --ink: var(--castalia-paper);
+  --muted: #d9e6ff;
+  --line: rgb(255 253 245 / 74%);
+  --paper: var(--castalia-cobalt);
+  --moss: var(--castalia-paper);
+  --moss-dark: var(--castalia-ink);
+  --amber: #ffe17a;
+  max-width: 76rem;
+  min-height: calc(100vh - 34px);
+  padding: clamp(1rem, 3vw, 2.5rem);
+  color: var(--castalia-paper);
+  background:
+    radial-gradient(
+      circle at 72% 12%,
+      rgb(255 255 255 / 20%) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 18% 46%,
+      rgb(255 255 255 / 18%) 0 1px,
+      transparent 2px
+    );
+  background-size:
+    173px 181px,
+    227px 211px;
+}
+
+.rfc-preview__hero {
+  position: relative;
+  min-height: 25rem;
+  align-items: flex-start;
+  overflow: hidden;
+  color: var(--castalia-paper);
+  background: rgb(6 61 147 / 32%);
+  border: 4px dotted var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 7px 7px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__hero > div,
+.rfc-preview__hero > .status {
+  position: relative;
+  z-index: 2;
+}
+
+.rfc-preview__hero > div {
+  max-width: 56%;
+}
+
+.rfc-preview__hero h1,
+.rfc-preview__problem-card h2,
+.rfc-preview__view h2,
+.rfc-preview__candidates h2,
+.rfc-preview__attention h2,
+.rfc-preview__candidate h3 {
+  color: var(--castalia-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  text-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__hero p:last-child,
+.rfc-preview__hero .rfc-preview__eyebrow,
+.rfc-preview__eyebrow,
+.rfc-preview__problem-question,
+.rfc-preview dt,
+.rfc-preview__fine-print,
+.rfc-preview__section-heading > span,
+.rfc-preview__footer,
+.rfc-preview__comparison-row small {
+  color: var(--castalia-paper);
+}
+
+.rfc-preview a {
+  color: var(--castalia-paper);
+  font-weight: 700;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.2em;
+}
+
+.rfc-preview__hero .status {
+  padding: 0.5rem 0.7rem;
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border: 2px solid var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__figure {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  image-rendering: pixelated;
+  filter: drop-shadow(6px 8px 0 rgb(2 37 108 / 28%));
+}
+
+.rfc-preview__figure--angel {
+  top: 1rem;
+  right: 2rem;
+  width: clamp(145px, 18vw, 255px);
+  opacity: 0.8;
+  animation: angel-hover 4.8s steps(8, end) infinite;
+}
+
+.rfc-preview__figure--merlin {
+  right: 7rem;
+  bottom: -8rem;
+  width: clamp(260px, 33vw, 470px);
+  opacity: 0.78;
+  animation: merlin-conjure 3.6s steps(6, end) infinite;
+}
+
+.rfc-preview__tabs,
+.rfc-preview__comparison {
+  background: transparent;
+  border: 2px solid var(--castalia-paper);
+  border-radius: 0;
+}
+
+.rfc-preview__tabs button {
+  color: var(--castalia-paper);
+  border-radius: 0;
+}
+
+.rfc-preview__tabs button[aria-pressed="true"] {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border-color: var(--castalia-paper);
+  box-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__boundary,
+.rfc-preview__notice {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border: 2px solid var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 4px 4px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__problem-card,
+.rfc-preview__attention,
+.rfc-preview__candidate,
+.rfc-preview__request,
+.rfc-preview__thread article,
+.rfc-preview__evidence-empty,
+.rfc-preview__evidence-example,
+.rfc-preview__export {
+  color: var(--castalia-paper);
+  background: rgb(6 61 147 / 34%);
+  border: 3px dotted var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 6px 6px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__state,
+.rfc-preview__assessment,
+.rfc-preview__criteria span {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border-radius: 0;
+}
+
+.rfc-preview__attention,
+.rfc-preview__comparison-row,
+.rfc-preview__comparison-row > div:first-child {
+  color: var(--castalia-paper);
+  background: transparent;
+}
+
+.rfc-preview__attention li strong,
+.rfc-preview__claim-label {
+  color: var(--castalia-paper);
+}
+
+.rfc-preview__comparison-row > div,
+.rfc-preview__comparison-row,
+.rfc-preview__metadata,
+.rfc-preview__candidate dl,
+.rfc-preview__attention li,
+.rfc-preview__footer {
+  border-color: var(--line);
+}
+
+.rfc-preview__secondary-action {
+  color: var(--castalia-ink);
+  background: var(--castalia-paper);
+  border: 2px solid var(--castalia-paper);
+  border-radius: 0;
+  box-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.rfc-preview__export button {
+  color: #53627c;
+  background: #dce5f6;
+  border: 2px solid #dce5f6;
+  border-radius: 0;
+}
+
+.rfc-preview__thread::before {
+  background: var(--castalia-paper);
+}
+
+@media (max-width: 760px) {
+  .rfc-preview {
+    padding: 1rem;
+  }
+
+  .rfc-preview__hero {
+    min-height: 31rem;
+    padding: 1.4rem;
+  }
+
+  .rfc-preview__hero > div {
+    max-width: 100%;
+  }
+
+  .rfc-preview__figure--angel {
+    top: auto;
+    right: -1rem;
+    bottom: 0;
+    width: 125px;
+  }
+
+  .rfc-preview__figure--merlin {
+    right: 4rem;
+    bottom: -5rem;
+    width: 260px;
+    opacity: 0.5;
+  }
+
+  .rfc-preview__comparison-row {
+    border-radius: 0;
+  }
+}

@@ -1,0 +1,25 @@
+Proof-carrying bounded search reports
+
+Castalia RFC: RFC-0017
+Exact revision: rev-rfc-0017-c
+Author: agent:cedar-07
+Authorship proof: Unavailable in fixture
+Date published: Not recorded
+Domain: Unspecified
+Status: In review
+Assessment: Unreviewed
+
+ABSTRACT
+Report the exact input, logic profile, explored envelope, limits, stop reason, and reproducible semantic output.
+
+SCOPE
+Claim coverage: Partial · CRIT-1.
+
+KNOWN LIMITATION
+Describes only the declared search envelope.
+
+MAINTENANCE
+This is a checked-in synthetic fixture. No publication action, repository lookup, or remote request occurs.
+
+REFERENCES
+No wikilinked references are recorded in this fixture.

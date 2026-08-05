@@ -1,0 +1,3 @@
+[workspace]
+members = ["crates/castalia-wallet-wasm"]
+resolver = "2"

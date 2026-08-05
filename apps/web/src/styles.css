@@ -315,8 +315,8 @@ body {
   grid-template-columns: auto minmax(0, 1fr) auto;
   position: relative;
   z-index: 20;
-  min-height: 28px;
-  padding: 0.18rem clamp(0.55rem, 1.2vw, 1.1rem);
+  min-height: 42px;
+  padding: 0.3rem clamp(0.68rem, 1.4vw, 1.25rem);
   color: var(--castalia-ink);
   background: linear-gradient(
     180deg,
@@ -350,8 +350,22 @@ body {
 }
 
 .brand {
-  font-size: clamp(0.68rem, 0.8vw, 0.76rem);
-  letter-spacing: -0.05em;
+  display: flex;
+  width: 4.25rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 0.7px var(--castalia-ink))
+    drop-shadow(0 1px 0 rgb(6 77 189 / 40%));
 }
 
 .brand:hover,
@@ -362,13 +376,13 @@ body {
 
 .app-nav {
   justify-content: flex-start;
-  gap: clamp(0.5rem, 1vw, 0.9rem);
-  margin-left: clamp(0.65rem, 1.3vw, 1.2rem);
+  gap: clamp(0.62rem, 1.1vw, 1rem);
+  margin-left: clamp(0.72rem, 1.4vw, 1.3rem);
 }
 
 .app-nav a {
-  padding: 0.08rem 0.14rem;
-  font-size: clamp(0.5rem, 0.58vw, 0.68rem);
+  padding: 0.12rem 0.2rem;
+  font-size: clamp(0.63rem, 0.72vw, 0.82rem);
 }
 
 .app-nav a[aria-current="page"] {
@@ -404,36 +418,9 @@ body {
 .bitmap-scene {
   position: relative;
   isolation: isolate;
-  min-height: calc(100vh - 34px);
+  min-height: calc(100vh - 46px);
   overflow: hidden;
-  background:
-    radial-gradient(
-      circle at 48% 42%,
-      rgba(255, 255, 255, 0.7) 0 1px,
-      transparent 2px
-    ),
-    radial-gradient(
-      circle at 72% 72%,
-      rgba(255, 255, 255, 0.72) 0 2px,
-      transparent 3px
-    ),
-    radial-gradient(
-      circle at 88% 36%,
-      rgba(255, 255, 255, 0.45) 0 1px,
-      transparent 2px
-    ),
-    radial-gradient(
-      circle at 62% 83%,
-      rgba(255, 255, 255, 0.45) 0 1px,
-      transparent 2px
-    ),
-    var(--castalia-cobalt);
-  background-size:
-    181px 173px,
-    277px 263px,
-    149px 137px,
-    223px 211px,
-    auto;
+  background: var(--castalia-cobalt);
 }
 
 .bitmap-scene::after {
@@ -451,9 +438,206 @@ body {
   mix-blend-mode: screen;
 }
 
+.bitmap-landing {
+  min-height: calc(100svh - 54px);
+}
+
+.pixel-night-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.pixel-aquarius {
+  position: absolute;
+  top: 4%;
+  left: 39%;
+  width: 36%;
+  height: 34%;
+}
+
+.pixel-star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: var(--castalia-paper);
+  box-shadow:
+    -2px 0 0 var(--castalia-paper),
+    2px 0 0 var(--castalia-paper),
+    0 -2px 0 var(--castalia-paper),
+    0 2px 0 var(--castalia-paper),
+    2px 2px 0 rgb(6 44 114 / 42%);
+  image-rendering: pixelated;
+}
+
+.pixel-star--major {
+  box-shadow:
+    -4px 0 0 var(--castalia-paper),
+    -2px 0 0 var(--castalia-paper),
+    2px 0 0 var(--castalia-paper),
+    4px 0 0 var(--castalia-paper),
+    0 -4px 0 var(--castalia-paper),
+    0 -2px 0 var(--castalia-paper),
+    0 2px 0 var(--castalia-paper),
+    0 4px 0 var(--castalia-paper),
+    2px 2px 0 rgb(6 44 114 / 42%);
+}
+
+.pixel-star--field {
+  opacity: 0.72;
+}
+
+.pixel-star--field.pixel-star--major {
+  opacity: 0.94;
+}
+
+.bitmap-title {
+  position: absolute;
+  top: 11%;
+  left: 5%;
+  z-index: 3;
+  width: auto;
+  margin: 0;
+  color: var(--castalia-paper);
+  text-align: left;
+}
+
+.bitmap-title h1 {
+  margin: 0;
+  color: inherit;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  text-shadow:
+    2px 0 0 var(--castalia-paper),
+    0 2px 0 var(--castalia-paper),
+    5px 5px 0 var(--castalia-shadow);
+}
+
+.bitmap-subheading {
+  width: max-content;
+  max-width: 30rem;
+  margin: 1rem 0 0 clamp(2.5rem, 5vw, 5rem);
+  color: rgb(255 253 245 / 82%);
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(0.88rem, 1.35vw, 1.05rem);
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1.25;
+  letter-spacing: 0.015em;
+  text-shadow: 1px 1px 0 var(--castalia-shadow);
+}
+
+.bitmap-start-cta {
+  display: block;
+  width: max-content;
+  margin: 0.7rem 0 0 clamp(2.5rem, 5vw, 5rem);
+  color: var(--castalia-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(0.79rem, 0.94vw, 0.94rem);
+  font-weight: 700;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  text-decoration: none;
+  text-shadow:
+    1px 1px 0 rgb(255 255 255 / 30%),
+    1px 2px 0 var(--castalia-shadow);
+}
+
+.bitmap-start-cta:hover,
+.bitmap-start-cta:focus-visible {
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+
+.bitmap-stream {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bitmap-stream__canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.river-grid-actions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.river-grid-action {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  color: var(--castalia-paper);
+  background: transparent;
+  border: 0;
+  opacity: 0.92;
+  text-decoration: none;
+  text-shadow: 1px 1px 0 var(--castalia-shadow);
+  font-variant-ligatures: none;
+  font-weight: 500;
+  filter: drop-shadow(1px 1px 0 rgba(2, 37, 108, 0.45));
+}
+
+.river-grid-action__face {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-rows: repeat(3, 1fr);
+}
+
+.river-grid-action__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: pre;
+}
+
+.river-grid-action__cell {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+.river-grid-action:hover,
+.river-grid-action:focus-visible {
+  color: #fff;
+  background: transparent;
+  opacity: 1;
+  text-decoration: none;
+  filter: drop-shadow(0 0 3px rgba(255, 253, 245, 0.7));
+}
+
+.river-grid-action:focus,
+.river-grid-action:focus-visible {
+  outline: 2px solid var(--castalia-paper);
+  outline-offset: 2px;
+}
+
 .bitmap-figure {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   display: block;
   height: auto;
   pointer-events: none;
@@ -775,6 +959,10 @@ body {
     min-height: 1120px;
   }
 
+  .bitmap-landing {
+    min-height: calc(100svh - 54px);
+  }
+
   .rooms-window {
     top: 44%;
     left: 34%;
@@ -789,10 +977,17 @@ body {
   }
 }
 
+@media (min-width: 641px) and (max-width: 1100px) {
+  .pixel-aquarius {
+    left: 58%;
+    width: 42%;
+  }
+}
+
 @media (max-width: 640px) {
   .app-header {
-    min-height: auto;
-    padding: 0.24rem 0.55rem 0.32rem;
+    min-height: 46px;
+    padding: 0.32rem 0.62rem;
     align-items: center;
     grid-template-columns: auto minmax(0, 1fr) auto;
   }
@@ -802,7 +997,8 @@ body {
   }
 
   .brand {
-    font-size: 0.75rem;
+    width: 3rem;
+    height: 2rem;
   }
 
   .app-nav {
@@ -814,7 +1010,7 @@ body {
 
   .app-nav a {
     flex: 0 0 auto;
-    font-size: 0.52rem;
+    font-size: 0.61rem;
   }
 
   .session-status {
@@ -825,6 +1021,37 @@ body {
   .bitmap-scene {
     min-height: 1120px;
     padding: 2rem 1rem 25rem;
+  }
+
+  .bitmap-landing {
+    min-height: calc(100svh - 46px);
+    padding: 0;
+  }
+
+  .bitmap-title {
+    top: 8.5%;
+    left: 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  .bitmap-title h1 {
+    font-size: clamp(2.8rem, 16vw, 4.4rem);
+  }
+
+  .bitmap-subheading {
+    width: 150px;
+    max-width: 150px;
+    margin-top: 0.7rem;
+    margin-left: 1.5rem;
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+
+  .pixel-aquarius {
+    top: 26%;
+    left: 4%;
+    width: 92%;
+    height: 26%;
   }
 
   .bitmap-message {
@@ -848,6 +1075,11 @@ body {
     right: -18px;
     width: 155px;
     opacity: 0.92;
+  }
+
+  .bitmap-landing .bitmap-angel {
+    top: 23%;
+    right: -12px;
   }
 
   .rooms-window {
@@ -879,6 +1111,10 @@ body {
     opacity: 0.86;
   }
 
+  .bitmap-landing .bitmap-merlin {
+    bottom: -1px;
+  }
+
   .app-main > .page-header,
   .app-main > .actions,
   .app-main > .zn-card,
@@ -886,6 +1122,37 @@ body {
   .app-main > .room-detail {
     width: min(calc(100% - 2rem), 1100px);
   }
+}
+
+.retained-not-found {
+  width: min(calc(100% - 2rem), 54rem);
+  margin: 0 auto;
+  padding: 2rem 0;
+  color: var(--castalia-paper);
+}
+
+.retained-not-found h1 {
+  margin: 0 0 0.75rem;
+  color: var(--castalia-paper);
+  font:
+    500 clamp(2rem, 5vw, 3rem) Georgia,
+    "Times New Roman",
+    serif;
+}
+
+.retained-not-found nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  font:
+    700 0.78rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+}
+
+.retained-not-found a {
+  color: var(--castalia-paper);
 }
 
 @media (prefers-reduced-motion: reduce) {

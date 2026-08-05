@@ -51,7 +51,7 @@ Matrix identity, Castalia membership, homeserver operation, Dregg authority, and
 
 ## Current repository claim
 
-Castalia Web currently provides deterministic fixture routes, a fixture BFF, contract sources, and visible unavailable states. It does not currently provide wallet authentication, `dga1_` presentation, Castalia Control connectivity, request submission, admission status, provisioning, Matrix access, deployment, or production readiness.
+Castalia Web currently provides deterministic fixture routes, a fixture BFF, contract sources, visible unavailable states, and a local Rust/WASM validator for the exact shape and context of a future wallet-onboarding request envelope. The validator signs nothing, verifies no wallet presentation, consumes no replay nonce authoritatively, and issues no session. The repository does not currently provide wallet authentication, `dga1_` presentation, Castalia Control connectivity, request submission, admission status, provisioning, Matrix access, deployment, or production readiness.
 
 ## Forbidden authority substitutions
 
