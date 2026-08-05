@@ -35,6 +35,10 @@ for phrase in 'ZenithResearch/castalia-web' 'Rust/Dregg Castalia' 'duplicate gua
   grep -Fiq "$phrase" docs/repository-evidence.md || fail "missing repository evidence phrase: $phrase"
 done
 
+for phrase in 'bananawalnut/castalia-web' 'https://bananawalnut.github.io/castalia-web/' '548f340d9b4e5b6f57c1a5875feb9bc36e6e19b3' 'CI, Security, CodeQL, and Pages' 'static-fixture deployment'; do
+  grep -Fiq "$phrase" docs/repository-evidence.md || fail "missing public migration evidence phrase: $phrase"
+done
+
 for phrase in 'Current fixture implementation' 'deterministic fixture shell' 'fixture BFF'; do
   grep -Fiq "$phrase" docs/product-boundary.md || fail "missing current product-state phrase: $phrase"
 done

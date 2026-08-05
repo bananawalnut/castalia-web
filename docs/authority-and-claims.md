@@ -9,7 +9,7 @@ Status: accepted authority contract from issue #9, preserving Historical issue #
 | Accounts, rooms, events, edits, redactions, membership, and participant-authorized sends | Matrix | Matrix remains canonical. Castalia Web is an unprivileged client. It receives no Synapse admin or appservice credentials and cannot replace Matrix truth. |
 | Castalia authorization, challenge/replay policy, syndicate admission policy/status, revocation/discharge enforcement, and authority receipts | Castalia Control using Dregg authorization | This repository does not implement that service. A future unprivileged client may present exact-request wallet proof plus a wallet-held `dga1_` capability directly to it. |
 | Infrastructure execution, including Zenith-hosted Matrix provisioning | The infrastructure provisioner; Hub may fill this role for Zenith-hosted resources | The provisioner alone holds cloud, DNS, Synapse-admin, signing, federation-admission, and deployment credentials. It is not the authorization source or Castalia lifecycle authority. |
-| Product routes and presentation | `ZenithResearch/castalia-web` | The repository may define the unprivileged web experience, while displaying upstream states without turning them into authority. |
+| Product routes and presentation | `bananawalnut/castalia-web` | The public repository may define and deploy the unprivileged fixture web experience, while displaying upstream states without turning them into authority. |
 | Documentation interpretation | The precedence rules below | Prose cannot override Matrix truth, verified Dregg authority, accepted issue boundaries, or reviewed evidence. |
 
 ## Request/status-first lifecycle
@@ -26,7 +26,7 @@ No live request submission, Castalia Control integration, provisioning, authorit
 
 ## Implemented fixture routes and APIs
 
-The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, and visible unavailable states. These surfaces are fixture-only. They do not establish live Matrix access, wallet authentication, Dregg capability verification, Castalia Control lookup or mutation, provisioning, participant-authorized sends, deployment, or production readiness.
+The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, visible unavailable states, and a static GitHub Pages deployment. These surfaces are fixture-only. They do not establish live Matrix access, wallet authentication, Dregg capability verification, Castalia Control lookup or mutation, provisioning, participant-authorized sends, or production readiness.
 
 ## Commons room posture
 

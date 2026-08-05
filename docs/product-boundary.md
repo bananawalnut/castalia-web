@@ -1,6 +1,6 @@
 # Product boundary
 
-Status: accepted planning contract from issue #9, preserving issues #1 and #2 as provenance while superseding issue #1's unresolved separate-registry target. This remains bounded repository evidence, not live-integration, deployment, or production evidence.
+Status: accepted planning contract from issue #9, preserving issues #1 and #2 as provenance while superseding issue #1's unresolved separate-registry target. The public Pages site is bounded static-fixture deployment evidence, not live-integration or production evidence.
 
 ## Product states
 
@@ -59,7 +59,7 @@ These registries and viewers read checked-in synthetic examples only. They conta
 
 ## Project and repository boundary
 
-- `ZenithResearch/castalia-web` owns the future web experience and its public, unprivileged integration contracts.
+- `bananawalnut/castalia-web` owns the public fixture web experience and its unprivileged integration contracts.
 - It is independent from the Rust/Dregg Castalia repository. Integration is planned only through reviewed public contracts; no code, release, credential, or current implementation claim is shared.
 - Matrix remains canonical for accounts, rooms, events, edits, redactions, membership, and participant-authorized sends.
 - Castalia Web must remain unprivileged. It receives no Synapse admin or appservice credentials.

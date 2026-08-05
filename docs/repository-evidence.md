@@ -46,11 +46,22 @@ At the time this evidence was written, issue #2 was outside pull request #3 and 
 
 This post-merge evidence establishes only the fixture implementation and its repository checks. It does not establish live Matrix or registry access, deployment, runtime security approval, or production readiness.
 
+## Public migration and Pages deployment
+
+On 2026-08-05, the current repository moved to the public [`bananawalnut/castalia-web`](https://github.com/bananawalnut/castalia-web) repository. Earlier `ZenithResearch/castalia-web` issue and pull-request links above remain historical provenance; they are not the current remote identity.
+
+- Public main commit: `548f340d9b4e5b6f57c1a5875feb9bc36e6e19b3` — `ci: publish Castalia to GitHub Pages`
+- Static fixture: <https://bananawalnut.github.io/castalia-web/>
+- Exact-head hosted evidence: CI, Security, CodeQL, and Pages completed successfully.
+- Pages uses workflow publishing from `main`; the deployed artifact contains the frontend only, with a project-base-aware router and static-host fallback.
+
+This proves a public static-fixture deployment at the named commit. It does not prove live Matrix or registry access, BFF hosting, wallet authentication, Castalia Control integration, infrastructure provisioning, or production readiness.
+
 ## Non-claims
 
 This evidence does not claim:
 
 - authorship or identity of the person who created the repository;
-- branch protection, required-check binding, or deployment;
+- branch protection, required-check binding, or any deployment beyond the bounded static Pages fixture above;
 - shared implementation or authority with Rust/Dregg Castalia;
 - live Matrix or registry access, provisioning, federation, AI interpretation, or production readiness.

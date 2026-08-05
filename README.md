@@ -1,8 +1,15 @@
 # Castalia Web
 
-Private, fixture-only scaffold for the planned Castalia collective selector, Matrix forum shell, Castalia Control request/status flow, and contract documentation.
+Public, fixture-only scaffold for the planned Castalia collective selector, Matrix forum shell, Castalia Control request/status flow, and contract documentation.
 
-The repository now contains an executable local fixture shell and BFF plus a fail-closed Rust/WASM validator for a future exact wallet-onboarding request envelope. It does **not** provide live Matrix access, wallet authentication or signing, Dregg capability presentation, Castalia Control connectivity, community or room provisioning, deployment evidence, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md), [wallet/WASM boundary](docs/vanilla-wasm-wallet-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
+The repository contains an executable fixture shell and BFF plus a fail-closed Rust/WASM validator for a future exact wallet-onboarding request envelope. The static frontend is published through GitHub Pages, but it does **not** provide live Matrix access, wallet authentication or signing, Dregg capability presentation, Castalia Control connectivity, community or room provisioning, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md), [wallet/WASM boundary](docs/vanilla-wasm-wallet-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
+
+## Public fixture
+
+- Repository: <https://github.com/bananawalnut/castalia-web>
+- Static frontend: <https://bananawalnut.github.io/castalia-web/>
+
+The Pages site is deployment evidence for the static fixture only. It is not evidence of live upstream integration or production authority.
 
 ## Architecture
 
@@ -55,7 +62,7 @@ Browser downloads, reports, temporary files, and performance outputs honor `PLAY
 - Browser gates use Chromium and `@axe-core/playwright` for 320px layout, keyboard/focus, `aria-current`, landmarks/headings, unavailable controls, browser persistence/network boundaries, and serious/critical axe findings.
 - Performance gates enforce gzip bundle limits, fresh web/BFF/Turbo build durations, and 20-sample compiled fixture BFF `/health` startup p95/max limits; RSS is report-only with a 128 MiB warning.
 - Security policy gates fail closed for unavailable/malformed dependency reports, denied or unreviewed licenses, secret scanners, contaminated emitted artifacts, and unsafe workflow changes. Synthetic negative tests prove those failure paths.
-- GitHub workflows declare stable check names for CI, dependency review/policy, secrets, and CodeQL. Configuration is not evidence that hosted checks ran; absent or entitlement-blocked checks remain unavailable, not green.
+- GitHub workflows declare stable check names for CI, dependency review/policy, secrets, CodeQL, and Pages. Exact-head hosted results are recorded in the repository evidence; configuration alone is never treated as proof that a later run passed.
 
 See [documentation verification](docs/verification.md), [repository and implementation evidence](docs/repository-evidence.md), the historical [community registry authority decision](docs/community-registry-authority.md), [dependency security evidence](docs/dependency-security.md), and [router dependency security evidence](docs/router-dependency-security.md) for bounded verification records.
 
@@ -63,4 +70,4 @@ Active product development is tracked through GitHub issues and evidence-backed 
 
 ## Fixture-only non-goals
 
-This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, wallet proof, `dga1_` custody/presentation, Castalia Control lookup or mutation, registration/join/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, deployment/rollback/signing, branch-rule binding, or production readiness. `/health` proves only that the local fixture process is responding.
+This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, wallet proof, `dga1_` custody/presentation, Castalia Control lookup or mutation, registration/join/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, production deployment/rollback/signing, branch-rule binding, or production readiness. `/health` proves only that the local fixture process is responding.
