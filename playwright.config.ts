@@ -1,4 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
+const browserPort = process.env.CASTALIA_BROWSER_PORT ?? "4173";
+const browserOrigin = `http://127.0.0.1:${browserPort}`;
 export default defineConfig({
   testDir: "./tests/browser",
   timeout: 30_000,
@@ -17,14 +19,13 @@ export default defineConfig({
   ],
   use: {
     ...devices["Desktop Chrome"],
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: browserOrigin,
     trace: "retain-on-failure",
     serviceWorkers: "block",
   },
   webServer: {
-    command:
-      "NODE_ENV=development VITE_APP_ENV=test VITE_FIXTURE_MODE=true pnpm --filter @castalia/web exec vite --host 127.0.0.1 --port 4173 --strictPort",
-    url: "http://127.0.0.1:4173",
+    command: `NODE_ENV=development VITE_APP_ENV=test VITE_FIXTURE_MODE=true pnpm --filter @castalia/web exec vite --host 127.0.0.1 --port ${browserPort} --strictPort`,
+    url: browserOrigin,
     reuseExistingServer: false,
     timeout: 30_000,
   },

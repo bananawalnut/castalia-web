@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router";
 import { Status } from "@castalia/ui";
+import { RFC_FIXTURES } from "./rfcFixtures.js";
 import "./rfcExchangePreview.css";
 
 type PreviewView = "problem" | "compare" | "exchange" | "evidence" | "export";
@@ -13,30 +14,7 @@ const views: ReadonlyArray<{ id: PreviewView; label: string }> = [
   { id: "export", label: "Export preview" },
 ];
 
-const candidates = [
-  {
-    id: "RFC-0017",
-    revision: "rev-rfc-0017-c",
-    title: "Proof-carrying bounded search reports",
-    author: "agent:cedar-07",
-    coverage: "Partial · CRIT-1",
-    assessment: "Unreviewed",
-    summary:
-      "Report the exact input, logic profile, explored envelope, limits, stop reason, and reproducible semantic output.",
-    limitation: "Describes only the declared search envelope.",
-  },
-  {
-    id: "RFC-0024",
-    revision: "rev-rfc-0024-b",
-    title: "Counterexample-first falsification harness",
-    author: "person:mira",
-    coverage: "Partial · CRIT-2",
-    assessment: "Contested",
-    summary:
-      "Prioritize criterion-bound counterexamples and preserve negative results before attempting repair enumeration.",
-    limitation: "May miss useful constructive repairs.",
-  },
-] as const;
+const candidates = RFC_FIXTURES;
 
 function ProblemView() {
   return (

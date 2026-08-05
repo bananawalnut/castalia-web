@@ -1,0 +1,303 @@
+.space-directory {
+  --space-line: rgb(255 253 245 / 54%);
+  width: min(100%, 76rem);
+  min-height: calc(100svh - 34px);
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2.25rem);
+  color: var(--castalia-paper);
+}
+
+.space-directory h1,
+.space-directory h2,
+.space-directory strong {
+  color: var(--castalia-paper);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  text-wrap: balance;
+}
+
+.space-directory a {
+  color: var(--castalia-paper);
+  text-underline-offset: 0.24em;
+}
+
+.space-directory a:focus-visible {
+  outline: 3px solid var(--castalia-paper);
+  outline-offset: 4px;
+}
+
+.space-directory__hero {
+  max-width: 58rem;
+  padding: 1.25rem 0 1rem;
+}
+
+.space-directory__eyebrow,
+.space-directory__section-heading span,
+.space-directory__list small,
+.space-directory__glyph,
+.space-directory__open,
+.space-directory__room-list,
+.space-directory__actions {
+  font-family: Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+}
+
+.space-directory__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.space-directory h1 {
+  margin: 0.3rem 0 0.65rem;
+  font-size: clamp(2.2rem, 4.5vw, 3.5rem);
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-shadow: 2px 2px 0 var(--castalia-shadow);
+}
+
+.space-directory__hero
+  > p:not(.space-directory__eyebrow, .space-directory__boundary),
+.space-directory--viewer
+  > p:not(.space-directory__eyebrow, .space-directory__boundary) {
+  max-width: 49rem;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.space-directory__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.space-directory__actions a {
+  min-height: 36px;
+  align-content: center;
+  padding: 0.45rem 0;
+}
+
+.space-directory__boundary {
+  max-width: 50rem;
+  margin: 1rem 0 0;
+  padding-left: 1rem;
+  border-left: 4px solid var(--castalia-paper);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.space-directory__section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0.75rem 0;
+  border-block: 1px solid var(--space-line);
+}
+
+.space-directory__section-heading h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+}
+
+.space-directory__section-heading span {
+  font-size: 0.72rem;
+}
+
+.space-directory__list,
+.space-directory__room-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.space-directory__list > li,
+.space-directory__room-list > li {
+  border-bottom: 1px solid var(--space-line);
+}
+
+.space-directory__list > li > a {
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr) 8rem;
+  gap: 1.5rem;
+  align-items: center;
+  min-height: 7rem;
+  padding: 1rem 0;
+  text-decoration: none;
+}
+
+.space-directory__list > li > a:hover,
+.space-directory__room-list > li > a:hover {
+  background: rgb(255 253 245 / 6%);
+}
+
+.space-directory__glyph {
+  align-self: start;
+  padding-top: 0.3rem;
+  font-size: 0.72rem;
+}
+
+.space-directory__list small,
+.space-directory__list strong,
+.space-directory__list strong + span {
+  display: block;
+}
+
+.space-directory__list small {
+  margin-bottom: 0.6rem;
+  font-size: 0.72rem;
+}
+
+.space-directory__list strong {
+  margin-bottom: 0.5rem;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.space-directory__list strong + span {
+  max-width: 45rem;
+  line-height: 1.5;
+}
+
+.space-directory__open {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: right;
+}
+
+.space-directory--viewer {
+  max-width: 62rem;
+}
+
+.space-directory__room-list > li > a {
+  display: grid;
+  grid-template-columns: 4rem minmax(11rem, 0.6fr) minmax(12rem, 1fr) 7rem;
+  gap: 1.5rem;
+  align-items: center;
+  min-height: 6.5rem;
+  padding: 1rem 0;
+  text-decoration: none;
+}
+
+.space-directory__room-list strong {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.space-directory--viewer footer,
+.space-directory__back {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--space-line);
+}
+
+.commons-room__status {
+  padding: 1.25rem 0;
+  border-block: 1px solid var(--space-line);
+}
+
+.commons-room__status h2 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+.commons-room__status dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 0;
+}
+
+.commons-room__status dl > div {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--space-line);
+}
+
+.commons-room__status dt,
+.commons-room__status dd {
+  font-family: Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+  font-size: 0.75rem;
+}
+
+.commons-room__status dd {
+  margin: 0.4rem 0 0;
+}
+
+/* Quick directory-density pass; creation links remain bounded placeholders. */
+.space-directory__hero {
+  max-width: 62rem;
+  padding: 1.25rem 0 1.5rem;
+}
+
+.space-directory h1 {
+  margin-block: 0.25rem 0.6rem;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  font-style: normal;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-shadow: 2px 2px 0 var(--castalia-shadow);
+}
+
+.space-directory__hero
+  > p:not(.space-directory__eyebrow, .space-directory__boundary),
+.space-directory--viewer
+  > p:not(.space-directory__eyebrow, .space-directory__boundary) {
+  font-size: 0.95rem;
+}
+
+.space-directory__actions {
+  margin-top: 1rem;
+}
+
+.space-directory__boundary {
+  margin-top: 0.85rem;
+}
+
+.space-directory__section-heading h2 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.space-directory__list > li > a {
+  min-height: 7rem;
+  padding-block: 1rem;
+}
+
+.space-directory__list strong {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+@media (max-width: 760px) {
+  .space-directory {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .space-directory__section-heading {
+    display: block;
+  }
+
+  .space-directory__section-heading span {
+    display: block;
+    margin-top: 0.7rem;
+  }
+
+  .space-directory__list > li > a,
+  .space-directory__room-list > li > a {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0.8rem 1rem;
+  }
+
+  .space-directory__open,
+  .space-directory__room-list strong,
+  .space-directory__room-list strong + span,
+  .space-directory__room-list a > span:last-child {
+    grid-column: 2;
+    text-align: left;
+  }
+
+  .commons-room__status dl {
+    grid-template-columns: 1fr;
+  }
+}

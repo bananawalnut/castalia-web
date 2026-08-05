@@ -15,8 +15,12 @@ for phrase in 'C4 system context' 'C4 containers and components' 'Artifact graph
   grep -Fiq "$phrase" docs/architecture/rfc-exchange.md || fail "missing RFC exchange architecture contract phrase: $phrase"
 done
 
-for route in '/' '/community/:slug/forum' '/create' '/create/:requestId' '/docs' '/docs/api' '/docs/specs' '/docs/architecture/rfc-exchange' '/docs/rfc-exchange/preview'; do
+for route in '/' '/tenders' '/tenders/:tenderId' '/rfcs' '/rfcs/:rfcId' '/docs'; do
   grep -Fq "\`$route\`" docs/product-boundary.md || fail "missing canonical route: $route"
+done
+
+for phrase in 'kind: Proposal' 'Tender → Bid → Award decision → Contract' 'A bid is an offer' 'no bid input' 'standalone Proposals'; do
+  grep -Fiq "$phrase" docs/product-boundary.md || fail "missing proposal/tender boundary phrase: $phrase"
 done
 
 for phrase in 'Historical issue #1' 'Matrix remains canonical' 'unprivileged client' 'Castalia Control' 'Dregg authorization' 'infrastructure provisioner' 'wallet-held `dga1_`' 'request/status-first' 'visible unavailable' 'Deferred interpretation' 'Documentation precedence' 'Claim ledger' 'Explicit non-claims'; do

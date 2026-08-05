@@ -1,22 +1,14 @@
 export const routes = [
-  { path: "/", label: "Rooms" },
-  { path: "/room/:slug", label: "Group chat" },
-  { path: "/community/:slug/forum", label: "Legacy room redirect" },
-  { path: "/create", label: "Create room" },
-  { path: "/create/:requestId", label: "Room request" },
+  { path: "/", label: "Landing" },
+  { path: "/tenders", label: "Tenders" },
+  { path: "/rfcs", label: "RFCs" },
   { path: "/docs", label: "Docs" },
-  { path: "/docs/api", label: "API reference" },
-  { path: "/docs/specs", label: "Contract specifications" },
-  {
-    path: "/docs/architecture/rfc-exchange",
-    label: "RFC exchange architecture",
-  },
-  { path: "/docs/rfc-exchange/preview", label: "RFC exchange preview" },
 ] as const;
 
 export const navigation = [
-  { to: "/", label: "Rooms" },
-  { to: "/room/zenith", label: "Zenith" },
-  { to: "/create", label: "Create room" },
+  { to: "/chronicle", label: "Chronicle" },
+  { to: "/tenders", label: "Tenders" },
+  { to: "/rfcs", label: "RFC" },
+  { to: "/merch", label: "Merch" },
   { to: "/docs", label: "Docs" },
 ] as const;

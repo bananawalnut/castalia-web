@@ -1,0 +1,25 @@
+Counterexample-first falsification harness
+
+Castalia RFC: RFC-0024
+Exact revision: rev-rfc-0024-b
+Author: person:mira
+Authorship proof: Unavailable in fixture
+Date published: Not recorded
+Domain: Unspecified
+Status: In review
+Assessment: Contested
+
+ABSTRACT
+Prioritize criterion-bound counterexamples and preserve negative results before attempting repair enumeration.
+
+SCOPE
+Claim coverage: Partial · CRIT-2.
+
+KNOWN LIMITATION
+May miss useful constructive repairs.
+
+MAINTENANCE
+This is a checked-in synthetic fixture. No publication action, repository lookup, or remote request occurs.
+
+REFERENCES
+No wikilinked references are recorded in this fixture.

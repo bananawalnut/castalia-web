@@ -1,0 +1,807 @@
+.rfc-document,
+.rfc-document-not-found {
+  --rfc-paper: #f8f5e9;
+  --rfc-ink: #171b22;
+  --rfc-paper-line: rgb(23 27 34 / 22%);
+  --rfc-rail-line: rgb(255 253 245 / 36%);
+  width: min(calc(100% - 2rem), 90rem);
+  margin: 0 auto;
+  padding: 1.25rem 0 4rem;
+  color: var(--castalia-paper);
+}
+
+.rfc-document__back {
+  display: inline-block;
+  margin: 0 0 1rem;
+  color: var(--castalia-paper);
+  font:
+    700 0.7rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.rfc-document__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+  align-items: start;
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.rfc-document__paper {
+  min-width: 0;
+  background: var(--castalia-cobalt);
+  color: var(--castalia-paper);
+  box-shadow: 0 1.2rem 3rem rgb(0 24 77 / 28%);
+}
+
+.rfc-document__intro,
+.rfc-document__viewer-panel {
+  padding: clamp(1.4rem, 3vw, 3rem);
+}
+
+.rfc-document__intro {
+  background: var(--castalia-cobalt);
+  color: var(--castalia-paper);
+}
+
+.rfc-document__viewer-panel {
+  background: var(--castalia-paper);
+  color: var(--rfc-ink);
+}
+
+.rfc-document__masthead {
+  padding-bottom: 1.4rem;
+  border-bottom: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__overline {
+  margin: 0 0 0.65rem;
+  font:
+    700 0.65rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rfc-document__paper h1 {
+  max-width: 22ch;
+  margin: 0 0 0.75rem;
+  color: var(--castalia-paper);
+  font:
+    500 clamp(2rem, 4vw, 3.4rem) Georgia,
+    "Times New Roman",
+    serif;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.rfc-document__byline {
+  margin: 0;
+  font:
+    0.72rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  line-height: 1.6;
+}
+
+.rfc-document__masthead-meta {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr) minmax(0, 0.85fr);
+  margin: 1rem 0 0;
+  border-block: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__masthead-meta > div {
+  min-width: 0;
+  padding: 0.65rem 0.8rem 0.65rem 0;
+}
+
+.rfc-document__masthead-meta > div + div {
+  padding-left: 0.8rem;
+  border-left: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__masthead-meta dt,
+.rfc-document__masthead-meta dd {
+  margin: 0;
+}
+
+.rfc-document__masthead-meta dt {
+  margin-bottom: 0.25rem;
+  color: rgb(255 253 245 / 72%);
+  font:
+    700 0.57rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.rfc-document__masthead-meta dd {
+  overflow-wrap: anywhere;
+  font:
+    600 0.7rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  line-height: 1.4;
+}
+
+.rfc-document__summary {
+  display: grid;
+  grid-template-columns: minmax(6rem, 0.25fr) minmax(0, 1fr);
+  gap: 1rem;
+  margin: 1.5rem 0 0;
+}
+
+.rfc-document__summary h2 {
+  margin: 0;
+  font:
+    700 0.63rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.rfc-document__summary p {
+  max-width: 48rem;
+  margin: 0;
+  font:
+    500 clamp(1rem, 1.6vw, 1.2rem) Georgia,
+    "Times New Roman",
+    serif;
+  line-height: 1.5;
+}
+
+.rfc-document__boundary {
+  margin: 1rem 0 0;
+  padding: 0.65rem 0.8rem;
+  border-left: 3px solid var(--castalia-paper);
+  background: rgb(0 24 77 / 24%);
+  font-size: 0.73rem;
+  line-height: 1.55;
+}
+
+.rfc-document__tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+}
+
+.rfc-document__tabs button {
+  min-height: 2.55rem;
+  padding: 0.65rem 0.85rem;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font:
+    700 0.66rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.rfc-document__tabs button[aria-selected="true"] {
+  border-bottom-width: 3px;
+}
+
+.rfc-document__tabs button:focus-visible,
+.rfc-comment-draft button:focus-visible,
+.rfc-document__comment-disabled button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+
+.rfc-document__tabs--format {
+  width: fit-content;
+  margin-top: 1.25rem;
+  padding: 0.15rem;
+  border: 1px solid var(--rfc-rail-line);
+  background: rgb(0 24 77 / 14%);
+  color: var(--castalia-paper);
+}
+
+.rfc-document__tabs--format button {
+  min-height: 1.85rem;
+  padding: 0.35rem 0.55rem;
+  border-bottom: 0;
+  font-size: 0.6rem;
+}
+
+.rfc-document__tabs--format button[aria-selected="true"] {
+  border-bottom: 0;
+  background: var(--castalia-paper);
+  color: var(--castalia-cobalt);
+}
+
+.rfc-document__format-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.rfc-document__viewer-toggle {
+  min-height: 2.15rem;
+  margin-top: 1.25rem;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--rfc-rail-line);
+  background: transparent;
+  color: var(--castalia-paper);
+  cursor: pointer;
+  font:
+    700 0.61rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.04em;
+}
+
+.rfc-document__viewer-toggle:hover,
+.rfc-document__viewer-toggle:focus-visible,
+.rfc-document__viewer-toggle[aria-pressed="true"] {
+  background: var(--castalia-paper);
+  color: var(--castalia-cobalt);
+}
+
+.rfc-document__viewer-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+
+.rfc-document__viewer-toggle[hidden] {
+  display: none;
+}
+
+.rfc-document__tabpanel--format {
+  min-height: 34rem;
+}
+
+.rfc-document__rendered {
+  padding-top: 1.6rem;
+}
+
+.rfc-document__rendered section {
+  scroll-margin-top: 1rem;
+}
+
+.rfc-document__rendered h2 {
+  margin: 2.75rem 0 0.8rem;
+  color: var(--rfc-ink);
+  font:
+    500 clamp(1.35rem, 2.2vw, 1.75rem) Georgia,
+    "Times New Roman",
+    serif;
+}
+
+.rfc-document__rendered section:first-child h2 {
+  margin-top: 0;
+}
+
+.rfc-document__rendered p {
+  max-width: 68ch;
+  margin: 0.65rem 0;
+  font:
+    1rem Georgia,
+    "Times New Roman",
+    serif;
+  line-height: 1.75;
+}
+
+.rfc-document__rendered ::selection {
+  background: #f3dd79;
+  color: #11151b;
+}
+
+.rfc-document__rendered--text {
+  max-width: 100%;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    0.78rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  line-height: 1.7;
+}
+
+.rfc-document__pdf {
+  display: block;
+  width: 100%;
+  height: min(72vh, 55rem);
+  min-height: 36rem;
+  border: 1px solid var(--rfc-paper-line);
+  background: white;
+}
+
+.rfc-comment-draft {
+  margin: 1.25rem 0 2rem;
+  padding: 1rem;
+  border: 1px solid #88701f;
+  background: #fff7ca;
+  color: #2a260f;
+}
+
+.rfc-comment-draft > span {
+  font:
+    700 0.65rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.rfc-comment-draft blockquote {
+  margin: 0.75rem 0;
+  padding-left: 0.9rem;
+  border-left: 2px solid currentColor;
+  font:
+    italic 1rem Georgia,
+    "Times New Roman",
+    serif;
+  line-height: 1.5;
+}
+
+.rfc-comment-draft p {
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.rfc-comment-draft button,
+.rfc-document__comment-disabled button {
+  min-height: 2.5rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid currentColor;
+  background: transparent;
+  color: inherit;
+  font:
+    700 0.65rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+}
+
+.rfc-comment-draft button:disabled,
+.rfc-document__comment-disabled button:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.rfc-document__rail {
+  position: sticky;
+  top: 1rem;
+  min-width: 0;
+  border: 1px solid var(--rfc-rail-line);
+  color: var(--castalia-paper);
+}
+
+.rfc-document__tabs--rail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(max-content, 1fr));
+  border-bottom: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__tabs--rail button {
+  min-width: 0;
+  padding-inline: 0.55rem;
+  border-bottom-color: transparent;
+}
+
+.rfc-document__tabs--rail button[aria-selected="true"] {
+  background: rgb(255 253 245 / 10%);
+  border-bottom-color: var(--castalia-paper);
+}
+
+.rfc-document__tabpanel--rail {
+  min-height: 26rem;
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.rfc-document__contents {
+  margin: 0;
+  padding-left: 1.4rem;
+}
+
+.rfc-document__contents li {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--rfc-rail-line);
+  font:
+    500 0.95rem Georgia,
+    "Times New Roman",
+    serif;
+}
+
+.rfc-document__contents a,
+.rfc-document__download {
+  color: inherit;
+}
+
+.rfc-document__details {
+  margin: 0;
+}
+
+.rfc-document__details > div {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__details dt {
+  margin-bottom: 0.3rem;
+  color: rgb(255 253 245 / 66%);
+  font:
+    700 0.61rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.rfc-document__details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font:
+    0.88rem Georgia,
+    "Times New Roman",
+    serif;
+  line-height: 1.45;
+}
+
+.rfc-document__comment-disabled {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rfc-rail-line);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.rfc-document__update {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1rem 0;
+  padding: 0.9rem;
+  border: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__update strong,
+.rfc-document__update span {
+  font-family: Menlo, "DejaVu Sans Mono", monospace;
+  font-size: 0.68rem;
+}
+
+.rfc-document__viewer-sidebar {
+  display: none;
+}
+
+html.rfc-viewer-active {
+  overflow: hidden;
+}
+
+.rfc-document--viewing {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--castalia-cobalt);
+}
+
+.rfc-document--viewing .rfc-document__back,
+.rfc-document--viewing .rfc-document__intro,
+.rfc-document--viewing .rfc-document__rail {
+  display: none;
+}
+
+.rfc-document--viewing .rfc-document__layout {
+  height: 100%;
+  min-height: 0;
+  grid-template-columns: minmax(16rem, 19rem) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+}
+
+.rfc-document--viewing .rfc-document__viewer-sidebar {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  max-height: 100%;
+  flex-direction: column;
+  grid-row: 1;
+  grid-column: 1;
+  border-right: 1px solid var(--rfc-rail-line);
+  background: var(--castalia-cobalt);
+  color: var(--castalia-paper);
+  overflow: hidden;
+}
+
+.rfc-document--viewing .rfc-document__viewer-sidebar[hidden] {
+  display: none;
+}
+
+.rfc-document__viewer-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem 0.75rem;
+  align-items: start;
+  padding: 1.1rem;
+  border-bottom: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__viewer-label,
+.rfc-document__viewer-title {
+  min-width: 0;
+  margin: 0;
+}
+
+.rfc-document__viewer-label {
+  font:
+    700 0.62rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rfc-document__viewer-title {
+  grid-column: 1 / -1;
+  overflow-wrap: anywhere;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.rfc-document__viewer-exit {
+  min-height: 2.25rem;
+  grid-row: 1;
+  grid-column: 2;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--rfc-rail-line);
+  background: var(--castalia-paper);
+  color: var(--castalia-cobalt);
+  cursor: pointer;
+  font:
+    700 0.6rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  white-space: nowrap;
+}
+
+.rfc-document__viewer-exit:focus-visible {
+  outline: 2px solid var(--castalia-paper);
+  outline-offset: 2px;
+}
+
+.rfc-document__tabs--viewer {
+  display: grid;
+  flex: 0 0 auto;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  overflow: visible;
+  border-bottom: 1px solid var(--rfc-rail-line);
+}
+
+.rfc-document__tabs--viewer button {
+  min-width: 0;
+  padding-inline: 0.5rem;
+  border-bottom-color: transparent;
+}
+
+.rfc-document__tabs--viewer button[aria-selected="true"] {
+  background: rgb(255 253 245 / 10%);
+  border-bottom-color: var(--castalia-paper);
+}
+
+.rfc-document__tabpanel--viewer {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 1.1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rfc-document--viewing .rfc-document__paper {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  grid-row: 1;
+  grid-column: 2;
+  overflow: hidden;
+  background: var(--castalia-paper);
+  box-shadow: none;
+}
+
+.rfc-document--viewing .rfc-document__viewer-panel {
+  height: 100%;
+  min-height: 0;
+  padding: clamp(2.5rem, 6vw, 5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rfc-document--viewing .rfc-document__rendered--markdown {
+  width: min(100%, 48rem);
+  margin: 0 auto;
+  padding-top: 0;
+  font-family: var(--font-body);
+}
+
+.rfc-document--viewing .rfc-document__rendered--markdown h2 {
+  margin-top: 3rem;
+  font-family: var(--font-body);
+  font-size: clamp(1.35rem, 2vw, 1.65rem);
+  font-weight: 650;
+  letter-spacing: -0.018em;
+  line-height: 1.25;
+}
+
+.rfc-document--viewing
+  .rfc-document__rendered--markdown
+  section:first-child
+  h2 {
+  margin-top: 0;
+}
+
+.rfc-document--viewing .rfc-document__rendered--markdown p {
+  max-width: 72ch;
+  margin: 0.8rem 0;
+  font-family: var(--font-body);
+  font-size: 1.08rem;
+  font-weight: 400;
+  line-height: 1.75;
+}
+
+.rfc-document--viewing .rfc-document__rendered section {
+  scroll-margin-top: 2rem;
+}
+
+.rfc-document--viewing .rfc-document__contents li,
+.rfc-document--viewing .rfc-document__tabpanel--viewer > p,
+.rfc-document--viewing .rfc-comment-draft blockquote {
+  font-family: var(--font-body);
+}
+
+.rfc-document__eyebrow {
+  font:
+    700 0.68rem Menlo,
+    "DejaVu Sans Mono",
+    monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rfc-document-not-found {
+  max-width: 54rem;
+  padding-top: 3rem;
+}
+
+.rfc-document-not-found h1 {
+  margin: 0.5rem 0 1rem;
+  color: var(--castalia-paper);
+  font:
+    500 clamp(2.4rem, 6vw, 4.5rem) Georgia,
+    "Times New Roman",
+    serif;
+}
+
+.rfc-document-not-found a {
+  color: var(--castalia-paper);
+}
+
+@media (max-width: 900px) {
+  .rfc-document__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rfc-document__rail {
+    position: static;
+  }
+
+  .rfc-document--viewing .rfc-document__layout {
+    grid-template-rows: minmax(12rem, 34dvh) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .rfc-document--viewing .rfc-document__viewer-sidebar {
+    grid-row: 1;
+    grid-column: 1;
+    border-right: 0;
+    border-bottom: 1px solid var(--rfc-rail-line);
+  }
+
+  .rfc-document--viewing .rfc-document__paper {
+    grid-row: 2;
+    grid-column: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .rfc-document,
+  .rfc-document-not-found {
+    width: min(calc(100% - 1.25rem), 90rem);
+  }
+
+  .rfc-document--viewing {
+    width: 100%;
+  }
+
+  .rfc-document__paper {
+    padding: 0;
+  }
+
+  .rfc-document__intro,
+  .rfc-document__viewer-panel {
+    padding: 1.2rem;
+  }
+
+  .rfc-document__masthead-meta > div {
+    padding-right: 0.35rem;
+  }
+
+  .rfc-document__masthead-meta > div + div {
+    padding-left: 0.35rem;
+  }
+
+  .rfc-document__masthead-meta dd {
+    font-size: 0.62rem;
+  }
+
+  .rfc-document__paper h1 {
+    font-size: clamp(1.9rem, 10vw, 2.7rem);
+  }
+
+  .rfc-document__summary {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .rfc-document__tabs--rail {
+    overflow: visible;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rfc-document__tabs--rail button {
+    padding-inline: 0.25rem;
+    font-size: 0.58rem;
+  }
+
+  .rfc-document__tabpanel--format {
+    min-height: 28rem;
+  }
+
+  .rfc-document__pdf {
+    min-height: 30rem;
+  }
+
+  .rfc-document--viewing .rfc-document__viewer-panel {
+    padding: 1.5rem 1.2rem 2.5rem;
+  }
+
+  .rfc-document__viewer-header {
+    padding: 0.75rem;
+  }
+
+  .rfc-document__viewer-title {
+    font-size: 0.86rem;
+  }
+
+  .rfc-document__tabs--viewer button {
+    min-height: 2.25rem;
+  }
+
+  .rfc-document__tabpanel--viewer {
+    padding: 0.75rem;
+  }
+
+  .rfc-document--viewing .rfc-document__rendered--markdown p {
+    font-size: 1rem;
+    line-height: 1.72;
+  }
+}

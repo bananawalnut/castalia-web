@@ -72,3 +72,15 @@ Observed after installation:
 Issue #11 remains draft/blocked because a fresh audit surfaced unrelated advisories after it was scoped: HIGH `find-my-way` advisory 1124273 and MODERATE `react-router` advisories 1124268, 1124271, and 1124272. Those paths are routed to issue #14 rather than absorbed into this `fast-uri` change. `pnpm security:dependencies` and full `pnpm verify` therefore still exit `1`; neither result is waived or represented as green.
 
 Hosted exact-head evidence remains pending. Issue #11 cannot satisfy its complete verification gate until issue #14 removes the newly disclosed router advisories and this branch is rebased onto that accepted baseline.
+
+## 2026-08-03 advisory refresh
+
+A later live registry audit disclosed new patched releases on already pinned transitive lines:
+
+- HIGH `GHSA-7p8r-x3mc-p8w7`: `fast-uri` `3.1.4` and `4.1.1` were replaced by same-major patched releases `3.1.5` and `4.1.2`;
+- HIGH `GHSA-rgw5-rvv9-x895`: `brace-expansion` `5.0.8` was replaced by `5.0.9`;
+- MODERATE `GHSA-fxqj-rqcc-2cmp`: `postcss` `8.5.18` was replaced by `8.5.23` rather than adding a policy exception.
+
+The workspace override policy and lockfile changed only to those patched versions. `pnpm install --lockfile-only`, `pnpm install --frozen-lockfile`, and the substantive repository verification chain passed. The live dependency policy reported `moderate=0 high=0 critical=0`; no exception, severity rewrite, scanner bypass, or cross-major override was introduced. The live audit also reported a LOW esbuild advisory; the zero-HIGH/CRITICAL policy does not waive or elevate it, and this refresh did not force an unrelated esbuild API-line override.
+
+The canonical `pnpm verify` wrapper remains blocked before its substantive gates by Prettier on the unrelated untracked file `apps/web/public/brand/variants.html`. That dirty-tree formatting blocker was not modified or represented as green. Formatting for the viewer, tests, workspace override, lockfile, and this evidence file passed, as did full lint, typecheck, workspace tests, contract checks, policy checks, docs verification, route verification, production build, build/startup budgets, artifact scan, dependency scan, secret scan, and all 17 browser/accessibility tests.

@@ -1,6 +1,6 @@
 # RFC exchange responsive wireframes and component/state inventory
 
-Companion to [journeys and information architecture](rfc-exchange-ux-journeys.md). These structures specify behavior and reading order, not a production visual design. Issue #19 implements only `/docs/rfc-exchange/preview`.
+Companion to [journeys and information architecture](rfc-exchange-ux-journeys.md). These structures specify future behavior and reading order, not the current production state. The current `/rfcs` registry includes Proposal-kind RFC documents, while `/tenders` independently lists read-only contract-opportunity fixtures. The standalone `/proposals` route, Problems, Spaces, and the former exchange preview are not currently routed.
 
 ## Responsive layout contract
 
@@ -70,6 +70,25 @@ The selected card uses `aria-current="true"`; selection updates local view state
 ### Narrow
 
 Reading order is header → source → solution claims → formalization → WMT → exchange → counterexamples → candidate revisions → reviews → preserved dissent → local action. A local section switcher may collapse visuals, but all content remains reachable and headings remain in DOM order.
+
+## Tender fixture wireframes
+
+The current tender surface is intentionally simpler than the future exchange. The catalog preserves identifier, lifecycle label, title, summary, and one link to the exact tender fixture. The viewer reads in this order:
+
+```text
+Tender ID + lifecycle state
+Title + summary
+Fixture-only boundary
+Exact revision + issuer reference
+Bid deadline + compensation + bid visibility
+Award status + contract status
+Deliverables
+Acceptance criteria
+Tender → Bid → Award decision → Contract
+Bidding unavailable
+```
+
+The unavailable bid control is disabled and is not inside a form. No input field is rendered. Narrow layouts stack metadata into one column and preserve the same DOM order without horizontal page overflow. No bid count, rank, recommendation, winner, or inferred award is displayed.
 
 ## Neutral comparison wireframes
 

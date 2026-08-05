@@ -1,0 +1,202 @@
+.rfc-catalog {
+  --rfc-line: rgb(255 253 245 / 38%);
+  --rfc-muted: rgb(255 253 245 / 72%);
+  width: min(calc(100% - 2rem), 72rem);
+  margin: 0 auto;
+  padding: clamp(2.25rem, 6vw, 5.5rem) 0 4rem;
+  color: var(--castalia-paper);
+}
+
+.rfc-catalog__header {
+  max-width: 54rem;
+}
+
+.rfc-catalog__eyebrow,
+.rfc-catalog__section-heading span,
+.rfc-catalog__table th,
+.rfc-catalog__id,
+.rfc-catalog__metadata {
+  font-family: Menlo, "DejaVu Sans Mono", "Courier New", monospace;
+}
+
+.rfc-catalog__eyebrow {
+  margin: 0 0 0.7rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.rfc-catalog h1 {
+  margin: 0;
+  color: var(--castalia-paper);
+  font:
+    italic 500 clamp(3rem, 7vw, 5.4rem) Georgia,
+    "Times New Roman",
+    serif;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  text-shadow: 3px 3px 0 var(--castalia-shadow);
+}
+
+.rfc-catalog__introduction {
+  max-width: 42rem;
+  margin: 1.15rem 0 0;
+  color: var(--castalia-paper);
+  font-size: clamp(0.88rem, 1.4vw, 1rem);
+  line-height: 1.6;
+}
+
+.rfc-catalog__boundary {
+  max-width: 46rem;
+  margin: 1.25rem 0 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--castalia-paper);
+  color: var(--rfc-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.rfc-catalog__section {
+  margin-top: clamp(3rem, 7vw, 5rem);
+}
+
+.rfc-catalog__section-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+}
+
+.rfc-catalog__section-heading h2 {
+  margin: 0;
+  color: var(--castalia-paper);
+  font:
+    500 clamp(1.35rem, 2.5vw, 1.9rem) Georgia,
+    "Times New Roman",
+    serif;
+}
+
+.rfc-catalog__section-heading span {
+  color: var(--rfc-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.rfc-catalog__scroll-hint {
+  display: none;
+  margin: -0.25rem 0 0.75rem;
+  color: var(--rfc-muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.rfc-catalog__table-viewport {
+  overflow-x: auto;
+  border-block: 1px solid var(--rfc-line);
+  scrollbar-color: var(--castalia-paper) rgb(255 253 245 / 12%);
+  scrollbar-width: thin;
+}
+
+.rfc-catalog__table-viewport:focus-visible {
+  outline: 2px solid var(--castalia-paper);
+  outline-offset: 4px;
+}
+
+.rfc-catalog__table {
+  width: 100%;
+  min-width: 44rem;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.rfc-catalog__table th,
+.rfc-catalog__table td {
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--rfc-line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.rfc-catalog__table th:first-child,
+.rfc-catalog__table td:first-child {
+  width: 16%;
+  padding-left: 0;
+}
+
+.rfc-catalog__table th:nth-child(2),
+.rfc-catalog__table td:nth-child(2) {
+  width: 44%;
+}
+
+.rfc-catalog__table th:nth-child(3),
+.rfc-catalog__table td:nth-child(3),
+.rfc-catalog__table th:nth-child(4),
+.rfc-catalog__table td:nth-child(4) {
+  width: 20%;
+}
+
+.rfc-catalog__table th {
+  color: var(--rfc-muted);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.rfc-catalog__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.rfc-catalog__table tbody tr:hover {
+  background: rgb(255 253 245 / 6%);
+}
+
+.rfc-catalog__id {
+  font-size: 0.76rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rfc-catalog__id a,
+.rfc-catalog__name a {
+  color: inherit;
+}
+
+.rfc-catalog__name {
+  color: var(--castalia-paper);
+  font:
+    500 clamp(1rem, 1.8vw, 1.25rem) Georgia,
+    "Times New Roman",
+    serif;
+  line-height: 1.2;
+}
+
+.rfc-catalog__metadata {
+  color: var(--rfc-muted);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .rfc-catalog {
+    width: min(calc(100% - 1.25rem), 72rem);
+    padding-top: 2.4rem;
+  }
+
+  .rfc-catalog__section {
+    margin-top: 2.75rem;
+  }
+
+  .rfc-catalog__scroll-hint {
+    display: block;
+  }
+
+  .rfc-catalog__table th,
+  .rfc-catalog__table td {
+    padding-block: 0.85rem;
+  }
+}

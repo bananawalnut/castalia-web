@@ -27,7 +27,6 @@ export function Layout() {
             ))}
           </nav>
         </div>
-        <span className="session-status">Session unavailable</span>
       </header>
       <main id="main" className="app-main" ref={mainRef} tabIndex={-1}>
         <Outlet />

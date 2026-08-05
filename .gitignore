@@ -4,6 +4,8 @@ coverage/
 playwright-report/
 test-results/
 .turbo/
+target/
+apps/web/src/generated/
 .env
 .env.*
 !.env.example

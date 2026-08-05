@@ -16,21 +16,21 @@ Status: accepted authority contract from issue #9, preserving Historical issue #
 
 Community creation is request/status-first, not an immediate creation claim:
 
-1. `/create` may collect a future typed request but remains unavailable until its own implementation issue passes.
-2. Castalia Control would issue the authoritative request identifier addressed by `/create/:requestId`; it is not a Matrix room identifier or success assertion.
+1. `/spaces/new` and `/spaces/:spaceId/rooms/new` expose future creation intent but remain unavailable until their own implementation issues pass.
+2. A future Castalia Control request identifier would remain distinct from a Space identifier, room identifier, or success assertion; no request/status route is currently retained.
 3. The status surface would display Castalia Control states such as pending, authorized, denied, executing, succeeded, failed, or unavailable.
 4. The infrastructure provisioner may act only after a valid Castalia Control authorization and must return typed execution evidence.
 5. Success is not established until Castalia Control status, provisioner evidence, and required Matrix evidence agree.
 
-No live request submission, Castalia Control integration, provisioning, or authoritative status endpoint exists. The example request endpoint is a deterministic fixture read only.
+No live request submission, Castalia Control integration, provisioning, authoritative status endpoint, or example request route exists.
 
 ## Implemented fixture routes and APIs
 
 The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, and visible unavailable states. These surfaces are fixture-only. They do not establish live Matrix access, wallet authentication, Dregg capability verification, Castalia Control lookup or mutation, provisioning, participant-authorized sends, deployment, or production readiness.
 
-## Forum posture
+## Commons room posture
 
-Under current evidence, the Zenith forum is **visible unavailable**. The implemented fixture shell keeps `/community/:slug/forum` visible for orientation and navigation and clearly labels it unavailable. It does not imply that a room is readable, joinable, authenticated, writable, federated, or even known to exist.
+Under current evidence, The Commons is **visible unavailable** at `/room/zenith`. The retained fixture room is reachable from the Zenith Space and clearly labels messages, membership, and connection unavailable. It does not imply that a room is readable, joinable, authenticated, writable, federated, or even known to exist upstream.
 
 ## Deferred interpretation
 

@@ -1,6 +1,6 @@
 # RFC exchange UX journeys and information architecture
 
-Status: implementation contract for Issue #19. This document specifies future production routes; the only route implemented by Issue #19 is the fixture-only preview at `/docs/rfc-exchange/preview`.
+Status: future production implementation contract from Issue #19. The repository currently routes minimal checked-in `/rfcs` and `/tenders` registries with exact fixture viewers. Proposal documents appear in the RFC registry with `kind: Proposal`; the standalone `/proposals` route is removed. Problems, Spaces, and the former exchange preview are not currently routed. The richer journeys below remain design history rather than implemented behavior.
 
 ## Product-wide authority frame
 
@@ -8,15 +8,18 @@ Every surface identifies the exact immutable revision it renders. A latest alias
 
 A solution relation is always introduced as **RFC claims to address this problem**. It is not proof that the RFC works or that the problem is solved. Comparison is neutral and produces no score, rank, winner, or recommendation. A directed request routes to one inert actor reference; it does not notify, assign, obligate, or imply endorsement.
 
+A proposal is an RFC document kind, not an independent registry or identifier family. A tender is a separate contract opportunity. The sequence is **Tender → Bid → Award decision → Contract**: a bid is only an offer to perform the tendered work, and neither bidding nor evaluation creates an award or contract. The current frontend implements read-only tender fixtures and no bid input, confidentiality, evaluation, award, contract, payment, or execution authority.
+
 ## Information architecture
 
 Primary product areas:
 
 1. **Problem Board** — browse exact problem revisions and derived attention facets.
-2. **RFCs** — browse exact RFC revisions, claims, reviews, and evidence.
-3. **Exchange** — traverse requests, responses, critiques, counterexamples, revisions, and preserved dissent by repository chronology and explicit reply edges.
-4. **Compare** — inspect two or more exact solution-claim revisions without ranking.
-5. **Local draft** — choose an artifact, validate locally, preview exact bundle files, then download only after explicit consent.
+2. **RFCs** — browse exact RFC revisions, including Proposal-kind documents, claims, reviews, and evidence.
+3. **Tenders** — browse exact contract opportunities without treating bids, awards, or contracts as interchangeable states.
+4. **Exchange** — traverse requests, responses, critiques, counterexamples, revisions, and preserved dissent by repository chronology and explicit reply edges.
+5. **Compare** — inspect two or more exact solution-claim revisions without ranking.
+6. **Local draft** — choose an artifact, validate locally, preview exact bundle files, then download only after explicit consent.
 
 Persistent actor-oriented views under Problem Board filters:
 
@@ -39,13 +42,15 @@ Each row pins the primary action, absent/invalid behavior, and authority copy. D
 | `/problems/:problemId/claim-solution` | Bind an RFC revision and declare coverage, approach role, addressed/not-addressed criteria, limits, and falsifiers. | Missing exact target or coverage blocks export. `full` is never preselected. | **RFC claims to address this problem. This claim does not mark the problem solved.** |
 | `/problems/:problemId/challenge` | Draft a critique or counterexample against an exact revision; preview its reply edge. | Missing locator/target blocks export; quarantined content is not rendered into the bundle. | **A challenge is attributed review material, not a lifecycle decision.** |
 | `/problems/:problemId/compare?claims=…` | Compare at least two exact solution-claim revisions; open each challenge, decision, and dissent trail. | Fewer than two valid claims: **Select at least two exact claim revisions.** Invalid claim is omitted with an error, never silently replaced by latest. | **Neutral comparison — no score, rank, winner, or recommendation.** |
-| `/rfcs` | Browse lifecycle labels and attention facets; open an exact RFC revision. | **No matching RFCs.** Invalid index: **RFC collection unavailable — generated index validation failed.** | **Lifecycle state comes only from accepted decision artifacts.** |
+| `/rfcs` | Browse lifecycle labels, document kinds including Proposal, and attention facets; open an exact RFC revision. | **No matching RFCs.** Invalid index: **RFC collection unavailable — generated index validation failed.** | **Lifecycle state comes only from accepted decision artifacts.** |
 | `/rfcs/new` | Draft an RFC and optionally bundle explicit solution claims; validate and preview files. | Empty form remains local. Optional claim omission is shown as **No problem-solution claim included.** | **Not published. A draft RFC has no community disposition.** |
 | `/rfcs/:rfcId` | Follow a visibly labeled latest alias to current immutable revision. | Missing alias target fails closed; never guesses newest lexical ID. | **Latest-route alias — currently resolves to revision {revision}.** |
 | `/rfcs/:rfcId/revisions/:revision` | Inspect source, solution claims, exchange, formalization, attributed WMT evidence, personal bucket receipts, optional RFC-bucket receipts, reviews, revisions, and dissent. | WMT failure does not hide source/review. Invalid revision hides dependent projections. | **Immutable RFC revision. WMT evidence is subjective to its person and named bucket; it decides nothing for the exchange.** |
 | `/rfcs/:rfcId/review` | Draft attributed peer review against exact RFC/claim-set revisions. | Missing attribution, conflicts disclosure, or targets blocks export. | **A review recommendation does not approve or reject the RFC.** |
 | `/rfcs/:rfcId/challenge` | Draft critique/counterexample against RFC, claim, evidence, or formalization. | Invalid target/locator blocks export and focuses summary. | **This entry preserves disagreement; it does not decide disposition.** |
 | `/rfcs/:rfcId/revise` | Fork a candidate revision, show parent binding and exact changed files. | Parent mismatch blocks preview. Original remains visible and immutable. | **Candidate revision — does not replace the accepted source until separately submitted and accepted.** |
+| `/tenders` | Browse exact checked-in tender opportunities and open one read-only viewer. | **No matching tenders.** Invalid fixture state renders no derived bid or award claim. | **A tender requests work; it is not an award or contract.** |
+| `/tenders/:tenderId` | Inspect exact revision, issuer reference, status, deliverables, acceptance criteria, compensation disclosure, bid visibility disclosure, and recorded award/contract state. | Unknown identifiers fail closed. Current fixtures expose no bidding form or writable state. | **A bid is an offer. No bid, award decision, or contract is created by this viewer.** |
 | `/solution-claims/:solutionClaimId/revisions/:revision` | Inspect exact coverage, role, criteria, evidence, assessment decisions, challenges, and dissent. | Digest/target mismatch fails closed. | **RFC claims to address this problem. Assessment requires an authorized decision artifact.** |
 | `/exchanges/:exchangeId/revisions/:revision` | Read one addressable entry with thread root, parent edge, correction chain, attribution, and request state. | Tombstoned content shows safe audit metadata; invalid references do not flatten the thread. | **Repository chronology and reply edges; activity is not quality or consensus.** |
 | `/reviews/:reviewId` | Inspect exact attribution, targets, recommendation, disclosures, and response/correction links. | Unverified attribution remains explicit; invalid binding fails closed. | **Git-attributed; community standing not established.** |
