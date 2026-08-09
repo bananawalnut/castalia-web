@@ -16,6 +16,56 @@ async function fixture() {
   return mkdtemp(join(tmpdir(), "castalia-policy-negative-"));
 }
 
+test("Pages generation materializes safe physical entries without hostname knowledge", async () => {
+  const { generatePagesRouteEntries } =
+    await import("../scripts/lib/pages-route-entries.mjs");
+  const root = await fixture();
+  const dist = join(root, "dist");
+  const shell =
+    '<!doctype html><script type="module" src="/dynamic-base/assets/app.js"></script>';
+  await mkdir(dist);
+  await writeFile(join(dist, "index.html"), shell);
+
+  const result = await generatePagesRouteEntries({
+    dist,
+    routes: ["/", "/start", "/rfcs/rfc-0017", "/tenders/tnd-0001"],
+  });
+
+  assert.deepEqual(result.routes, [
+    "/",
+    "/rfcs/rfc-0017",
+    "/start",
+    "/tenders/tnd-0001",
+  ]);
+  for (const route of result.routes.filter((route) => route !== "/")) {
+    assert.equal(
+      await readFile(join(dist, route.slice(1), "index.html"), "utf8"),
+      shell,
+    );
+  }
+  assert.equal(await readFile(join(dist, "404.html"), "utf8"), shell);
+  assert.equal(await readFile(join(dist, ".nojekyll"), "utf8"), "");
+  assert.doesNotMatch(shell, /bananawalnut\.github\.io/);
+  await assert.rejects(
+    generatePagesRouteEntries({ dist, routes: ["/../escape"] }),
+    /unsafe route/i,
+  );
+
+  const workflow = await readFile(
+    new URL("../.github/workflows/pages.yml", import.meta.url),
+    "utf8",
+  );
+  assert.match(
+    workflow,
+    /pnpm exec tsx scripts\/generate-pages-route-entries\.ts/,
+  );
+  assert.doesNotMatch(workflow, /cp apps\/web\/dist\/index\.html/);
+  const packageManifest = JSON.parse(
+    await readFile(new URL("../package.json", import.meta.url), "utf8"),
+  );
+  assert.equal(packageManifest.devDependencies.tsx, "4.21.0");
+});
+
 test("workspace overrides pin patched high-severity transitive dependencies", async () => {
   const workspace = await readFile(
     new URL("../pnpm-workspace.yaml", import.meta.url),

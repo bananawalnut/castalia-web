@@ -43,9 +43,7 @@ jobs:
           VITE_FIXTURE_MODE: "true"
         run: pnpm --filter @castalia/web build
       - name: Add Pages static-hosting files
-        run: |
-          cp apps/web/dist/index.html apps/web/dist/404.html
-          touch apps/web/dist/.nojekyll
+        run: pnpm exec tsx scripts/generate-pages-route-entries.ts apps/web/dist
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa
         with:
           path: apps/web/dist

@@ -5,17 +5,23 @@ function normalizeBasePath(basePath: string) {
   return leadingSlash.endsWith("/") ? leadingSlash : `${leadingSlash}/`;
 }
 
+function normalizeRoutePath(pathname: string) {
+  if (pathname === "/") return pathname;
+  return pathname.replace(/\/+$/, "") || "/";
+}
+
 export function routePath(
   pathname: string,
   basePath = defaultBasePath,
 ): string {
   const normalizedBase = normalizeBasePath(basePath);
-  if (normalizedBase === "/") return pathname;
+  if (normalizedBase === "/") return normalizeRoutePath(pathname);
   const prefix = normalizedBase.slice(0, -1);
   if (pathname === prefix || pathname === normalizedBase) return "/";
-  return pathname.startsWith(`${prefix}/`)
+  const logicalPath = pathname.startsWith(`${prefix}/`)
     ? pathname.slice(prefix.length)
     : pathname;
+  return normalizeRoutePath(logicalPath);
 }
 
 export function deployedPath(
