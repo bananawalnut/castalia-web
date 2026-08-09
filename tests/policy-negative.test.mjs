@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { mkdtemp, writeFile, mkdir } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { evaluateAudit } from "../scripts/lib/dependency-policy.mjs";
@@ -15,6 +15,15 @@ import { validateWorkflowText } from "../scripts/lib/workflow-policy.mjs";
 async function fixture() {
   return mkdtemp(join(tmpdir(), "castalia-policy-negative-"));
 }
+
+test("workspace overrides pin patched high-severity transitive dependencies", async () => {
+  const workspace = await readFile(
+    new URL("../pnpm-workspace.yaml", import.meta.url),
+    "utf8",
+  );
+  assert.match(workspace, /^  js-yaml: 4\.3\.1$/m);
+  assert.match(workspace, /^  nanoid: 3\.3\.17$/m);
+});
 
 test("dependency policy rejects high, unexcepted moderate, expired exception, and scanner failure", () => {
   assert.throws(
