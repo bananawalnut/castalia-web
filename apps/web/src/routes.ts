@@ -1,9 +1,6 @@
-export const routes = [
-  { path: "/", label: "Landing" },
-  { path: "/tenders", label: "Tenders" },
-  { path: "/rfcs", label: "RFCs" },
-  { path: "/docs", label: "Docs" },
-] as const;
+import { TOP_LEVEL_PAGE_ROUTES } from "./page-routes.js";
+
+export const routes = TOP_LEVEL_PAGE_ROUTES;
 
 export const navigation = [
   { to: "/chronicle", label: "Chronicle" },

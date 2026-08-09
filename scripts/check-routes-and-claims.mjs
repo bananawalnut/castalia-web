@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 const root = resolve(new URL("..", import.meta.url).pathname);
 const [
   routes,
+  pageRoutes,
   landing,
   runtime,
   retainedViews,
@@ -12,6 +13,7 @@ const [
   tenders,
 ] = await Promise.all([
   readFile(join(root, "apps/web/src/routes.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/page-routes.ts"), "utf8"),
   readFile(join(root, "apps/web/src/landing.ts"), "utf8"),
   readFile(join(root, "apps/web/src/runtime.ts"), "utf8"),
   readFile(join(root, "apps/web/src/retained-views.ts"), "utf8"),
@@ -20,8 +22,8 @@ const [
   readFile(join(root, "apps/web/src/rfcFixtures.ts"), "utf8"),
   readFile(join(root, "apps/web/src/tenders.ts"), "utf8"),
 ]);
-const requiredRoutes = ["/", "/tenders", "/rfcs", "/docs"];
-const placeholderRoutes = ["/start", "/chronicle", "/merch"];
+const requiredRoutes = ["/", "/start", "/tenders", "/rfcs", "/docs"];
+const placeholderRoutes = ["/chronicle", "/merch"];
 const removedRoutes = ["/proposals"];
 const requiredLabels = ["Chronicle", "Tenders", "RFC", "Merch", "Docs"];
 const requiredNavigation = ['{ to: "/chronicle", label: "Chronicle" }'];
@@ -46,7 +48,8 @@ const surfaceSource =
   tenders;
 const failures = [];
 for (const value of requiredRoutes)
-  if (!routes.includes(`\"${value}\"`)) failures.push(`missing route ${value}`);
+  if (!pageRoutes.includes(`\"${value}\"`))
+    failures.push(`missing route ${value}`);
 for (const value of requiredLabels)
   if (!routes.includes(`label: \"${value}\"`))
     failures.push(`missing navigation label ${value}`);
@@ -65,7 +68,7 @@ for (const value of [
   if (!runtime.includes(value))
     failures.push(`missing layout contract ${value}`);
 for (const value of placeholderRoutes)
-  if (routes.includes(`path: \"${value}\"`))
+  if (pageRoutes.includes(`path: \"${value}\"`))
     failures.push(`placeholder must remain unimplemented: ${value}`);
 for (const value of removedRoutes)
   if (routes.includes(value)) failures.push(`removed route returned: ${value}`);

@@ -7,6 +7,7 @@ describe("project-site base paths", () => {
     expect(routePath("/castalia-web/tenders/tnd-0001", "/castalia-web/")).toBe(
       "/tenders/tnd-0001",
     );
+    expect(routePath("/castalia-web/start/", "/castalia-web/")).toBe("/start");
   });
 
   it("maps logical routes and assets under the deployed project path", () => {
@@ -21,6 +22,7 @@ describe("project-site base paths", () => {
 
   it("keeps local-root development paths unchanged", () => {
     expect(routePath("/rfcs/rfc-0017", "/")).toBe("/rfcs/rfc-0017");
+    expect(routePath("/start/", "/")).toBe("/start");
     expect(deployedPath("/docs", "/")).toBe("/docs");
   });
 });
