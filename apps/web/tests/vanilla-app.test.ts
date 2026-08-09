@@ -76,6 +76,84 @@ describe("vanilla Castalia shell", () => {
     app.destroy();
   });
 
+  it("renders the Start flow and delegates wallet creation to the extension", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const openMembershipFlow = vi.fn(() =>
+      Promise.resolve({ state: "opened" as const }),
+    );
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      openMembershipFlow,
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+    };
+    const prepareAdmission = vi.fn(() =>
+      Promise.resolve({ state: "pending-server-verification" as const }),
+    );
+    const providerState: { current: typeof provider | undefined } = {
+      current: undefined,
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl:
+        "https://chromewebstore.google.com/detail/castalia/example",
+      getWalletProvider: () => providerState.current,
+    });
+
+    app.navigate("/start");
+    expect(root.querySelector("h1")?.textContent).toBe("Start");
+    expect(
+      root.querySelector<HTMLAnchorElement>(".start-flow__cta")?.textContent,
+    ).toBe("Join now");
+    providerState.current = provider;
+    await vi.waitFor(() => {
+      expect(
+        root.querySelector<HTMLButtonElement>("button.start-flow__cta")
+          ?.textContent,
+      ).toBe("Become a member");
+    });
+    app.destroy();
+
+    const installedApp = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+      prepareAdmission,
+    });
+    installedApp.navigate("/start");
+    const becomeMember =
+      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!becomeMember) throw new Error("missing Become a member button");
+    click(becomeMember);
+    await vi.waitFor(() => {
+      expect(openMembershipFlow).toHaveBeenCalledOnce();
+    });
+
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready"),
+    );
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "Awaiting membership service",
+      );
+    });
+    expect(root.textContent).not.toMatch(/^Member$/m);
+    expect(prepareAdmission).toHaveBeenCalledWith(provider);
+    expect(becomeMember.textContent).toBe("Wallet ready");
+    expect(
+      Array.from(root.querySelectorAll('[role="log"] li')).map((entry) =>
+        entry.textContent.trim(),
+      ),
+    ).toEqual([
+      "Wallet extension detected.",
+      "Opening extension-owned wallet flow.",
+      "Temporary wallet created. Current site approved.",
+      "Preparing signed admission presentation.",
+      "Signed presentation ready. Awaiting membership service.",
+    ]);
+    installedApp.destroy();
+  });
+
   it("renders the RFC catalog as a four-column fixture table", () => {
     const root = document.querySelector<HTMLElement>("#root");
     if (!root) throw new Error("missing test root");

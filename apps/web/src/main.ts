@@ -6,8 +6,9 @@ import "./rfcs.css";
 import "./rfc-catalog.css";
 import "./rfc-document.css";
 import "./spaces.css";
+import "./start.css";
 
-loadBrowserEnv(import.meta.env);
+const env = loadBrowserEnv(import.meta.env);
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing root element");
-mountCastaliaApp(root);
+mountCastaliaApp(root, { walletInstallUrl: env.walletInstallUrl });

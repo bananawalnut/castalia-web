@@ -23,6 +23,18 @@ await new Promise((resolve, reject) => {
       : reject(new Error(`UI prerequisite build exited ${code}`)),
   );
 });
+await new Promise((resolve, reject) => {
+  const build = spawn("pnpm", ["--filter", "@castalia/web", "wasm:build"], {
+    stdio: "inherit",
+    env,
+  });
+  build.on("error", reject);
+  build.on("exit", (code) =>
+    code === 0
+      ? resolve()
+      : reject(new Error(`wallet WASM prerequisite build exited ${code}`)),
+  );
+});
 const child = spawn("pnpm", ["exec", "playwright", "test"], {
   stdio: "inherit",
   env,

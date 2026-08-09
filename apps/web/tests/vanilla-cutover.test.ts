@@ -9,7 +9,7 @@ describe("vanilla production cutover", () => {
   it("boots through the vanilla runtime", () => {
     const entry = read("src/main.ts");
     expect(entry).toContain('from "./runtime.js"');
-    expect(entry).toContain("mountCastaliaApp(root)");
+    expect(entry).toMatch(/mountCastaliaApp\(root(?:,|\))/u);
     expect(entry).not.toMatch(/react|createRoot|StrictMode/u);
   });
 
