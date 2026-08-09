@@ -25,6 +25,16 @@ test("workspace overrides pin patched high-severity transitive dependencies", as
   assert.match(workspace, /^  nanoid: 3\.3\.17$/m);
 });
 
+test("standalone browser and budget gates build the wallet WASM prerequisite", async () => {
+  for (const script of ["run-browser.mjs", "check-build-budgets.mjs"]) {
+    const source = await readFile(
+      new URL(`../scripts/${script}`, import.meta.url),
+      "utf8",
+    );
+    assert.match(source, /"@castalia\/web",\s*"wasm:build"/);
+  }
+});
+
 test("dependency policy rejects high, unexcepted moderate, expired exception, and scanner failure", () => {
   assert.throws(
     () =>
