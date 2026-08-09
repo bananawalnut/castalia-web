@@ -6,14 +6,32 @@ import { rfcDocumentView } from "./rfc-document.js";
 import { docsView, notFoundView } from "./retained-views.js";
 import { tenderCatalogView, tenderViewerView } from "./tenders.js";
 import { deployedPath, routePath } from "./base-path.js";
+import {
+  prepareAdmissionRequest,
+  startView,
+  type StartFlowDependencies,
+  type StartWalletProvider,
+} from "./start.js";
 
 export type CastaliaApp = {
   navigate(path: string): void;
   destroy(): void;
 };
 
-function route(pathname: string): View {
+type CastaliaAppOptions = Partial<StartFlowDependencies>;
+
+declare global {
+  interface Window {
+    castaliaWallet?: StartWalletProvider;
+  }
+}
+
+function route(
+  pathname: string,
+  startDependencies: StartFlowDependencies,
+): View {
   if (pathname === "/") return landingView();
+  if (pathname === "/start") return startView(startDependencies);
   if (pathname === "/tenders") return tenderCatalogView();
   if (pathname.startsWith("/tenders/"))
     return tenderViewerView(
@@ -66,14 +84,23 @@ function createShell(root: HTMLElement) {
   return { main, nav };
 }
 
-export function mountCastaliaApp(root: HTMLElement): CastaliaApp {
+export function mountCastaliaApp(
+  root: HTMLElement,
+  options: CastaliaAppOptions = {},
+): CastaliaApp {
   const { main, nav } = createShell(root);
   let currentView: View | undefined;
+  const startDependencies: StartFlowDependencies = {
+    walletInstallUrl: options.walletInstallUrl ?? "",
+    getWalletProvider:
+      options.getWalletProvider ?? (() => window.castaliaWallet),
+    prepareAdmission: options.prepareAdmission ?? prepareAdmissionRequest,
+  };
 
   const render = () => {
     currentView?.destroy?.();
     const currentPath = routePath(window.location.pathname);
-    currentView = route(currentPath);
+    currentView = route(currentPath, startDependencies);
     main.replaceChildren(currentView.element);
     for (const link of main.querySelectorAll<HTMLAnchorElement>("a[href]")) {
       const href = link.getAttribute("href");

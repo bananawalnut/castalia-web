@@ -4,7 +4,7 @@ const navigationDestinations = [
   [
     "Start",
     "/start",
-    "Landing call to action; destination intentionally unimplemented.",
+    "Wallet detection and extension-owned membership request start flow.",
   ],
   [
     "Chronicle",

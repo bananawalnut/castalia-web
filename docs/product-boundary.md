@@ -16,7 +16,7 @@ Under current evidence, the Zenith forum posture remains **visible unavailable**
 
 ## Current fixture implementation
 
-Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The route surfaces below render deterministic fixture or unavailable states. They do not perform Matrix, Castalia Control, wallet-provider/signing, provisioning, authentication, or production network operations. A later local-only Rust/WASM module validates the shape and context of a future wallet-onboarding request envelope; it accepts no credential, contacts no signer, verifies no presentation, and creates no session.
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The route surfaces below render deterministic fixture or unavailable states. `/start` may detect the Castalia browser provider, request an extension-owned embedded wallet setup, and use the local Rust/WASM validator before asking the extension for a signed presentation. That presentation remains pending remote verification and is not membership. The app does not perform Matrix or Castalia Control operations, provisioning, authentication, or production network operations.
 
 ## Canonical routes and navigation
 

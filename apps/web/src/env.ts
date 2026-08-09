@@ -6,6 +6,7 @@ const allowed = new Set([
   "VITE_APP_ENV",
   "VITE_BFF_BASE_URL",
   "VITE_FIXTURE_MODE",
+  "VITE_CASTALIA_WALLET_INSTALL_URL",
 ]);
 const appEnvironments = new Set(["development", "test", "production"] as const);
 
@@ -26,6 +27,18 @@ function canonicalOrigin(value: string): string {
   return value;
 }
 
+function walletInstallUrl(value: string): string {
+  if (value === "") return value;
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username !== "" || url.password !== "")
+      throw new Error();
+  } catch {
+    throw new Error("VITE_CASTALIA_WALLET_INSTALL_URL must be an HTTPS URL");
+  }
+  return value;
+}
+
 export function loadBrowserEnv(input: Record<string, string | undefined>) {
   for (const [key, value] of Object.entries(input)) {
     if (value === undefined || !applicationKey.test(key) || allowed.has(key))
@@ -42,6 +55,9 @@ export function loadBrowserEnv(input: Record<string, string | undefined>) {
   return {
     appEnv: appEnv as "development" | "test" | "production",
     bffBaseUrl: canonicalOrigin(input.VITE_BFF_BASE_URL ?? ""),
+    walletInstallUrl: walletInstallUrl(
+      input.VITE_CASTALIA_WALLET_INSTALL_URL ?? "",
+    ),
     fixtureMode: true as const,
   };
 }
