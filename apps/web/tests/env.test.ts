@@ -13,6 +13,17 @@ describe("browser environment", () => {
     ).toBe("https://chromewebstore.google.com/detail/castalia/example");
   });
 
+  it("accepts a canonical Control origin and public audience", () => {
+    const env = loadBrowserEnv({
+      VITE_APP_ENV: "test",
+      VITE_FIXTURE_MODE: "true",
+      VITE_CASTALIA_CONTROL_BASE_URL: "https://control.castalia.example",
+      VITE_CASTALIA_CONTROL_AUDIENCE: "castalia-control-production",
+    });
+    expect(env.controlBaseUrl).toBe("https://control.castalia.example");
+    expect(env.controlAudience).toBe("castalia-control-production");
+  });
+
   it("rejects a non-HTTPS wallet installer URL", () => {
     expect(() =>
       loadBrowserEnv({
@@ -64,6 +75,22 @@ describe("browser environment", () => {
         VITE_BFF_BASE_URL: "https://example.com/path",
       },
       "canonical origin",
+    ],
+    [
+      {
+        VITE_APP_ENV: "test",
+        VITE_FIXTURE_MODE: "true",
+        VITE_CASTALIA_CONTROL_BASE_URL: "http://control.castalia.example",
+      },
+      "HTTPS outside loopback",
+    ],
+    [
+      {
+        VITE_APP_ENV: "test",
+        VITE_FIXTURE_MODE: "true",
+        VITE_CASTALIA_CONTROL_AUDIENCE: "castalia-control\nother",
+      },
+      "must be canonical",
     ],
   ])("rejects invalid keys", (env, message) => {
     expect(() => loadBrowserEnv(env)).toThrow(message);

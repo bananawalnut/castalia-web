@@ -38,7 +38,8 @@ jobs:
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
       - name: Build project site
         env:
-          CASTALIA_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # The production Pages site is served from its custom-domain root.
+          CASTALIA_BASE_PATH: /
           VITE_APP_ENV: production
           VITE_FIXTURE_MODE: "true"
         run: pnpm --filter @castalia/web build

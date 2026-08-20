@@ -83,6 +83,81 @@ for (const route of routes) {
     ).toEqual({ local: 0, session: 0, serviceWorker: false });
   });
 }
+
+test("Start reports success only after Wallet hands off verified Active membership", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "castaliaWallet", {
+      configurable: true,
+      value: {
+        kind: "castalia.wallet-provider",
+        version: "1",
+        membershipJoinProtocol: "castalia.permissionless-membership.v2",
+        getStatus: () => Promise.resolve({ state: "ready" }),
+        createAuthenticationPresentation: () =>
+          Promise.resolve({
+            format: "castalia.wallet-presentation.v1",
+            payload: "legacy-unused",
+          }),
+        openMembershipFlow: () => {
+          window.setTimeout(() => {
+            window.dispatchEvent(
+              new CustomEvent("castalia:wallet:membership-flow-ready", {
+                detail: {
+                  membership: {
+                    cellId: "44".repeat(32),
+                    status: "active",
+                    generation: 0,
+                    changedAt: 0,
+                    lastReceiptHash: "55".repeat(32),
+                  },
+                },
+              }),
+            );
+          });
+          return Promise.resolve({ state: "opened" });
+        },
+        getMembership: () =>
+          Promise.resolve({
+            cellId: "44".repeat(32),
+            status: "active",
+            generation: 0,
+            changedAt: 0,
+            lastReceiptHash: "55".repeat(32),
+          }),
+      },
+    });
+  });
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/start");
+  await expect(page.getByLabel("Membership type")).toHaveCount(0);
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  expect(
+    results.violations.filter(
+      (item) => item.impact === "serious" || item.impact === "critical",
+    ),
+  ).toEqual([]);
+
+  await page.getByRole("button", { name: "Join Castalia" }).click();
+  await expect(
+    page.getByRole("status", { name: "Membership request status" }),
+  ).toHaveText("Castalia membership is Active for this Member Key.");
+  await expect(
+    page.getByRole("button", { name: "Membership active" }),
+  ).toBeDisabled();
+  expect(await page.context().cookies()).toEqual([]);
+  expect(
+    await page.evaluate(() => ({
+      local: localStorage.length,
+      session: sessionStorage.length,
+    })),
+  ).toEqual({ local: 0, session: 0 });
+});
+
 test("pixel night sky preserves a clear subtitle and unconnected Aquarius", async ({
   page,
 }) => {

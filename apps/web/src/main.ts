@@ -11,4 +11,6 @@ import "./start.css";
 const env = loadBrowserEnv(import.meta.env);
 const root = document.getElementById("root");
 if (!root) throw new Error("Missing root element");
-mountCastaliaApp(root, { walletInstallUrl: env.walletInstallUrl });
+mountCastaliaApp(root, {
+  walletInstallUrl: env.walletInstallUrl,
+});

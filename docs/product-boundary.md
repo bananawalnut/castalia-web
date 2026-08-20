@@ -7,7 +7,7 @@ Status: accepted planning contract from issue #9, preserving issues #1 and #2 as
 | State | Meaning |
 | --- | --- |
 | Documentation-only | Historical I01 state before the application scaffold merged. Retained as provenance, not as the current repository state. |
-| Fixture implementation | The current repository state. A deterministic fixture shell, fixture BFF, canonical contracts, and unavailable route surfaces are implemented without live upstream access. |
+| Fixture implementation | The current repository state. A deterministic fixture shell, fixture BFF, canonical contracts, unavailable content surfaces, and an unprivileged permissionless membership Join client are implemented without production deployment evidence. |
 | Visible unavailable | A route may be visibly represented while clearly saying it cannot currently be used. It must not expose data or imply access. |
 | Planned | An issue may own future work, but the capability does not exist until its evidence gate passes. |
 | Evidence-backed | Reserved for a later capability whose owning issue, tests, review, and deployment evidence all pass. Nothing in this issue reaches this state. |
@@ -16,7 +16,9 @@ Under current evidence, the Zenith forum posture remains **visible unavailable**
 
 ## Current fixture implementation
 
-Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The route surfaces below render deterministic fixture or unavailable states. `/start` may detect the Castalia browser provider, request an extension-owned embedded wallet setup, and use the local Rust/WASM validator before asking the extension for a signed presentation. That presentation remains pending remote verification and is not membership. The app does not perform Matrix or Castalia Control operations, provisioning, authentication, or production network operations.
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment delegates permissionless base membership to Wallet: Wallet creates or unlocks its durable Member Key, signs the v2 transcript, calls the public Dregg membership endpoint, verifies the deterministic immutable Active cell, and then exposes only the verified summary to Web. There is no application, pending review, or Control admission step.
+
+The static public Pages site can detect an installed Wallet, but a complete Join also requires that Wallet's configured Castalia Dregg node to be reachable. The current acceptance composition uses loopback and is not a public production-node deployment claim. The app performs no Matrix operation, provisioning, authenticated session issuance, or production operation.
 
 ## Canonical routes and navigation
 
@@ -29,7 +31,7 @@ The route inventory is:
 - `/rfcs/:rfcId`
 - `/docs`
 
-The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), and **Docs** (`/docs`). Tenders, RFC, and Docs are implemented fixture destinations. Chronicle and Merch remain visible placeholders, and the landing **Start** action remains unavailable. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
+The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), and **Docs** (`/docs`). Tenders, RFC, and Docs are implemented fixture destinations. Chronicle and Merch remain visible placeholders. The landing **Start** action opens `/start`; Join requires a compatible Wallet and reachable configured Dregg node. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
 
 These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or Castalia Control integration, authentication, provisioning, deployment, or production readiness.
 
@@ -63,10 +65,10 @@ These registries and viewers read checked-in synthetic examples only. They conta
 - It is independent from the Rust/Dregg Castalia repository. Integration is planned only through reviewed public contracts; no code, release, credential, or current implementation claim is shared.
 - Matrix remains canonical for accounts, rooms, events, edits, redactions, membership, and participant-authorized sends.
 - Castalia Web must remain unprivileged. It receives no Synapse admin or appservice credentials.
-- Castalia Control is the planned Dregg authorization, challenge/replay, admission-policy/status, revocation/discharge, and receipt service for the Castalia collective. This repository does not implement or host it.
+- Castalia Control may coordinate narrower role, moderation, service, or infrastructure authority, but it is not required for permissionless base membership. This repository does not implement or host it.
 - The infrastructure provisioner alone holds cloud, DNS, Synapse-admin, signing, federation-admission, and deployment credentials. Hub may fill that execution role for Zenith-hosted resources, but it is not Castalia authorization authority.
-- A future Web client may present exact-request wallet proof plus delegated Dregg authority directly to Castalia Control. It must not create a cookie/BFF authority session or persist raw capabilities.
-- The current browser/WASM seam validates only an outbound request envelope and returns any future provider presentation as pending remote verification. It is not wallet authentication evidence. See the [Vanilla TypeScript and wallet WASM boundary](vanilla-wasm-wallet-boundary.md).
+- The current Web client opens Wallet and accepts its bounded verified Active summary only after Wallet has completed direct Dregg issuance; older Wallet-ready events retain a `getMembership()` compatibility read. It creates no cookie/BFF authority session and persists no proof or raw capability.
+- The retained browser/WASM v1 application verifier is compatibility code, not the active Join path. See the [membership onboarding boundary](membership-onboarding.md) and [Vanilla TypeScript and wallet WASM boundary](vanilla-wasm-wallet-boundary.md).
 - See the [Castalia Control authority boundary](castalia-control-authority.md) for fixture-versus-anchored authority and execution separation.
 
 ## Historical issue #1 non-goals
@@ -83,11 +85,11 @@ Issue #1 did not:
 
 Those constraints remain historical provenance. Issue #2 later implemented only the fixture surfaces described above; it did not make the deferred capabilities live.
 
-## Current issue #9 and repository non-goals
+## Historical issue #9 and continuing repository non-goals
 
-Issue #9 changes documentation and semantic claim checks only. It does not:
+Issue #9 changed documentation and semantic claim checks only. The later Web onboarding increment adds the bounded enrollment client described above but does not:
 
-- implement wallet proof, `dga1_` custody or presentation, Castalia Control, anchored Dregg authority, or provisioner execution;
+- implement Castalia Control, authoritative proof verification or replay consumption, `dga1_` custody or presentation, anchored Dregg authority, or provisioner execution;
 - provide Matrix reading, joining, posting, membership, federation, login, access-token, cross-signing, or E2EE behavior;
 - provision communities, infrastructure, accounts, rooms, or syndicate admission;
 - add infrastructure, Synapse-admin, appservice, signing, federation-admission, or deployment credentials;

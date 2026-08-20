@@ -1,6 +1,8 @@
 # Castalia Control authority boundary
 
-Status: accepted planning contract from issue #9. This document supersedes issue #1's unresolved separate-registry ownership model without claiming that Castalia Control, wallet presentation, provisioning, or anchored authority is implemented.
+Status: accepted authority contract from issue #9, narrowed after permissionless base membership v2. This document does not claim that Castalia Control roles, provisioning, sessions, or anchored authority are implemented in this repository.
+
+Castalia Control is not part of the active base-membership Join path. Anyone may create a Member Key and issue the deterministic v2 membership through Dregg. The authority model below applies only to separately delegated roles, moderation, services, infrastructure, or legacy v1 compatibility.
 
 ## Historical supersession
 
@@ -20,15 +22,15 @@ The accepted architecture now resolves that ownership differently: Castalia is t
 | Matrix accounts, devices, rooms, membership, events, edits, redactions, access tokens, cross-signing, and E2EE | Matrix | Matrix remains canonical for Matrix state. Native Matrix device and encryption state stays client-side. |
 | Web experience | Castalia Web | Remains an unprivileged client with no provisioning secrets, Matrix admin credentials, or cookie/BFF authority session. |
 
-## Planned request boundary
+## Web enrollment request boundary
 
-A future Castalia Web client may request a bounded challenge, ask Castalia Wallet to present holder proof plus a wallet-held `dga1_` capability, and call Castalia Control directly. Castalia Control may return a typed decision or plan receipt. Consequential infrastructure execution remains a separate provisioner operation under narrower authority.
+The current Castalia Web client can request a bounded membership-enrollment challenge, ask Castalia Wallet for exact holder proof, independently verify that proof in the browser, and submit the verified application directly to a configured Castalia Control service. The enrollment-v2 proof establishes control of the application owner key; it does not itself present a `dga1_` capability, activate membership, or authorize infrastructure work. Consequential decisions and execution remain separate Control and provisioner operations under narrower authority.
 
 Authentication and authorization stay distinct:
 
-- the wallet signature proves control of the wallet key over the exact request context;
-- the Dregg capability proves delegated authority;
-- Castalia Control verifies both and binds the capability subject to the verified wallet key;
+- the wallet signature proves control of the wallet key over the exact enrollment request context;
+- Castalia Control must repeat holder-proof verification, consume the challenge, and apply membership policy authoritatively;
+- any later Dregg capability proves separately delegated authority and must be bound to the verified wallet key;
 - neither a Matrix login nor browser possession of a token creates Castalia authority.
 
 ## Fixture and anchored authority
@@ -51,7 +53,9 @@ Matrix identity, Castalia membership, homeserver operation, Dregg authority, and
 
 ## Current repository claim
 
-Castalia Web currently provides deterministic fixture routes, a fixture BFF, contract sources, visible unavailable states, and a local Rust/WASM validator for the exact shape and context of a future wallet-onboarding request envelope. The validator signs nothing, verifies no wallet presentation, consumes no replay nonce authoritatively, and issues no session. The repository does not currently provide wallet authentication, `dga1_` presentation, Castalia Control connectivity, request submission, admission status, provisioning, Matrix access, deployment, or production readiness.
+Castalia Web currently provides deterministic fixture routes, a fixture BFF, contract sources, visible unavailable content states, and the Web edge of permissionless Wallet-to-Dregg Join. The former Control challenge/application client and independent browser enrollment-v2 verifier remain compatibility code but are not called by `/start`. Web signs nothing, grants no role, and issues no session.
+
+The public deployment does not need a Control origin for base membership. It still lacks production Dregg-node and trust-anchor evidence. This repository also provides no `dga1_` presentation, Control-side role service, provisioning, Matrix access, authenticated session, or production readiness.
 
 ## Forbidden authority substitutions
 
@@ -68,13 +72,13 @@ The following must never be described as canonical Castalia authorization author
 
 ## Evidence gates
 
-This planning contract becomes implementation evidence only through separately reviewed issues and pull requests that prove:
+The full composition becomes implementation evidence only through separately reviewed changes that prove:
 
-1. exact-request wallet presentation and external holder binding;
+1. exact-request wallet presentation and external holder binding in both Web and Control;
 2. fail-closed Castalia Control verification and bounded replay/resource controls;
 3. canonical wallet custody and direct unprivileged Web integration;
 4. fixture composition evidence explicitly marked fixture-only;
 5. anchored Dregg authority evidence verified independently;
 6. provisioner and Matrix boundaries remain separate.
 
-Until those gates pass, all new behavior remains planned or unavailable.
+The browser-side portion of gate 1 now has local vector and negative-test evidence. The Control-side, replay, admission, status, anchored-authority, provisioner, and Matrix gates remain unavailable.
