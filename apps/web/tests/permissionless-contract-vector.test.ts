@@ -25,7 +25,7 @@ describe("permissionless membership v2 contract vector", () => {
       factoryId:
         "7ad3af1ba0e83ad560a881780295706073c1a0c9fe8656310051f62444903554",
       programId:
-        "63daa3adfa47c7ad07a28b5a7a48777b001f24eed6613a47b548ce6bf79a68cc",
+        "6c37adae385c40894127e766deb9aff54e4cd01b0ccf01aff1ac7c12e24441fd",
       tokenId:
         "7f66eec85e99cd49ef3c8d733b8c489defe0a721f03fb2c3dd4bea04b1710d1f",
       membershipCellId:
