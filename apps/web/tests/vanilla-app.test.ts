@@ -293,7 +293,9 @@ describe("vanilla Castalia shell", () => {
       root.querySelector<HTMLButtonElement>(".start-flow__cta");
     if (!becomeMember) throw new Error("missing Join Castalia button");
     click(becomeMember);
-    await vi.waitFor(() => expect(becomeMember.disabled).toBe(true));
+    await vi.waitFor(() => {
+      expect(becomeMember.disabled).toBe(true);
+    });
 
     window.dispatchEvent(
       new CustomEvent("castalia:wallet:membership-flow-ready"),
