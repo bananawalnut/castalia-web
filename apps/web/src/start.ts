@@ -148,7 +148,13 @@ export function startView(dependencies: StartFlowDependencies): View {
       } else {
         if (!current) throw new Error("Wallet provider is unavailable");
         appendActivity("Reading and verifying the issued membership cell.");
-        membership = await current.getMembership();
+        const fallbackMembership = membershipFromReadyDetail({
+          membership: await current.getMembership(),
+        });
+        if (!fallbackMembership) {
+          throw new Error("Wallet did not return a membership summary");
+        }
+        membership = fallbackMembership;
       }
       if (
         membership.status !== "active" ||

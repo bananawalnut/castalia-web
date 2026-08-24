@@ -264,6 +264,53 @@ describe("vanilla Castalia shell", () => {
     app.destroy();
   });
 
+  it("fails closed when the compatibility membership summary is not exact v2", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      membershipJoinProtocol: "castalia.permissionless-membership.v2" as const,
+      openMembershipFlow: () => Promise.resolve({ state: "opened" as const }),
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getMembership: vi.fn(() =>
+        Promise.resolve({
+          cellId: "44".repeat(32),
+          status: "active" as const,
+          generation: 0,
+          changedAt: 1,
+          lastReceiptHash: "55".repeat(32),
+        }),
+      ),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+    });
+    app.navigate("/start");
+    const becomeMember =
+      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!becomeMember) throw new Error("missing Join Castalia button");
+    click(becomeMember);
+    await vi.waitFor(() => expect(becomeMember.disabled).toBe(true));
+
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready"),
+    );
+
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "non-canonical membership summary",
+      );
+    });
+    expect(becomeMember.textContent).toBe("Try again");
+    expect(root.textContent).not.toContain(
+      "Castalia membership is Active for this Member Key.",
+    );
+    app.destroy();
+  });
+
   it("renders the RFC catalog as a four-column fixture table", () => {
     const root = document.querySelector<HTMLElement>("#root");
     if (!root) throw new Error("missing test root");
