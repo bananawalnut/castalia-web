@@ -46,7 +46,9 @@ export function membershipFromReadyDetail(
     throw new Error("Wallet readiness event did not contain a membership");
   }
   const value = membership as Partial<StartMembershipSummary>;
+  const keys = Object.keys(value).sort();
   if (
+    keys.join(",") !== "cellId,changedAt,generation,lastReceiptHash,status" ||
     typeof value.cellId !== "string" ||
     !HEX32.test(value.cellId) ||
     value.status !== "active" ||

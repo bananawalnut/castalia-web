@@ -313,6 +313,56 @@ describe("vanilla Castalia shell", () => {
     app.destroy();
   });
 
+  it("rejects unrecognized fields in a Wallet membership handoff", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      membershipJoinProtocol: "castalia.permissionless-membership.v2" as const,
+      openMembershipFlow: () => Promise.resolve({ state: "opened" as const }),
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getMembership: vi.fn(),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+    });
+    app.navigate("/start");
+    const becomeMember =
+      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!becomeMember) throw new Error("missing Join Castalia button");
+    click(becomeMember);
+    await vi.waitFor(() => {
+      expect(becomeMember.disabled).toBe(true);
+    });
+
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready", {
+        detail: {
+          membership: {
+            cellId: "44".repeat(32),
+            status: "active",
+            generation: 0,
+            changedAt: 0,
+            lastReceiptHash: null,
+            applicationState: "approved",
+          },
+        },
+      }),
+    );
+
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "non-canonical membership summary",
+      );
+    });
+    expect(becomeMember.textContent).toBe("Try again");
+    expect(provider.getMembership).not.toHaveBeenCalled();
+    app.destroy();
+  });
+
   it("renders the RFC catalog as a four-column fixture table", () => {
     const root = document.querySelector<HTMLElement>("#root");
     if (!root) throw new Error("missing test root");
