@@ -5,12 +5,18 @@ import { loadMembershipIssuerRuntime } from "./runtime.js";
 const runtime = loadMembershipIssuerRuntime(process.env);
 const app = createMembershipIssuerApp(runtime.issuer);
 
+function requestChunkBytes(chunk: unknown): Uint8Array {
+  if (typeof chunk === "string") return new TextEncoder().encode(chunk);
+  if (chunk instanceof Uint8Array) return chunk;
+  throw new TypeError("request body chunk must be bytes");
+}
+
 createServer((request, response) => {
   void (async () => {
-    const chunks: Buffer[] = [];
+    const chunks: Uint8Array[] = [];
     let length = 0;
     for await (const chunk of request) {
-      const bytes = Buffer.from(chunk);
+      const bytes = requestChunkBytes(chunk);
       length += bytes.length;
       if (length > 4096) {
         response.writeHead(413, { "content-type": "application/json" });
