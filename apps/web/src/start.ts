@@ -1,16 +1,16 @@
 import { elementFromHtml, escapeHtml, type View } from "./dom.js";
 import type { CastaliaWalletProvider } from "./wallet/onboarding.js";
+import {
+  ZENITH_MEMBERSHIP_PROTOCOL,
+  verifyZenithMembershipCredential,
+  type ZenithMembershipCredentialV3,
+  type ZenithMembershipTrustPolicyV1,
+} from "@castalia/membership-contract";
 
-export type StartMembershipSummary = {
-  cellId: string;
-  status: "pending" | "active" | "suspended" | "revoked" | "expired";
-  generation: number;
-  changedAt: number;
-  lastReceiptHash: string | null;
-};
+export type StartMembershipSummary = ZenithMembershipCredentialV3;
 
 export type StartWalletProvider = CastaliaWalletProvider & {
-  readonly membershipJoinProtocol?: "castalia.permissionless-membership.v2";
+  readonly membershipJoinProtocol?: typeof ZENITH_MEMBERSHIP_PROTOCOL;
   openMembershipFlow(): Promise<{ state: "opened" }>;
   getMembership(): Promise<StartMembershipSummary>;
 };
@@ -20,15 +20,25 @@ export type StartFlowDependencies = {
   getWalletProvider(): StartWalletProvider | undefined;
 };
 
-const HEX32 = /^[0-9a-f]{64}$/u;
-const PERMISSIONLESS_JOIN_PROTOCOL = "castalia.permissionless-membership.v2";
+const trustPolicy = {
+  schema: "castalia.zenith-membership-trust-policy.v1",
+  version: 1,
+  roots: [
+    {
+      issuerId: "zenith-research",
+      keyId: __CASTALIA_ZENITH_ISSUER_KEY_ID__,
+      signatureSuite: "Ed25519",
+      publicKey: __CASTALIA_ZENITH_ISSUER_PUBLIC_KEY__,
+    },
+  ],
+} satisfies ZenithMembershipTrustPolicyV1;
 
-function supportsPermissionlessJoin(
+function supportsZenithIssuedJoin(
   provider: StartWalletProvider | undefined,
 ): provider is StartWalletProvider & {
-  membershipJoinProtocol: typeof PERMISSIONLESS_JOIN_PROTOCOL;
+  membershipJoinProtocol: typeof ZENITH_MEMBERSHIP_PROTOCOL;
 } {
-  return provider?.membershipJoinProtocol === PERMISSIONLESS_JOIN_PROTOCOL;
+  return provider?.membershipJoinProtocol === ZENITH_MEMBERSHIP_PROTOCOL;
 }
 
 function errorMessage(error: unknown): string {
@@ -37,36 +47,32 @@ function errorMessage(error: unknown): string {
     : "Unknown Wallet error";
 }
 
-export function membershipFromReadyDetail(
+async function assertMembershipMatchesWallet(
+  provider: StartWalletProvider | undefined,
+  membership: StartMembershipSummary,
+): Promise<void> {
+  if (!provider || typeof provider.getSubject !== "function")
+    throw new Error("Wallet cannot bind membership to its current Member Key");
+  const subject = await provider.getSubject();
+  if (subject.dreggOwnerPublicKey !== membership.ownerPublicKey)
+    throw new Error("membership credential owner does not match this Wallet");
+}
+
+export async function membershipFromReadyDetail(
   detail: unknown,
-): StartMembershipSummary | null {
+): Promise<StartMembershipSummary | null> {
   if (typeof detail !== "object" || detail === null) return null;
   const membership = (detail as { membership?: unknown }).membership;
   if (typeof membership !== "object" || membership === null) {
     throw new Error("Wallet readiness event did not contain a membership");
   }
-  const value = membership as Partial<StartMembershipSummary>;
-  const keys = Object.keys(value).sort();
-  if (
-    keys.join(",") !== "cellId,changedAt,generation,lastReceiptHash,status" ||
-    typeof value.cellId !== "string" ||
-    !HEX32.test(value.cellId) ||
-    value.status !== "active" ||
-    value.generation !== 0 ||
-    value.changedAt !== 0 ||
-    (value.lastReceiptHash !== null &&
-      (typeof value.lastReceiptHash !== "string" ||
-        !HEX32.test(value.lastReceiptHash)))
-  ) {
-    throw new Error("Wallet returned a non-canonical membership summary");
-  }
-  return value as StartMembershipSummary;
+  return verifyZenithMembershipCredential(membership, trustPolicy);
 }
 
 export function startView(dependencies: StartFlowDependencies): View {
   let provider = dependencies.getWalletProvider();
   const walletUpdateRequired =
-    provider && !supportsPermissionlessJoin(provider);
+    provider && !supportsZenithIssuedJoin(provider);
   const action = walletUpdateRequired
     ? '<p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>'
     : provider
@@ -75,9 +81,9 @@ export function startView(dependencies: StartFlowDependencies): View {
         ? `<a class="start-flow__cta" href="${escapeHtml(dependencies.walletInstallUrl)}" rel="noreferrer">Join now</a>`
         : '<p class="start-flow__unavailable" role="status">Wallet installer not configured.</p>';
   const explanation = walletUpdateRequired
-    ? "This Wallet build predates direct permissionless Dregg membership issuance."
+    ? "This Wallet build predates Zenith-issued membership v3."
     : provider
-      ? "Your wallet will create or unlock your Member Key and issue its membership directly on Dregg."
+      ? "Your wallet will create or unlock your Member Key and request its signed membership from Zenith."
       : "Install the Castalia wallet to create your private identity.";
   const element = elementFromHtml(
     `<article class="start-flow"><p class="start-flow__eyebrow">Castalia</p><h1>Start</h1><p class="start-flow__lede">Membership begins with a private wallet and a signed request you control.</p><section class="start-flow__step" aria-labelledby="membership-heading"><p class="start-flow__number">01</p><div><h2 id="membership-heading">Become a member</h2><div class="start-flow__action"><p>${explanation}</p>${action}</div></div></section><p class="start-flow__result" role="status" aria-label="Membership request status" hidden></p><section class="start-flow__activity" aria-labelledby="activity-heading"><h2 id="activity-heading">Activity</h2><div role="log" aria-label="Wallet activity" aria-live="polite" aria-relevant="additions"><ol></ol></div></section></article>`,
@@ -136,21 +142,21 @@ export function startView(dependencies: StartFlowDependencies): View {
       showFailure(new Error("Membership status surface is unavailable"), true);
       return;
     }
-    appendActivity("Member Key ready. Dregg issuance completed by Wallet.");
+    appendActivity("Member Key ready. Zenith issuance completed by Wallet.");
     try {
       const detail: unknown =
         event instanceof CustomEvent
           ? (event as CustomEvent<unknown>).detail
           : null;
-      const handedOffMembership = membershipFromReadyDetail(detail);
+      const handedOffMembership = await membershipFromReadyDetail(detail);
       let membership: StartMembershipSummary;
       if (handedOffMembership) {
         appendActivity("Accepting Wallet's verified membership result.");
         membership = handedOffMembership;
       } else {
         if (!current) throw new Error("Wallet provider is unavailable");
-        appendActivity("Reading and verifying the issued membership cell.");
-        const fallbackMembership = membershipFromReadyDetail({
+        appendActivity("Reading and verifying the signed membership credential.");
+        const fallbackMembership = await membershipFromReadyDetail({
           membership: await current.getMembership(),
         });
         if (!fallbackMembership) {
@@ -158,12 +164,7 @@ export function startView(dependencies: StartFlowDependencies): View {
         }
         membership = fallbackMembership;
       }
-      if (
-        membership.status !== "active" ||
-        membership.generation !== 0 ||
-        !HEX32.test(membership.cellId)
-      )
-        throw new Error("Wallet did not return canonical Active membership");
+      await assertMembershipMatchesWallet(current, membership);
       result.hidden = false;
       membershipIssued = true;
       onboardingRunning = false;
@@ -172,7 +173,7 @@ export function startView(dependencies: StartFlowDependencies): View {
         button.disabled = true;
         button.textContent = "Membership active";
       }
-      appendActivity("Member-owned Castalia membership verified Active.");
+      appendActivity("Zenith-signed Castalia membership verified Active.");
     } catch (error) {
       showFailure(error, true);
     }
@@ -213,15 +214,15 @@ export function startView(dependencies: StartFlowDependencies): View {
           ".start-flow__action",
         );
         if (!actionContainer) return;
-        if (!supportsPermissionlessJoin(detected)) {
+        if (!supportsZenithIssuedJoin(detected)) {
           appendActivity("Wallet extension update required.");
           actionContainer.innerHTML =
-            '<p>This Wallet build predates direct permissionless Dregg membership issuance.</p><p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>';
+            '<p>This Wallet build predates Zenith-issued membership v3.</p><p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>';
           return;
         }
         appendActivity("Wallet extension detected.");
         actionContainer.innerHTML =
-          '<p>Your wallet will create or unlock your Member Key and issue its membership directly on Dregg.</p><button class="start-flow__cta" type="button">Join Castalia</button>';
+          '<p>Your wallet will create or unlock your Member Key and request its signed membership from Zenith.</p><button class="start-flow__cta" type="button">Join Castalia</button>';
         wireButton();
       }, 250);
   window.addEventListener(

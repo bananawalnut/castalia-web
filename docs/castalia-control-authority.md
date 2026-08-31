@@ -2,7 +2,7 @@
 
 Status: accepted authority contract from issue #9, narrowed after permissionless base membership v2. This document does not claim that Castalia Control roles, provisioning, sessions, or anchored authority are implemented in this repository.
 
-Castalia Control is not part of the active base-membership Join path. Anyone may create a Member Key and issue the deterministic v2 membership through Dregg. The authority model below applies only to separately delegated roles, moderation, services, infrastructure, or legacy v1 compatibility.
+Castalia Control is not part of the active base-membership Join path. Anyone may create a Member Key and request the deterministic Zenith-signed v3 credential; Zenith is initially the only trusted signer. Dregg permissionless v2 remains a dormant future path. The authority model below applies only to separately delegated roles, moderation, services, infrastructure, or legacy v1 compatibility.
 
 ## Historical supersession
 
@@ -53,7 +53,7 @@ Matrix identity, Castalia membership, homeserver operation, Dregg authority, and
 
 ## Current repository claim
 
-Castalia Web currently provides deterministic fixture routes, a fixture BFF, contract sources, visible unavailable content states, and the Web edge of permissionless Wallet-to-Dregg Join. The former Control challenge/application client and independent browser enrollment-v2 verifier remain compatibility code but are not called by `/start`. Web signs nothing, grants no role, and issues no session.
+Castalia Web currently provides deterministic fixture routes, a fixture BFF, exact Zenith membership v3 contract sources, a stateless issuer, and independent Web credential verification. Dregg permissionless v2 and the former Control challenge/application verifier remain compatibility code but are not called by `/start`. Web signs nothing, grants no role, and issues no session.
 
 The public deployment does not need a Control origin for base membership. It still lacks production Dregg-node and trust-anchor evidence. This repository also provides no `dga1_` presentation, Control-side role service, provisioning, Matrix access, authenticated session, or production readiness.
 

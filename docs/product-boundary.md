@@ -16,7 +16,7 @@ Under current evidence, the Zenith forum posture remains **visible unavailable**
 
 ## Current fixture implementation
 
-Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment delegates permissionless base membership to Wallet: Wallet creates or unlocks its durable Member Key, signs the v2 transcript, calls the public Dregg membership endpoint, verifies the deterministic immutable Active cell, and then exposes only the verified summary to Web. There is no application, pending review, or Control admission step.
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment delegates Member Key custody and possession proof to Wallet, uses a stateless Zenith signer for deterministic v3 membership credentials, and independently verifies the exact public credential in Web. Dregg permissionless v2 remains dormant compatibility. There is no application, pending review, Control admission step, cookie, or Web session.
 
 The static public Pages site can detect an installed Wallet, but a complete Join also requires that Wallet's configured Castalia Dregg node to be reachable. The current acceptance composition uses loopback and is not a public production-node deployment claim. The app performs no Matrix operation, provisioning, authenticated session issuance, or production operation.
 
@@ -67,7 +67,7 @@ These registries and viewers read checked-in synthetic examples only. They conta
 - Castalia Web must remain unprivileged. It receives no Synapse admin or appservice credentials.
 - Castalia Control may coordinate narrower role, moderation, service, or infrastructure authority, but it is not required for permissionless base membership. This repository does not implement or host it.
 - The infrastructure provisioner alone holds cloud, DNS, Synapse-admin, signing, federation-admission, and deployment credentials. Hub may fill that execution role for Zenith-hosted resources, but it is not Castalia authorization authority.
-- The current Web client opens Wallet and accepts its bounded verified Active summary only after Wallet has completed direct Dregg issuance; older Wallet-ready events retain a `getMembership()` compatibility read. It creates no cookie/BFF authority session and persists no proof or raw capability.
+- The current Web client opens Wallet and accepts the exact Active v3 credential only after independently verifying its deterministic ID and pinned Zenith issuer signature; no-detail Wallet-ready events retain a `getMembership()` compatibility read. It creates no cookie/BFF authority session and persists no proof or raw capability.
 - The retained browser/WASM v1 application verifier is compatibility code, not the active Join path. See the [membership onboarding boundary](membership-onboarding.md) and [Vanilla TypeScript and wallet WASM boundary](vanilla-wasm-wallet-boundary.md).
 - See the [Castalia Control authority boundary](castalia-control-authority.md) for fixture-versus-anchored authority and execution separation.
 

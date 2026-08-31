@@ -31,7 +31,7 @@ for phrase in 'Castalia Control' 'authorization decisions' 'challenge and replay
   grep -Fiq "$phrase" docs/castalia-control-authority.md || fail "missing Castalia Control authority phrase: $phrase"
 done
 
-for phrase in 'permissionless' 'Wallet' 'Dregg' 'Ed25519' 'membership issuance' 'deterministic cell' 'No part of Join issues' 'Control is not an admission authority' 'compatibility'; do
+for phrase in 'Zenith-signed' 'Wallet' 'Dregg permissionless v2' 'Ed25519' 'membership issuance' 'deterministic public credential' 'No part of Join issues' 'Control' 'compatibility'; do
   grep -Fiq "$phrase" docs/membership-onboarding.md || fail "missing membership-onboarding boundary phrase: $phrase"
 done
 

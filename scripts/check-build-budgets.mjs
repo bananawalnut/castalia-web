@@ -98,6 +98,7 @@ const turboMs = await run(
     join(output, "turbo-cache"),
   ],
   limit.turboMs,
+  { VITE_FIXTURE_MODE: "true" },
 );
 const assets = await walk(web);
 const sizes = [];

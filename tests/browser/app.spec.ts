@@ -1,6 +1,20 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 const appOrigin = `http://127.0.0.1:${process.env.CASTALIA_BROWSER_PORT ?? "4173"}`;
+const zenithMembershipFixture = {
+  schema: "castalia.zenith-membership-credential.v3",
+  version: 3,
+  membershipId:
+    "b2409aad97015e17749442377f14acd6ccd9ce804661738e4aa7e860d554d8a9",
+  ownerPublicKey:
+    "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+  status: "active",
+  issuerId: "zenith-research",
+  issuerKeyId: "zenith-membership-issuer-fixture-ed25519-1",
+  signatureSuite: "Ed25519",
+  issuerSignature:
+    "b4Sf_uSYTxfhQUaF_Arq44IxYNByxKsrUOgmXCB4dEYbfAlJ6to50ZeY_qBbvZYibHO6A4JrIERZ1DBDxSkRBA",
+} as const;
 const routes = [
   "/",
   "/docs",
@@ -87,48 +101,42 @@ for (const route of routes) {
 test("Start reports success only after Wallet hands off verified Active membership", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
+  await page.addInitScript((membership) => {
     Object.defineProperty(window, "castaliaWallet", {
       configurable: true,
       value: {
         kind: "castalia.wallet-provider",
         version: "1",
-        membershipJoinProtocol: "castalia.permissionless-membership.v2",
+        membershipJoinProtocol: "castalia.zenith-membership.v3",
         getStatus: () => Promise.resolve({ state: "ready" }),
         createAuthenticationPresentation: () =>
           Promise.resolve({
             format: "castalia.wallet-presentation.v1",
             payload: "legacy-unused",
           }),
+        getSubject: () =>
+          Promise.resolve({
+            subjectId: `did:castalia:member:${membership.ownerPublicKey}`,
+            publicKey: membership.ownerPublicKey,
+            dreggOwnerPublicKey: membership.ownerPublicKey,
+            walletKind: "castalia-dregg",
+          }),
         openMembershipFlow: () => {
           window.setTimeout(() => {
             window.dispatchEvent(
               new CustomEvent("castalia:wallet:membership-flow-ready", {
                 detail: {
-                  membership: {
-                    cellId: "44".repeat(32),
-                    status: "active",
-                    generation: 0,
-                    changedAt: 0,
-                    lastReceiptHash: "55".repeat(32),
-                  },
+                  membership,
                 },
               }),
             );
           });
           return Promise.resolve({ state: "opened" });
         },
-        getMembership: () =>
-          Promise.resolve({
-            cellId: "44".repeat(32),
-            status: "active",
-            generation: 0,
-            changedAt: 0,
-            lastReceiptHash: "55".repeat(32),
-          }),
+        getMembership: () => Promise.resolve(membership),
       },
     });
-  });
+  }, zenithMembershipFixture);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/start");

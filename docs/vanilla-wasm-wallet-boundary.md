@@ -4,7 +4,7 @@
 
 Castalia Web boots through the direct DOM/history runtime in `apps/web/src/main.ts` and `apps/web/src/runtime.ts`. React is not in the web application manifest or production entrypoint.
 
-The enrollment-v2 verifier described below is now legacy compatibility code. The active `/start` path opens extension-owned Wallet UI and accepts Wallet's bounded verified membership summary, with `getMembership()` retained only for older no-detail ready events; it does not call this verifier, construct an application, or contact Control. Web is not a wallet, signer, login screen, admission authority, or authenticated session. No Web credential form accepts a passphrase, recovery material, private key, seed, or generic bytes to sign.
+The enrollment-v2 verifier described below is now legacy compatibility code. The active `/start` path opens extension-owned Wallet UI and cryptographically verifies the full Zenith-signed v3 credential, with `getMembership()` retained only for no-detail ready events; it does not call this verifier, construct an application, or contact Control. Web is not a wallet, signer, login screen, admission authority, or authenticated session. No Web credential form accepts a passphrase, recovery material, private key, seed, or generic bytes to sign.
 
 ## Ownership boundaries
 
@@ -19,7 +19,7 @@ A generic localhost signing HTTP server, in-page key storage, direct encrypted-d
 
 ## Exact membership verification contract
 
-The active operation is `castalia.membership.enroll` under challenge version `2` and presentation schema `castalia.wallet-membership-presentation.v2`. Verification binds the Control-issued application commitment, challenge ID, nonce, browser origin, Control audience, operation, raw owner public key, signature suite, issue time, and expiry.
+The retained legacy operation is `castalia.membership.enroll` under challenge version `2` and presentation schema `castalia.wallet-membership-presentation.v2`. Its verification binds the Control-issued application commitment, challenge ID, nonce, browser origin, Control audience, operation, raw owner public key, signature suite, issue time, and expiry.
 
 Rust rejects malformed or unknown fields, non-canonical fixed-size encodings, owner mismatch, application-commitment mismatch, wrong version/origin/audience/operation, invalid application literals, future-issued or expired challenges, excessive lifetimes, and malformed signatures. It emits either a finite denial or the raw public key, transcript, and signature bytes. TypeScript rejects widened Rust output before invoking WebCrypto.
 

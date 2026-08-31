@@ -92,8 +92,30 @@ importers:
         specifier: 4.1.0
         version: 4.1.0(@opentelemetry/api@1.9.1)(@types/node@24.10.13)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@7.3.5(@types/node@24.10.13)(tsx@4.21.0)(yaml@2.8.3))
 
+  apps/membership-issuer:
+    dependencies:
+      '@castalia/membership-contract':
+        specifier: workspace:*
+        version: link:../../packages/membership-contract
+    devDependencies:
+      '@types/node':
+        specifier: 24.10.13
+        version: 24.10.13
+      tsx:
+        specifier: 4.21.0
+        version: 4.21.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.0
+        version: 4.1.0(@opentelemetry/api@1.9.1)(@types/node@24.10.13)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@7.3.5(@types/node@24.10.13)(tsx@4.21.0)(yaml@2.8.3))
+
   apps/web:
     dependencies:
+      '@castalia/membership-contract':
+        specifier: workspace:*
+        version: link:../../packages/membership-contract
       '@castalia/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -148,6 +170,15 @@ importers:
         version: 2.8.3
 
   packages/matrix-client:
+    devDependencies:
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: 4.1.0
+        version: 4.1.0(@opentelemetry/api@1.9.1)(@types/node@24.10.13)(jsdom@27.4.0(@noble/hashes@1.8.0))(vite@7.3.5(@types/node@24.10.13)(tsx@4.21.0)(yaml@2.8.3))
+
+  packages/membership-contract:
     devDependencies:
       typescript:
         specifier: 5.9.3

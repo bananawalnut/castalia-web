@@ -1,8 +1,8 @@
 # Castalia Web
 
-Public fixture scaffold and unprivileged Web client for Castalia's permissionless Wallet-to-Dregg membership Join, planned Matrix forum shell, separate Control operations, and contract documentation.
+Public fixture scaffold and unprivileged Web client for Castalia's Zenith-signed membership v3 Join, planned Matrix forum shell, separate Control operations, and contract documentation.
 
-The repository contains an executable fixture shell and BFF plus the Web edge of permissionless membership issuance. `/start` opens extension-owned Wallet UI; Wallet creates or unlocks its durable Member Key, signs the fixed v2 Join transcript, issues its deterministic member-owned cell directly through Dregg, verifies the live immutable Active cell, and only then signals Web. There is no individual/institution selector and no application or review step. Web never calls Castalia Control for base membership. The frontend still provides no Castalia sign-in session, live Matrix access, `dga1_` presentation, community or room provisioning, production node trust proof, runtime security approval, or production readiness. See the [membership onboarding boundary](docs/membership-onboarding.md), [product boundary](docs/product-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
+The repository contains an executable fixture shell and BFF, the stateless Zenith membership issuer, and the Web verifier. `/start` opens extension-owned Wallet UI; Wallet proves possession of its durable Member Key, verifies the deterministic Zenith-signed credential, and hands that public credential to Web. Web independently verifies its exact fields, issuer-independent membership ID, pinned issuer key, and signature before displaying success. There is no individual/institution selector, application, review, Control call, cookie, or sign-in session. Dregg permissionless v2 remains preserved as a dormant forward-compatible path. See the [membership onboarding boundary](docs/membership-onboarding.md), [product boundary](docs/product-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
 
 ## Public fixture
 
@@ -14,13 +14,15 @@ The Pages site is deployment evidence for the static fixture only. It is not evi
 ## Architecture
 
 - `apps/web` — Vanilla TypeScript/Vite 7 direct-DOM SPA with bounded history routes and visible unavailable states.
+- `apps/membership-issuer` — narrow stateless Node service that verifies Member Key possession and signs deterministic v3 credentials.
+- `packages/membership-contract` — exact shared v3 schemas, transcripts, deterministic ID, trust policy, and browser verifier.
 - `crates/castalia-wallet-wasm` — Rust/WASM validator that reconstructs the exact membership-v2 transcript and BLAKE3 application commitment for independent browser verification; it signs nothing, consumes no challenge, and issues no session.
 - `apps/bff` — Fastify 5 fixture BFF with process-health/session/fixture reads, strict environment validation, exact-origin CORS, security headers, and allowlisted logs.
 - `packages/contracts` — authoritative OpenAPI 3.1 and JSON Schema 2020-12 sources, fixtures, checked-in generated TypeScript, and drift checks.
 - `packages/ui` — small local UI primitives used by the fixture shell.
 - `packages/matrix-client` — network-free, read-only interface and unavailable fixture; no Matrix SDK or privileged operations.
 
-The composition keeps responsibilities separate: Wallet owns the Member Key and verifies its v2 membership; a Castalia-operated Dregg node relays the public factory birth; Castalia Web remains unprivileged; Control is reserved for narrower roles or consequential authorized operations; an infrastructure provisioner owns execution credentials; Matrix remains canonical for Matrix state. This repository implements the Web side of Join, not a sign-in session or provisioner.
+The composition keeps responsibilities separate: Wallet owns the Member Key and verifies its v3 credential; Zenith initially operates the only trusted signer; Castalia Web independently verifies the same public credential and remains unprivileged; Dregg v2 is dormant; Control is reserved for narrower consequential operations; Matrix remains canonical for Matrix state. This repository implements membership issuance and display, not a sign-in session or provisioner.
 
 ## Exact toolchain
 
@@ -70,4 +72,4 @@ Active product development is tracked through GitHub issues and evidence-backed 
 
 ## Current non-goals
 
-This increment does not claim or implement live Matrix rooms/messages/sync, login/session cookies, an authenticated Web session, `dga1_` custody/presentation, registration/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, a production Dregg trust anchor, production endpoints/secrets, HSTS/CDN/WAF/rate limits, production deployment/rollback/signing, branch-rule binding, or production readiness. `/start` reports membership only after Wallet returns a verified Active v2 cell. `/health` proves only that the local fixture process is responding.
+This increment does not claim or implement live Matrix rooms/messages/sync, login/session cookies, an authenticated Web session, `dga1_` custody/presentation, registration/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production issuer-key custody, HSTS/CDN/WAF/rate limits, production deployment/rollback, branch-rule binding, or production readiness. `/start` reports membership only after cryptographically verifying an Active v3 credential. `/health` proves only that a process is responding.

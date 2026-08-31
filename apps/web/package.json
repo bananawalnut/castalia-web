@@ -12,6 +12,7 @@
     "lint": "pnpm wasm:build && eslint \"src/**/*.ts\" \"tests/**/*.ts\" --ignore-pattern src/generated"
   },
   "dependencies": {
+    "@castalia/membership-contract": "workspace:*",
     "@castalia/ui": "workspace:*",
     "@chenglou/pretext": "0.0.8",
     "vite": "7.3.5"

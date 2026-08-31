@@ -7,12 +7,13 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 ### Added
 
-- Added the direct permissionless Castalia membership flow on `/start` — Castalia Web opens the extension-owned Wallet ceremony and displays Active status only after the Wallet returns a verified v2 membership.
+- Added the shared Zenith membership v3 contract, canonical vector, stateless possession-verifying issuer, and independent Web credential verifier.
+- Added the direct Castalia membership flow on `/start` — Web opens the extension-owned Wallet ceremony and displays Active status only after cryptographically verifying the exact v3 credential and binding it to the current Wallet Member Key.
 
 ### Changed
 
-- Removed member-class selection, Control approval, browser session issuance, and application language from the active Join path — membership is issued directly by Wallet through Dregg.
+- Removed member-class selection, Control approval, browser session issuance, and application language from active Join. Zenith is initially the sole compatible signer; Dregg permissionless v2 remains dormant compatibility.
 
 ### Fixed
 
-- Membership-ready events and compatibility lookups now require the exact canonical public v2 summary with no unrecognized fields — malformed or legacy responses cannot be displayed as Active membership.
+- Membership-ready events and compatibility lookups require the exact signed v3 credential, deterministic membership ID, pinned issuer, valid signature, and current Wallet owner with no unrecognized fields.

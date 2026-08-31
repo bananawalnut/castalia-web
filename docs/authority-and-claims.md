@@ -26,7 +26,7 @@ The `/start` client now implements the challenge and application HTTP contracts,
 
 ## Implemented fixture routes and APIs
 
-The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, visible unavailable content states, a static GitHub Pages deployment, and the Web edge of permissionless Wallet-to-Dregg membership Join. Existing content surfaces remain fixture-only. Local Join can display a Wallet-verified Active v2 membership, but it does not establish an authenticated Web session, production-deployed membership service, live Matrix access, Dregg capability authority, provisioning, participant-authorized sends, or production readiness.
+The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, visible unavailable content states, a static GitHub Pages deployment, a stateless Zenith membership v3 issuer, and independent Web credential verification. Existing content surfaces remain fixture-only. Join can display a Wallet-provided v3 credential only after Web verifies its deterministic membership ID and pinned issuer signature; it does not establish an authenticated Web session, production-deployed membership service, live Matrix access, Dregg capability authority, provisioning, participant-authorized sends, or production readiness.
 
 ## Commons room posture
 
