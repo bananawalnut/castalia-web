@@ -248,7 +248,9 @@ describe("vanilla Castalia shell", () => {
     const button = root.querySelector<HTMLButtonElement>(".start-flow__cta");
     if (!button) throw new Error("missing Join Castalia button");
     click(button);
-    await vi.waitFor(() => expect(button.disabled).toBe(true));
+    await vi.waitFor(() => {
+      expect(button.disabled).toBe(true);
+    });
     window.dispatchEvent(
       new CustomEvent("castalia:wallet:membership-flow-ready", {
         detail: { membership: zenithMembershipFixture },
