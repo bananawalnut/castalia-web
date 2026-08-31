@@ -250,6 +250,21 @@ function parseZenithMembershipCredentialPayload(
   return structuredClone(value as ZenithMembershipCredentialPayloadV3);
 }
 
+function credentialPayload(
+  credential: ZenithMembershipCredentialV3,
+): ZenithMembershipCredentialPayloadV3 {
+  return {
+    schema: credential.schema,
+    version: credential.version,
+    membershipId: credential.membershipId,
+    ownerPublicKey: credential.ownerPublicKey,
+    status: credential.status,
+    issuerId: credential.issuerId,
+    issuerKeyId: credential.issuerKeyId,
+    signatureSuite: credential.signatureSuite,
+  };
+}
+
 export function zenithMembershipCredentialTranscript(
   input: unknown,
 ): Uint8Array {
@@ -344,8 +359,7 @@ export async function verifyZenithMembershipCredential(
   const root = policy.roots.find(
     (candidate) =>
       candidate.issuerId === credential.issuerId &&
-      candidate.keyId === credential.issuerKeyId &&
-      candidate.signatureSuite === credential.signatureSuite,
+      candidate.keyId === credential.issuerKeyId,
   );
   if (!root) throw new Error("membership credential issuer is not trusted");
   const publicKey = await globalThis.crypto.subtle.importKey(
@@ -355,7 +369,6 @@ export async function verifyZenithMembershipCredential(
     false,
     ["verify"],
   );
-  const { issuerSignature: _signature, ...payload } = credential;
   const valid = await globalThis.crypto.subtle.verify(
     { name: "Ed25519" },
     publicKey,
@@ -365,7 +378,9 @@ export async function verifyZenithMembershipCredential(
         "membership issuer signature",
       ),
     ),
-    arrayBufferFromBytes(zenithMembershipCredentialTranscript(payload)),
+    arrayBufferFromBytes(
+      zenithMembershipCredentialTranscript(credentialPayload(credential)),
+    ),
   );
   if (!valid) throw new Error("membership credential signature is invalid");
   return credential;

@@ -36,6 +36,19 @@ function credential(overrides: Partial<ZenithMembershipCredentialV3> = {}) {
   } satisfies ZenithMembershipCredentialV3;
 }
 
+function credentialPayload(value: ZenithMembershipCredentialV3) {
+  return {
+    schema: value.schema,
+    version: value.version,
+    membershipId: value.membershipId,
+    ownerPublicKey: value.ownerPublicKey,
+    status: value.status,
+    issuerId: value.issuerId,
+    issuerKeyId: value.issuerKeyId,
+    signatureSuite: value.signatureSuite,
+  };
+}
+
 const policy = {
   schema: "castalia.zenith-membership-trust-policy.v1",
   version: 1,
@@ -73,10 +86,13 @@ describe("Zenith membership v3 contract", () => {
     expect(
       hexFromBytes(zenithMembershipJoinTranscript(vector.ownerPublicKey)),
     ).toBe(vector.transcripts.joinHex);
-    const { issuerSignature: _signature, ...payload } = vector.credential;
-    expect(hexFromBytes(zenithMembershipCredentialTranscript(payload))).toBe(
-      vector.transcripts.credentialHex,
-    );
+    expect(
+      hexFromBytes(
+        zenithMembershipCredentialTranscript(
+          credentialPayload(vector.credential),
+        ),
+      ),
+    ).toBe(vector.transcripts.credentialHex);
     await expect(
       verifyZenithMembershipCredential(vector.credential, {
         schema: "castalia.zenith-membership-trust-policy.v1",
@@ -104,9 +120,11 @@ describe("Zenith membership v3 contract", () => {
     expect(() =>
       parseZenithMembershipCredential({ ...credential(), invented: true }),
     ).toThrow("fields are not canonical v3");
-    const { issuerSignature: _signature, ...payload } = credential();
     expect(() =>
-      zenithMembershipCredentialTranscript({ ...payload, invented: true }),
+      zenithMembershipCredentialTranscript({
+        ...credentialPayload(credential()),
+        invented: true,
+      }),
     ).toThrow("payload fields are not canonical v3");
   });
 
