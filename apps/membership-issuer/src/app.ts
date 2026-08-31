@@ -31,7 +31,10 @@ function json(status: number, value: unknown): IssuerHttpResponse {
 
 export function createMembershipIssuerApp(issuer: ZenithMembershipIssuer) {
   return async (request: IssuerHttpRequest): Promise<IssuerHttpResponse> => {
-    if (request.method === "OPTIONS" && request.path === ZENITH_MEMBERSHIP_ENDPOINT_PATH)
+    if (
+      request.method === "OPTIONS" &&
+      request.path === ZENITH_MEMBERSHIP_ENDPOINT_PATH
+    )
       return {
         status: 204,
         headers: {
@@ -58,7 +61,9 @@ export function createMembershipIssuerApp(issuer: ZenithMembershipIssuer) {
     if (request.body.length === 0 || request.body.length > 4096)
       return json(413, { error: "request_too_large" });
     try {
-      const text = new TextDecoder("utf-8", { fatal: true }).decode(request.body);
+      const text = new TextDecoder("utf-8", { fatal: true }).decode(
+        request.body,
+      );
       const credential = await issuer.issue(JSON.parse(text) as unknown);
       return json(200, credential);
     } catch (error) {

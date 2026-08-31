@@ -15,8 +15,10 @@ import {
   type ZenithMembershipTrustPolicyV1,
 } from "../src/index.js";
 
-const OWNER = "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c";
-const ISSUER = "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a";
+const OWNER =
+  "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c";
+const ISSUER =
+  "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a";
 const SIGNATURE = "A".repeat(86);
 
 function credential(overrides: Partial<ZenithMembershipCredentialV3> = {}) {
@@ -68,9 +70,9 @@ describe("Zenith membership v3 contract", () => {
     expect(await deriveZenithMembershipId(vector.ownerPublicKey)).toBe(
       vector.membershipId,
     );
-    expect(hexFromBytes(zenithMembershipJoinTranscript(vector.ownerPublicKey))).toBe(
-      vector.transcripts.joinHex,
-    );
+    expect(
+      hexFromBytes(zenithMembershipJoinTranscript(vector.ownerPublicKey)),
+    ).toBe(vector.transcripts.joinHex);
     const { issuerSignature: _signature, ...payload } = vector.credential;
     expect(hexFromBytes(zenithMembershipCredentialTranscript(payload))).toBe(
       vector.transcripts.credentialHex,
@@ -109,9 +111,9 @@ describe("Zenith membership v3 contract", () => {
       membershipId: await deriveZenithMembershipId(OWNER),
       issuerKeyId: "unknown-issuer-key",
     });
-    await expect(verifyZenithMembershipCredential(value, policy)).rejects.toThrow(
-      "issuer is not trusted",
-    );
+    await expect(
+      verifyZenithMembershipCredential(value, policy),
+    ).rejects.toThrow("issuer is not trusted");
   });
 
   it("rejects a credential bound to the wrong expected Member Key", async () => {

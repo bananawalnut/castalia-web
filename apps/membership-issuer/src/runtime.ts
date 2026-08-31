@@ -43,7 +43,9 @@ export function loadMembershipIssuerRuntime(
       issuer.issuerPublicKey ===
         "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a")
   )
-    throw new Error("production issuer must not use the Zenith test fixture key");
+    throw new Error(
+      "production issuer must not use the Zenith test fixture key",
+    );
   return {
     host,
     port,

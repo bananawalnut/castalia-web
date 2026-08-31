@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
 const fixtureKeyId = "zenith-membership-issuer-fixture-ed25519-1";
@@ -26,10 +27,22 @@ export default defineConfig(() => {
     !fixture &&
     (issuerKeyId === fixtureKeyId || issuerPublicKey === fixturePublicKey)
   )
-    throw new Error("production Web must not trust the Zenith test fixture issuer");
+    throw new Error(
+      "production Web must not trust the Zenith test fixture issuer",
+    );
   return {
     base: process.env.CASTALIA_BASE_PATH ?? "/",
     build: { sourcemap: true },
+    resolve: {
+      alias: {
+        "@castalia/membership-contract": fileURLToPath(
+          new URL(
+            "../../packages/membership-contract/src/index.ts",
+            import.meta.url,
+          ),
+        ),
+      },
+    },
     define: {
       __CASTALIA_ZENITH_ISSUER_KEY_ID__: JSON.stringify(issuerKeyId),
       __CASTALIA_ZENITH_ISSUER_PUBLIC_KEY__: JSON.stringify(issuerPublicKey),

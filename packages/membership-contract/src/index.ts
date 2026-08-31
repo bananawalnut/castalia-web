@@ -59,9 +59,8 @@ function exactKeys(value: object, expected: readonly string[]): boolean {
 export function bytesFromHex32(value: unknown, label: string): Uint8Array {
   if (typeof value !== "string" || !HEX_32.test(value))
     throw new Error(`${label} must be 32-byte lowercase hex`);
-  return Uint8Array.from(
-    value.match(/../gu) ?? [],
-    (pair) => Number.parseInt(pair, 16),
+  return Uint8Array.from(value.match(/../gu) ?? [], (pair) =>
+    Number.parseInt(pair, 16),
   );
 }
 
@@ -105,6 +104,12 @@ function concatBytes(...parts: readonly Uint8Array[]): Uint8Array {
   return output;
 }
 
+function arrayBufferFromBytes(value: Uint8Array): ArrayBuffer {
+  const copy = new Uint8Array(value.byteLength);
+  copy.set(value);
+  return copy.buffer;
+}
+
 function u64le(value: bigint): Uint8Array {
   const bytes = new Uint8Array(8);
   new DataView(bytes.buffer).setBigUint64(0, value, true);
@@ -133,9 +138,11 @@ export async function deriveZenithMembershipId(
 ): Promise<string> {
   const digest = await globalThis.crypto.subtle.digest(
     "SHA-256",
-    concatBytes(
-      textEncoder.encode(ZENITH_MEMBERSHIP_ID_DOMAIN),
-      bytesFromHex32(ownerPublicKey, "Member Key"),
+    arrayBufferFromBytes(
+      concatBytes(
+        textEncoder.encode(ZENITH_MEMBERSHIP_ID_DOMAIN),
+        bytesFromHex32(ownerPublicKey, "Member Key"),
+      ),
     ),
   );
   return hexFromBytes(new Uint8Array(digest));
@@ -199,10 +206,7 @@ export function parseZenithMembershipCredential(
   bytesFromHex32(value.ownerPublicKey, "Member Key");
   framedUtf8(value.issuerId ?? "", "membership issuer ID");
   framedUtf8(value.issuerKeyId ?? "", "membership issuer key ID");
-  bytesFromBase64url64(
-    value.issuerSignature,
-    "membership issuer signature",
-  );
+  bytesFromBase64url64(value.issuerSignature, "membership issuer signature");
   return structuredClone(value as ZenithMembershipCredentialV3);
 }
 
@@ -251,7 +255,9 @@ export function validateZenithTrustPolicy(
     bytesFromHex32(root.publicKey, "issuer public key");
     const identity = `${root.issuerId}\0${root.keyId}`;
     if (identities.has(identity))
-      throw new Error("Zenith membership trust policy contains a duplicate root");
+      throw new Error(
+        "Zenith membership trust policy contains a duplicate root",
+      );
     identities.add(identity);
   }
 }
@@ -267,12 +273,16 @@ export async function verifyZenithMembershipCredential(
     expectedOwnerPublicKey !== undefined &&
     credential.ownerPublicKey !== expectedOwnerPublicKey
   )
-    throw new Error("membership credential owner does not match this Member Key");
+    throw new Error(
+      "membership credential owner does not match this Member Key",
+    );
   if (
     credential.membershipId !==
     (await deriveZenithMembershipId(credential.ownerPublicKey))
   )
-    throw new Error("membership credential ID is not deterministic for its owner");
+    throw new Error(
+      "membership credential ID is not deterministic for its owner",
+    );
   const root = policy.roots.find(
     (candidate) =>
       candidate.issuerId === credential.issuerId &&
@@ -282,7 +292,7 @@ export async function verifyZenithMembershipCredential(
   if (!root) throw new Error("membership credential issuer is not trusted");
   const publicKey = await globalThis.crypto.subtle.importKey(
     "raw",
-    bytesFromHex32(root.publicKey, "issuer public key"),
+    arrayBufferFromBytes(bytesFromHex32(root.publicKey, "issuer public key")),
     { name: "Ed25519" },
     false,
     ["verify"],
@@ -291,11 +301,13 @@ export async function verifyZenithMembershipCredential(
   const valid = await globalThis.crypto.subtle.verify(
     { name: "Ed25519" },
     publicKey,
-    bytesFromBase64url64(
-      credential.issuerSignature,
-      "membership issuer signature",
+    arrayBufferFromBytes(
+      bytesFromBase64url64(
+        credential.issuerSignature,
+        "membership issuer signature",
+      ),
     ),
-    zenithMembershipCredentialTranscript(payload),
+    arrayBufferFromBytes(zenithMembershipCredentialTranscript(payload)),
   );
   if (!valid) throw new Error("membership credential signature is invalid");
   return credential;

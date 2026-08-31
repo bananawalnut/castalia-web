@@ -71,8 +71,7 @@ export async function membershipFromReadyDetail(
 
 export function startView(dependencies: StartFlowDependencies): View {
   let provider = dependencies.getWalletProvider();
-  const walletUpdateRequired =
-    provider && !supportsZenithIssuedJoin(provider);
+  const walletUpdateRequired = provider && !supportsZenithIssuedJoin(provider);
   const action = walletUpdateRequired
     ? '<p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>'
     : provider
@@ -155,7 +154,9 @@ export function startView(dependencies: StartFlowDependencies): View {
         membership = handedOffMembership;
       } else {
         if (!current) throw new Error("Wallet provider is unavailable");
-        appendActivity("Reading and verifying the signed membership credential.");
+        appendActivity(
+          "Reading and verifying the signed membership credential.",
+        );
         const fallbackMembership = await membershipFromReadyDetail({
           membership: await current.getMembership(),
         });

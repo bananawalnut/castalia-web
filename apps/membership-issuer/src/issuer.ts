@@ -47,7 +47,10 @@ function privateKeyFromBase64url(value: string): KeyObject {
 }
 
 function rawPublicKey(privateKey: KeyObject): Uint8Array {
-  const spki = createPublicKey(privateKey).export({ format: "der", type: "spki" });
+  const spki = createPublicKey(privateKey).export({
+    format: "der",
+    type: "spki",
+  });
   if (
     spki.length !== ED25519_SPKI_PREFIX.length + 32 ||
     !spki.subarray(0, ED25519_SPKI_PREFIX.length).equals(ED25519_SPKI_PREFIX)

@@ -11,8 +11,10 @@ import { createMembershipIssuerApp } from "../src/app.js";
 import { createZenithMembershipIssuer } from "../src/issuer.js";
 
 const PKCS8_PREFIX = "302e020100300506032b657004220420";
-const OWNER_SEED = "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb";
-const ISSUER_SEED = "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60";
+const OWNER_SEED =
+  "4ccd089b28ff96da9db6c346ec114e0f5b8a319f35aba624da8cf6ed4fb8a6fb";
+const ISSUER_SEED =
+  "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60";
 
 function privateKey(seed: string) {
   return createPrivateKey({
@@ -76,7 +78,10 @@ describe("membership issuer HTTP boundary", () => {
     expect(issued.status).toBe(200);
     expect(issued.headers["cache-control"]).toBe("no-store");
     expect(issued.headers["set-cookie"]).toBeUndefined();
-    expect(JSON.parse(issued.body)).toMatchObject({ status: "active", version: 3 });
+    expect(JSON.parse(issued.body)).toMatchObject({
+      status: "active",
+      version: 3,
+    });
     expect(
       (
         await handle({
@@ -110,7 +115,10 @@ describe("membership issuer HTTP boundary", () => {
         })
       ).status,
     ).toBe(413);
-    const altered = JSON.parse(new TextDecoder().decode(body())) as Record<string, unknown>;
+    const altered = JSON.parse(new TextDecoder().decode(body())) as Record<
+      string,
+      unknown
+    >;
     altered.ownerPublicKey = "44".repeat(32);
     const rejected = await handle({
       method: "POST",
