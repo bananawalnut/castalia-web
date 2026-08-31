@@ -1,6 +1,7 @@
 import { loadBrowserEnv } from "./env.js";
 import { mountCastaliaApp } from "./runtime.js";
 import "./styles.css";
+import "./chronicle.css";
 import "./docs.css";
 import "./rfcs.css";
 import "./rfc-catalog.css";

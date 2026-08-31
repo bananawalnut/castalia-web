@@ -79,7 +79,7 @@ describe("vanilla Castalia shell", () => {
     app.destroy();
   });
 
-  it("uses history routing, focuses main, and keeps placeholders on the 404 surface", () => {
+  it("uses history routing, focuses main, and renders Chronicle inside the shell", () => {
     const root = document.querySelector<HTMLElement>("#root");
     if (!root) throw new Error("missing test root");
     const app = mountCastaliaApp(root);
@@ -90,7 +90,11 @@ describe("vanilla Castalia shell", () => {
     if (!chronicle) throw new Error("missing Chronicle link");
     click(chronicle);
     expect(window.location.pathname).toBe("/chronicle");
-    expect(root.querySelector("h1")?.textContent).toBe("Page not found");
+    expect(root.querySelector("h1")?.textContent).toBe(
+      "Portable data is the part of Web3 we still owe people",
+    );
+    expect(root.textContent).toContain(".castaway");
+    expect(root.textContent).toContain(".castalia-recovery");
     expect(document.activeElement).toBe(root.querySelector("main"));
 
     app.navigate("/docs");

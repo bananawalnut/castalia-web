@@ -7,6 +7,7 @@ const [
   landing,
   runtime,
   retainedViews,
+  chronicle,
   rfcCatalog,
   rfcDocument,
   rfcFixtures,
@@ -17,13 +18,21 @@ const [
   readFile(join(root, "apps/web/src/landing.ts"), "utf8"),
   readFile(join(root, "apps/web/src/runtime.ts"), "utf8"),
   readFile(join(root, "apps/web/src/retained-views.ts"), "utf8"),
+  readFile(join(root, "apps/web/src/chronicle.ts"), "utf8"),
   readFile(join(root, "apps/web/src/rfc-catalog.ts"), "utf8"),
   readFile(join(root, "apps/web/src/rfc-document.ts"), "utf8"),
   readFile(join(root, "apps/web/src/rfcFixtures.ts"), "utf8"),
   readFile(join(root, "apps/web/src/tenders.ts"), "utf8"),
 ]);
-const requiredRoutes = ["/", "/start", "/tenders", "/rfcs", "/docs"];
-const placeholderRoutes = ["/chronicle", "/merch"];
+const requiredRoutes = [
+  "/",
+  "/start",
+  "/chronicle",
+  "/tenders",
+  "/rfcs",
+  "/docs",
+];
+const placeholderRoutes = ["/merch"];
 const removedRoutes = ["/proposals"];
 const requiredLabels = ["Chronicle", "Tenders", "RFC", "Merch", "Docs"];
 const requiredNavigation = ['{ to: "/chronicle", label: "Chronicle" }'];
@@ -31,7 +40,8 @@ const requiredCopy = [
   "<h1>Castalia</h1>",
   "an open spring for independent worlds.",
   'href="/start">Start</a>',
-  "Landing, Tenders, RFCs, and Docs are implemented fixture surfaces",
+  "Landing, Chronicle, Tenders, RFCs, and Docs are implemented fixture surfaces",
+  "Portable data is the part of Web3 we still owe people",
   "Catalog UI draft",
   "Comment submission is disabled",
   "Bid submission unavailable",
@@ -42,6 +52,7 @@ const surfaceSource =
   landing +
   runtime +
   retainedViews +
+  chronicle +
   rfcCatalog +
   rfcDocument +
   rfcFixtures +

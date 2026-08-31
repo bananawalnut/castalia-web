@@ -4,6 +4,7 @@ import { TENDER_FIXTURES } from "./tenderFixtures.js";
 export const TOP_LEVEL_PAGE_ROUTES = [
   { path: "/", label: "Landing" },
   { path: "/start", label: "Start" },
+  { path: "/chronicle", label: "Chronicle" },
   { path: "/tenders", label: "Tenders" },
   { path: "/rfcs", label: "RFCs" },
   { path: "/docs", label: "Docs" },

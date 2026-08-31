@@ -1,4 +1,5 @@
 import { landingView } from "./landing.js";
+import { chronicleView } from "./chronicle.js";
 import { navigation } from "./routes.js";
 import type { View } from "./dom.js";
 import { rfcCatalogView } from "./rfc-catalog.js";
@@ -40,6 +41,7 @@ function route(
 ): View {
   if (pathname === "/") return landingView();
   if (pathname === "/start") return startView(startDependencies);
+  if (pathname === "/chronicle") return chronicleView();
   if (pathname === "/tenders") return tenderCatalogView();
   if (pathname.startsWith("/tenders/"))
     return tenderViewerView(
@@ -121,7 +123,7 @@ export function mountCastaliaApp(
         : currentPath;
     for (const link of nav.querySelectorAll<HTMLAnchorElement>("a")) {
       if (
-        ["/docs", "/rfcs", "/tenders"].includes(navigationPath) &&
+        ["/chronicle", "/docs", "/rfcs", "/tenders"].includes(navigationPath) &&
         routePath(link.pathname) === navigationPath
       )
         link.setAttribute("aria-current", "page");

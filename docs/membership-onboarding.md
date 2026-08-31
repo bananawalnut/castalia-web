@@ -7,7 +7,7 @@ Status: Zenith-signed base-membership v3 is the active Join contract. It creates
 `/start` accepts a compatible Wallet only when it advertises `membershipJoinProtocol: "castalia.zenith-membership.v3"`. Older Wallet builds receive **Wallet update required** and their Join UI is not opened.
 
 1. The member selects **Join Castalia**. There is no individual/institution selector, application, review, approval, or Pending state.
-2. The member's active user action asks Wallet to open a Chrome-owned popup outside page-owned DOM; automatic page calls are rejected. The popup names the requesting Web origin and binds any later approval to that same initiating tab and origin. Web never receives a passphrase, private key, recovery file, or generic signing interface.
+2. The member's active user action asks Wallet to open a Chrome-owned popup outside page-owned DOM; automatic page calls are rejected. The popup names the requesting Web origin and binds any later approval to that same initiating tab and origin. Web never receives a passphrase, private key, `.castalia-recovery` file, `.castaway` vault, private vault entry, or generic signing interface.
 3. Wallet creates or unlocks its encrypted durable Ed25519 Member Key.
 4. Wallet signs `castalia/zenith-membership-join/v3\0 || ownerPublicKey` and sends only the public key and signature to `POST /v3/memberships` on its compiled Zenith issuer origin.
 5. Zenith verifies possession and signs the deterministic Active credential. A retry returns the same credential bytes and creates no session or database record.
@@ -62,6 +62,8 @@ Zenith alone performs membership issuance. Web requests the Wallet ceremony and 
 The issuer private key is never present in Web, Wallet, repository fixtures, or the public credential. A compromised issuer could mint credentials for arbitrary public keys, so key custody and rotation are production security boundaries. It cannot recover a member's private key.
 
 No part of Join issues a browser cookie, Castalia session, Matrix token/device, capability, delegation, role, or infrastructure credential. Membership and sign-in remain separate work.
+
+The planned `.castaway` portable vault is also separate from Join. Possessing or importing a vault does not create membership, and Web cannot ask Wallet to disclose the whole vault when one approved public membership projection is sufficient. See the [Castaway portable-vault boundary](castaway-portable-vault.md).
 
 ## Version compatibility
 

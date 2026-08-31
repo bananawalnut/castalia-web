@@ -25,13 +25,14 @@ The static public Pages site can detect an installed Wallet, but a complete Join
 The route inventory is:
 
 - `/`
+- `/chronicle`
 - `/tenders`
 - `/tenders/:tenderId`
 - `/rfcs`
 - `/rfcs/:rfcId`
 - `/docs`
 
-The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), and **Docs** (`/docs`). Tenders, RFC, and Docs are implemented fixture destinations. Chronicle and Merch remain visible placeholders. The landing **Start** action opens `/start`; Join requires a compatible Wallet and reachable configured Dregg node. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
+The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), and **Docs** (`/docs`). Chronicle, Tenders, RFC, and Docs are implemented fixture destinations; Merch remains a visible placeholder. Chronicle publishes a checked-in read-only essay about portable data and the planned `.castaway` vault, not a remote publication system. The landing **Start** action opens `/start`; Join requires a compatible Wallet and its configured Zenith issuer. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
 
 These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or Castalia Control integration, authentication, provisioning, deployment, or production readiness.
 
@@ -58,6 +59,8 @@ These registries and viewers read checked-in synthetic examples only. They conta
 ## Documentation surface
 
 `/docs` is the only routed documentation page. It is a compact, information-first map of retained surfaces, product-model distinctions, and fixture boundaries. The previous large card grid and nested API, specifications, RFC architecture, and exchange-preview pages are no longer routed.
+
+The [Castaway portable-vault boundary](castaway-portable-vault.md) documents Web's relationship to the planned application-neutral encrypted vault. Web may request individually approved public projections from Wallet, but it does not receive, decrypt, store, or install the vault or its private entries.
 
 ## Project and repository boundary
 

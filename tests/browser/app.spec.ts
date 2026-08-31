@@ -61,6 +61,7 @@ for (const route of routes) {
       'nav[aria-label="Primary"] [aria-current="page"]',
     );
     const expectedCurrent = [
+      "/chronicle",
       "/docs",
       "/rfcs",
       "/tenders",
@@ -343,7 +344,10 @@ test("keyboard navigation, visible focus, route focus, and unavailable controls"
   await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/chronicle$/);
   await expect(page.locator("main")).toBeFocused();
-  await expect(page.locator("h1")).toHaveText("Page not found");
+  await expect(page.locator("h1")).toHaveText(
+    "Portable data is the part of Web3 we still owe people",
+  );
+  await expect(page.getByText(".castaway", { exact: true })).toHaveCount(4);
   await expect(page.getByText("Session unavailable")).toHaveCount(0);
 });
 

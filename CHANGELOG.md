@@ -9,6 +9,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 
 - Added the shared Zenith membership v3 contract, canonical vector, stateless possession-verifying issuer, and independent Web credential verifier.
 - Added the direct Castalia membership flow on `/start` — Web asks Wallet to open a Chrome-owned popup outside page-owned DOM and displays Active status only after cryptographically verifying the exact v3 credential and binding it to the current Wallet Member Key.
+- Added the read-only `/chronicle` essay on portable data and a product boundary for the planned `.castaway` encrypted vault — publishes the vision without claiming that Web receives private vault contents or that the draft wire format exists.
 
 ### Changed
 
