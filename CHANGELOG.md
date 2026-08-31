@@ -17,4 +17,4 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 ### Fixed
 
 - Membership-ready events and compatibility lookups require the exact signed v3 credential, deterministic membership ID, pinned issuer, valid signature, and current Wallet owner with no unrecognized fields.
-- Zenith membership verification now passes owned byte buffers to WebCrypto under Node 24, and Vite resolves the workspace contract source in clean hosted builds and browser runs.
+- Zenith membership verification now passes owned byte buffers to WebCrypto under Node 24, validates untyped transcript and trust-policy inputs, and resolves the workspace contract source in clean hosted builds and browser runs.

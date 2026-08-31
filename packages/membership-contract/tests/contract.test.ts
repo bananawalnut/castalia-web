@@ -104,6 +104,19 @@ describe("Zenith membership v3 contract", () => {
     expect(() =>
       parseZenithMembershipCredential({ ...credential(), invented: true }),
     ).toThrow("fields are not canonical v3");
+    const { issuerSignature: _signature, ...payload } = credential();
+    expect(() =>
+      zenithMembershipCredentialTranscript({ ...payload, invented: true }),
+    ).toThrow("payload fields are not canonical v3");
+  });
+
+  it("rejects unrecognized trust-policy fields before issuer lookup", async () => {
+    await expect(
+      verifyZenithMembershipCredential(credential(), {
+        ...policy,
+        roots: [{ ...policy.roots[0], invented: true }],
+      }),
+    ).rejects.toThrow("trust root fields are not canonical");
   });
 
   it("rejects an untrusted issuer before accepting membership", async () => {

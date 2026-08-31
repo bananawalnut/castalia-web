@@ -39,6 +39,11 @@ export type ZenithMembershipCredentialV3 = {
   issuerSignature: string;
 };
 
+type ZenithMembershipCredentialPayloadV3 = Omit<
+  ZenithMembershipCredentialV3,
+  "issuerSignature"
+>;
+
 export type ZenithMembershipTrustRootV1 = {
   issuerId: string;
   keyId: string;
@@ -210,50 +215,103 @@ export function parseZenithMembershipCredential(
   return structuredClone(value as ZenithMembershipCredentialV3);
 }
 
-export function zenithMembershipCredentialTranscript(
-  input: Omit<ZenithMembershipCredentialV3, "issuerSignature">,
-): Uint8Array {
-  bytesFromHex32(input.membershipId, "membership ID");
-  bytesFromHex32(input.ownerPublicKey, "Member Key");
+function parseZenithMembershipCredentialPayload(
+  input: unknown,
+): ZenithMembershipCredentialPayloadV3 {
+  if (typeof input !== "object" || input === null || Array.isArray(input))
+    throw new Error("membership credential payload must be an object");
   if (
-    input.schema !== ZENITH_MEMBERSHIP_CREDENTIAL_SCHEMA ||
-    input.version !== ZENITH_MEMBERSHIP_VERSION ||
-    input.status !== "active" ||
-    input.signatureSuite !== "Ed25519"
+    !exactKeys(input, [
+      "issuerId",
+      "issuerKeyId",
+      "membershipId",
+      "ownerPublicKey",
+      "schema",
+      "signatureSuite",
+      "status",
+      "version",
+    ])
+  )
+    throw new Error(
+      "membership credential payload fields are not canonical v3",
+    );
+  const value = input as Partial<ZenithMembershipCredentialPayloadV3>;
+  if (
+    value.schema !== ZENITH_MEMBERSHIP_CREDENTIAL_SCHEMA ||
+    value.version !== ZENITH_MEMBERSHIP_VERSION ||
+    value.status !== "active" ||
+    value.signatureSuite !== "Ed25519"
   )
     throw new Error("membership credential payload is not canonical v3");
+  bytesFromHex32(value.membershipId, "membership ID");
+  bytesFromHex32(value.ownerPublicKey, "Member Key");
+  framedUtf8(value.issuerId ?? "", "membership issuer ID");
+  framedUtf8(value.issuerKeyId ?? "", "membership issuer key ID");
+  return structuredClone(value as ZenithMembershipCredentialPayloadV3);
+}
+
+export function zenithMembershipCredentialTranscript(
+  input: unknown,
+): Uint8Array {
+  const value = parseZenithMembershipCredentialPayload(input);
   return concatBytes(
     textEncoder.encode(ZENITH_MEMBERSHIP_CREDENTIAL_DOMAIN),
-    u64le(BigInt(input.version)),
-    bytesFromHex32(input.membershipId, "membership ID"),
-    bytesFromHex32(input.ownerPublicKey, "Member Key"),
-    framedUtf8(input.status, "membership status"),
-    framedUtf8(input.issuerId, "membership issuer ID"),
-    framedUtf8(input.issuerKeyId, "membership issuer key ID"),
-    framedUtf8(input.signatureSuite.toLowerCase(), "signature suite"),
+    u64le(BigInt(value.version)),
+    bytesFromHex32(value.membershipId, "membership ID"),
+    bytesFromHex32(value.ownerPublicKey, "Member Key"),
+    framedUtf8(value.status, "membership status"),
+    framedUtf8(value.issuerId, "membership issuer ID"),
+    framedUtf8(value.issuerKeyId, "membership issuer key ID"),
+    framedUtf8(value.signatureSuite.toLowerCase(), "signature suite"),
   );
 }
 
 export function validateZenithTrustPolicy(
-  policy: ZenithMembershipTrustPolicyV1,
-): void {
+  policy: unknown,
+): asserts policy is ZenithMembershipTrustPolicyV1 {
+  if (typeof policy !== "object" || policy === null || Array.isArray(policy))
+    throw new Error("Zenith membership trust policy must be an object");
+  if (!exactKeys(policy, ["roots", "schema", "version"]))
+    throw new Error(
+      "Zenith membership trust policy fields are not canonical v1",
+    );
+  const value = policy as Partial<ZenithMembershipTrustPolicyV1>;
   if (
-    policy.schema !== "castalia.zenith-membership-trust-policy.v1" ||
-    policy.version !== 1 ||
-    !Array.isArray(policy.roots) ||
-    policy.roots.length === 0
+    value.schema !== "castalia.zenith-membership-trust-policy.v1" ||
+    value.version !== 1 ||
+    !Array.isArray(value.roots) ||
+    value.roots.length === 0
   )
     throw new Error("Zenith membership trust policy is not canonical v1");
+  const roots = value.roots as readonly unknown[];
   const identities = new Set<string>();
-  for (const root of policy.roots) {
+  for (const candidate of roots) {
+    if (
+      typeof candidate !== "object" ||
+      candidate === null ||
+      Array.isArray(candidate)
+    )
+      throw new Error("Zenith membership trust root must be an object");
+    if (
+      !exactKeys(candidate, [
+        "issuerId",
+        "keyId",
+        "publicKey",
+        "signatureSuite",
+      ])
+    )
+      throw new Error("Zenith membership trust root fields are not canonical");
+    const root = candidate as Partial<ZenithMembershipTrustRootV1>;
+    const issuerId = root.issuerId ?? "";
+    const keyId = root.keyId ?? "";
     if (
       root.signatureSuite !== "Ed25519" ||
-      !IDENTIFIER.test(root.issuerId) ||
-      !IDENTIFIER.test(root.keyId)
+      !IDENTIFIER.test(issuerId) ||
+      !IDENTIFIER.test(keyId)
     )
       throw new Error("Zenith membership trust root is not canonical");
     bytesFromHex32(root.publicKey, "issuer public key");
-    const identity = `${root.issuerId}\0${root.keyId}`;
+    const identity = `${issuerId}\0${keyId}`;
     if (identities.has(identity))
       throw new Error(
         "Zenith membership trust policy contains a duplicate root",
