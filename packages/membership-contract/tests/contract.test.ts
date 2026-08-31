@@ -129,11 +129,15 @@ describe("Zenith membership v3 contract", () => {
   });
 
   it("rejects unrecognized trust-policy fields before issuer lookup", async () => {
+    const policyWithUnknownRootField = {
+      ...policy,
+      roots: [{ ...policy.roots[0], invented: true }],
+    } as unknown as ZenithMembershipTrustPolicyV1;
     await expect(
-      verifyZenithMembershipCredential(credential(), {
-        ...policy,
-        roots: [{ ...policy.roots[0], invented: true }],
-      }),
+      verifyZenithMembershipCredential(
+        credential(),
+        policyWithUnknownRootField,
+      ),
     ).rejects.toThrow("trust root fields are not canonical");
   });
 
