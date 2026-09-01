@@ -17,7 +17,7 @@ async function boundedBody(request: Request): Promise<Uint8Array> {
   const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
   let length = 0;
-  while (true) {
+  for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
     length += value.byteLength;
