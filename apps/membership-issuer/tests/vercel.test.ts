@@ -15,7 +15,7 @@ function response(status = 200) {
 
 describe("Vercel membership issuer adapter", () => {
   it("maps the Web request into the bounded issuer application contract", async () => {
-    const app = vi.fn<MembershipIssuerApp>(async () => response());
+    const app = vi.fn<MembershipIssuerApp>(() => Promise.resolve(response()));
     const handle = createVercelIssuerHandler(app, "/v3/memberships");
     const result = await handle(
       new Request("https://membership.zenith-research.ca/v3/memberships", {
@@ -38,8 +38,8 @@ describe("Vercel membership issuer adapter", () => {
   });
 
   it("caps oversized bodies before forwarding them to the issuer", async () => {
-    const app = vi.fn<MembershipIssuerApp>(async (request) =>
-      response(request.body.byteLength > 4096 ? 413 : 200),
+    const app = vi.fn<MembershipIssuerApp>((request) =>
+      Promise.resolve(response(request.body.byteLength > 4096 ? 413 : 200)),
     );
     const handle = createVercelIssuerHandler(app, "/v3/memberships");
     const result = await handle(
@@ -55,7 +55,7 @@ describe("Vercel membership issuer adapter", () => {
   });
 
   it("binds health to its fixed public path without reading a body", async () => {
-    const app = vi.fn<MembershipIssuerApp>(async () => response());
+    const app = vi.fn<MembershipIssuerApp>(() => Promise.resolve(response()));
     const handle = createVercelIssuerHandler(app, "/health");
     await handle(
       new Request("https://membership.zenith-research.ca/health", {
@@ -71,14 +71,16 @@ describe("Vercel membership issuer adapter", () => {
   });
 
   it("emits a bodyless 204 response for browser CORS preflight", async () => {
-    const app = vi.fn<MembershipIssuerApp>(async () => ({
-      status: 204,
-      headers: {
-        "access-control-allow-origin": "*",
-        "access-control-allow-methods": "POST, OPTIONS",
-      },
-      body: "",
-    }));
+    const app = vi.fn<MembershipIssuerApp>(() =>
+      Promise.resolve({
+        status: 204,
+        headers: {
+          "access-control-allow-origin": "*",
+          "access-control-allow-methods": "POST, OPTIONS",
+        },
+        body: "",
+      }),
+    );
     const handle = createVercelIssuerHandler(app, "/v3/memberships");
     const result = await handle(
       new Request("https://membership.zenith-research.ca/v3/memberships", {

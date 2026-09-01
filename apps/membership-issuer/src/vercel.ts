@@ -7,9 +7,10 @@ export type MembershipIssuerApp = (
 ) => Promise<IssuerHttpResponse>;
 
 async function boundedBody(request: Request): Promise<Uint8Array> {
-  if (!request.body) return new Uint8Array();
+  const stream = request.body as ReadableStream<Uint8Array> | null;
+  if (stream === null) return new Uint8Array();
 
-  const reader = request.body.getReader();
+  const reader = stream.getReader();
   const chunks: Uint8Array[] = [];
   let length = 0;
   while (true) {
