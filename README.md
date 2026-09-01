@@ -26,7 +26,7 @@ The composition keeps responsibilities separate: Wallet owns the Member Key and 
 
 ## Exact toolchain
 
-Node `24.18.0`, pnpm `11.12.0`, Turborepo `2.10.4`, ESM, and strict TypeScript are pinned by repository configuration and the frozen lockfile. The wallet validator currently builds with Rust `1.96.0`, the `wasm32-unknown-unknown` target, and `wasm-pack` `0.14.0`.
+Node `24.18.0`, pnpm `11.25.0`, Turborepo `2.10.4`, ESM, and strict TypeScript are pinned by repository configuration and the frozen lockfile. The wallet validator currently builds with Rust `1.96.0`, the `wasm32-unknown-unknown` target, and `wasm-pack` `0.14.0`.
 
 ```sh
 corepack enable
