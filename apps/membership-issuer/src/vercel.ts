@@ -6,8 +6,12 @@ export type MembershipIssuerApp = (
   request: IssuerHttpRequest,
 ) => Promise<IssuerHttpResponse>;
 
+function requestBody(request: Request): ReadableStream<Uint8Array> | null {
+  return request.body;
+}
+
 async function boundedBody(request: Request): Promise<Uint8Array> {
-  const stream = request.body as ReadableStream<Uint8Array> | null;
+  const stream = requestBody(request);
   if (stream === null) return new Uint8Array();
 
   const reader = stream.getReader();
