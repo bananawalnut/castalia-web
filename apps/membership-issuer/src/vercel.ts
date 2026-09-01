@@ -45,7 +45,7 @@ export function createVercelIssuerHandler(
       ...(contentType === null ? {} : { contentType }),
       body,
     });
-    return new Response(result.body, {
+    return new Response(result.status === 204 ? null : result.body, {
       status: result.status,
       headers: result.headers,
     });

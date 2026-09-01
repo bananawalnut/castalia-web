@@ -69,4 +69,27 @@ describe("Vercel membership issuer adapter", () => {
       body: new Uint8Array(),
     });
   });
+
+  it("emits a bodyless 204 response for browser CORS preflight", async () => {
+    const app = vi.fn<MembershipIssuerApp>(async () => ({
+      status: 204,
+      headers: {
+        "access-control-allow-origin": "*",
+        "access-control-allow-methods": "POST, OPTIONS",
+      },
+      body: "",
+    }));
+    const handle = createVercelIssuerHandler(app, "/v3/memberships");
+    const result = await handle(
+      new Request("https://membership.zenith-research.ca/v3/memberships", {
+        method: "OPTIONS",
+      }),
+    );
+
+    expect(result.status).toBe(204);
+    expect(result.body).toBeNull();
+    expect(result.headers.get("access-control-allow-methods")).toBe(
+      "POST, OPTIONS",
+    );
+  });
 });
