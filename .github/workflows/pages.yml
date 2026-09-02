@@ -36,11 +36,20 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - id: pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
+      - name: Require reviewed production issuer trust
+        env:
+          ISSUER_KEY_ID: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_KEY_ID }}
+          ISSUER_PUBLIC_KEY: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_PUBLIC_KEY }}
+        run: |
+          test -n "$ISSUER_KEY_ID"
+          test -n "$ISSUER_PUBLIC_KEY"
       - name: Build project site
         env:
-          CASTALIA_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # The production Pages site is served from its custom-domain root.
+          CASTALIA_BASE_PATH: /
           VITE_APP_ENV: production
-          VITE_FIXTURE_MODE: "true"
+          CASTALIA_ZENITH_ISSUER_KEY_ID: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_KEY_ID }}
+          CASTALIA_ZENITH_ISSUER_PUBLIC_KEY: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_PUBLIC_KEY }}
         run: pnpm --filter @castalia/web build
       - name: Add Pages static-hosting files
         run: pnpm exec tsx scripts/generate-pages-route-entries.ts apps/web/dist

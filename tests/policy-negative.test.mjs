@@ -72,7 +72,10 @@ test("workspace overrides pin patched high-severity transitive dependencies", as
     "utf8",
   );
   assert.match(workspace, /^  js-yaml: 4\.3\.1$/m);
-  assert.match(workspace, /^  nanoid: 3\.3\.17$/m);
+  assert.match(workspace, /^  nanoid: 3\.3\.18$/m);
+  assert.match(workspace, /^  esbuild: 0\.28\.1$/m);
+  assert.match(workspace, /^  - esbuild@0\.28\.1$/m);
+  assert.match(workspace, /^  - nanoid@3\.3\.18$/m);
 });
 
 test("standalone browser and budget gates build the wallet WASM prerequisite", async () => {

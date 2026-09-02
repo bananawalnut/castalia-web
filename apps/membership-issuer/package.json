@@ -1,0 +1,23 @@
+{
+  "name": "@castalia/membership-issuer",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx src/server.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run tests",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint src tests"
+  },
+  "dependencies": {
+    "@castalia/membership-contract": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.13",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vitest": "4.1.0"
+  }
+}

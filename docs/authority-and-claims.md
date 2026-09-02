@@ -7,7 +7,7 @@ Status: accepted authority contract from issue #9, preserving Historical issue #
 | Surface | Canonical authority | Castalia Web boundary |
 | --- | --- | --- |
 | Accounts, rooms, events, edits, redactions, membership, and participant-authorized sends | Matrix | Matrix remains canonical. Castalia Web is an unprivileged client. It receives no Synapse admin or appservice credentials and cannot replace Matrix truth. |
-| Castalia authorization, challenge/replay policy, syndicate admission policy/status, revocation/discharge enforcement, and authority receipts | Castalia Control using Dregg authorization | This repository does not implement that service. A future unprivileged client may present exact-request wallet proof plus a wallet-held `dga1_` capability directly to it. |
+| Castalia authorization, challenge/replay policy, syndicate admission policy/status, revocation/discharge enforcement, and authority receipts | Castalia Control using Dregg authorization | This repository does not implement that service. Its unprivileged Web client may send exact enrollment-v2 wallet proof directly to configured Control; a later capability-bearing operation using a wallet-held `dga1_` remains separate. |
 | Infrastructure execution, including Zenith-hosted Matrix provisioning | The infrastructure provisioner; Hub may fill this role for Zenith-hosted resources | The provisioner alone holds cloud, DNS, Synapse-admin, signing, federation-admission, and deployment credentials. It is not the authorization source or Castalia lifecycle authority. |
 | Product routes and presentation | `bananawalnut/castalia-web` | The public repository may define and deploy the unprivileged fixture web experience, while displaying upstream states without turning them into authority. |
 | Documentation interpretation | The precedence rules below | Prose cannot override Matrix truth, verified Dregg authority, accepted issue boundaries, or reviewed evidence. |
@@ -22,11 +22,11 @@ Community creation is request/status-first, not an immediate creation claim:
 4. The infrastructure provisioner may act only after a valid Castalia Control authorization and must return typed execution evidence.
 5. Success is not established until Castalia Control status, provisioner evidence, and required Matrix evidence agree.
 
-No live request submission, Castalia Control integration, provisioning, authoritative status endpoint, or example request route exists.
+The `/start` client now implements the challenge and application HTTP contracts, but the public deployment is unconfigured and the currently integrated Control service lacks the application endpoint. No deployed end-to-end submission, authoritative status endpoint, admission decision, or provisioning exists.
 
 ## Implemented fixture routes and APIs
 
-The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, visible unavailable states, and a static GitHub Pages deployment. These surfaces are fixture-only. They do not establish live Matrix access, wallet authentication, Dregg capability verification, Castalia Control lookup or mutation, provisioning, participant-authorized sends, or production readiness.
+The current repository implements deterministic fixture routes, read-only fixture BFF endpoints, canonical contract sources, visible unavailable content states, a static GitHub Pages deployment, a stateless Zenith membership v3 issuer, and independent Web credential verification. Existing content surfaces remain fixture-only. Join can display a Wallet-provided v3 credential only after Web verifies its deterministic membership ID and pinned issuer signature; it does not establish an authenticated Web session, production-deployed membership service, live Matrix access, Dregg capability authority, provisioning, participant-authorized sends, or production readiness.
 
 ## Commons room posture
 
@@ -54,8 +54,9 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 | Product routes and navigation contract are defined | Implemented fixture claim | Issues #1 and #2, the route shell, and route/browser checks; no live upstream behavior claimed. |
 | Fixture BFF and canonical contract sources exist | Implemented fixture claim | Issue #2, local/hosted verification, and checked-in OpenAPI/JSON Schema sources; no deployed API claimed. |
 | Matrix is canonical for Matrix state and authorized sends | Authority boundary | Matrix; this repository remains unprivileged. |
-| Castalia creation/admission uses request/status-first semantics | Contract only | Castalia Control contract plus later implementation, anchored-authority, provisioner, and verification issues. |
-| Castalia Control is the planned Dregg authorization/admission service | Authority boundary, not implementation | [Castalia Control authority boundary](castalia-control-authority.md); no connectivity exists here. |
+| Castalia creation/admission uses request/status-first semantics | Web submission client implemented; authority and status unavailable | The Web client can submit only after local proof verification. Control application processing, status, anchored authority, provisioner work, and lifecycle evidence remain required. |
+| Castalia Control is the Dregg authorization/admission service | Authority boundary; external service not implemented here | [Castalia Control authority boundary](castalia-control-authority.md); Web has a direct client contract, but the public deployment is unconfigured and end-to-end application processing is unavailable. |
+| Enrollment-v2 Wallet holder proof is independently verified before Web submission | Implemented local client claim | Rust/WASM fixed-vector and tamper tests plus WebCrypto verification; Control must repeat verification and consume replay state authoritatively. |
 | Hub may be provisioner-only for privileged Zenith-hosted changes | Authority boundary | Infrastructure provisioner contract; no provisioning exists here. |
 | Zenith forum is visible unavailable | Implemented fixture posture | Issue #2 route/browser evidence proves the unavailable copy and navigation; any later live-access issue must preserve that posture until its own access evidence passes. |
 | AI interpretation | Deferred and non-authoritative | A future explicitly authorized issue, privacy/provenance contract, implementation, tests, and deployment evidence. |
@@ -65,10 +66,10 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 
 This repository does not currently claim:
 
-- live or privileged application routes, APIs, or upstream connectivity beyond the deterministic fixture implementation;
+- live or privileged application routes, APIs, or deployed upstream connectivity beyond the optional unprivileged enrollment client;
 - live Matrix reading, discovery, joining, authentication, posting, membership, federation, or live rooms;
 - Synapse admin/appservice authority or credentials;
-- implementation or deployment of Castalia Control or anchored Dregg authority;
-- wallet proof, `dga1_` custody/presentation, request submission, status retrieval, community or room provisioning;
+- implementation or deployment of Castalia Control, authoritative proof verification/replay consumption, or anchored Dregg authority;
+- authenticated sessions, active membership, `dga1_` custody/presentation, application status retrieval, or community/room provisioning;
 - AI interpretation, canonical summaries, or an interpreter repository;
 - infrastructure, deployment, security approval, or production readiness.

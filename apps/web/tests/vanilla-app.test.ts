@@ -1,6 +1,29 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mountCastaliaApp } from "../src/runtime.js";
 
+const zenithMembershipFixture = {
+  schema: "castalia.zenith-membership-credential.v3",
+  version: 3,
+  membershipId:
+    "b2409aad97015e17749442377f14acd6ccd9ce804661738e4aa7e860d554d8a9",
+  ownerPublicKey:
+    "3d4017c3e843895a92b70aa74d1b7ebc9c982ccf2ec4968cc0cd55f12af4660c",
+  status: "active",
+  issuerId: "zenith-research",
+  issuerKeyId: "zenith-membership-issuer-fixture-ed25519-1",
+  signatureSuite: "Ed25519",
+  issuerSignature:
+    "b4Sf_uSYTxfhQUaF_Arq44IxYNByxKsrUOgmXCB4dEYbfAlJ6to50ZeY_qBbvZYibHO6A4JrIERZ1DBDxSkRBA",
+} as const;
+
+const fixtureSubject = () =>
+  Promise.resolve({
+    subjectId: "did:castalia:member:test",
+    publicKey: "public-key",
+    dreggOwnerPublicKey: zenithMembershipFixture.ownerPublicKey,
+    walletKind: "castalia-dregg" as const,
+  });
+
 function click(element: Element) {
   element.dispatchEvent(
     new MouseEvent("click", { bubbles: true, cancelable: true }),
@@ -56,7 +79,7 @@ describe("vanilla Castalia shell", () => {
     app.destroy();
   });
 
-  it("uses history routing, focuses main, and keeps placeholders on the 404 surface", () => {
+  it("uses history routing, focuses main, and renders Chronicle inside the shell", () => {
     const root = document.querySelector<HTMLElement>("#root");
     if (!root) throw new Error("missing test root");
     const app = mountCastaliaApp(root);
@@ -67,7 +90,11 @@ describe("vanilla Castalia shell", () => {
     if (!chronicle) throw new Error("missing Chronicle link");
     click(chronicle);
     expect(window.location.pathname).toBe("/chronicle");
-    expect(root.querySelector("h1")?.textContent).toBe("Page not found");
+    expect(root.querySelector("h1")?.textContent).toBe(
+      "Portable data is the part of Web3 we still owe people",
+    );
+    expect(root.textContent).toContain(".castaway");
+    expect(root.textContent).toContain(".castalia-recovery");
     expect(document.activeElement).toBe(root.querySelector("main"));
 
     app.navigate("/docs");
@@ -85,13 +112,14 @@ describe("vanilla Castalia shell", () => {
     const provider = {
       kind: "castalia.wallet-provider" as const,
       version: "1" as const,
+      membershipJoinProtocol: "castalia.zenith-membership.v3" as const,
       openMembershipFlow,
       getStatus: () => Promise.resolve({ state: "ready" as const }),
       createAuthenticationPresentation: vi.fn(),
+      getSubject: fixtureSubject,
+      requestMembershipPresentation: vi.fn(),
+      getMembership: vi.fn(() => Promise.resolve(zenithMembershipFixture)),
     };
-    const prepareAdmission = vi.fn(() =>
-      Promise.resolve({ state: "pending-server-verification" as const }),
-    );
     const providerState: { current: typeof provider | undefined } = {
       current: undefined,
     };
@@ -111,47 +139,275 @@ describe("vanilla Castalia shell", () => {
       expect(
         root.querySelector<HTMLButtonElement>("button.start-flow__cta")
           ?.textContent,
-      ).toBe("Become a member");
+      ).toBe("Join Castalia");
     });
     app.destroy();
 
     const installedApp = mountCastaliaApp(root, {
       walletInstallUrl: "",
       getWalletProvider: () => provider,
-      prepareAdmission,
     });
     installedApp.navigate("/start");
     const becomeMember =
       root.querySelector<HTMLButtonElement>(".start-flow__cta");
-    if (!becomeMember) throw new Error("missing Become a member button");
+    if (!becomeMember) throw new Error("missing Join Castalia button");
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready"),
+    );
+    expect(provider.getMembership).not.toHaveBeenCalled();
     click(becomeMember);
     await vi.waitFor(() => {
       expect(openMembershipFlow).toHaveBeenCalledOnce();
     });
 
     window.dispatchEvent(
-      new CustomEvent("castalia:wallet:membership-flow-ready"),
+      new CustomEvent("castalia:wallet:membership-flow-ready", {
+        detail: {
+          membership: zenithMembershipFixture,
+        },
+      }),
     );
     await vi.waitFor(() => {
       expect(root.querySelector('[role="status"]')?.textContent).toContain(
-        "Awaiting membership service",
+        "Castalia membership is Active",
       );
     });
     expect(root.textContent).not.toMatch(/^Member$/m);
-    expect(prepareAdmission).toHaveBeenCalledWith(provider);
-    expect(becomeMember.textContent).toBe("Wallet ready");
+    expect(provider.getMembership).not.toHaveBeenCalled();
+    expect(becomeMember.textContent).toBe("Membership active");
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready"),
+    );
+    expect(provider.getMembership).not.toHaveBeenCalled();
     expect(
       Array.from(root.querySelectorAll('[role="log"] li')).map((entry) =>
         entry.textContent.trim(),
       ),
     ).toEqual([
       "Wallet extension detected.",
-      "Opening extension-owned wallet flow.",
-      "Temporary wallet created. Current site approved.",
-      "Preparing signed admission presentation.",
-      "Signed presentation ready. Awaiting membership service.",
+      "Opening the extension-owned wallet flow.",
+      "Member Key ready. Zenith issuance completed by Wallet.",
+      "Accepting Wallet's verified membership result.",
+      "Zenith-signed Castalia membership verified Active.",
     ]);
     installedApp.destroy();
+  });
+
+  it("blocks a stale Wallet build before opening a non-issuing Join flow", () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const openMembershipFlow = vi.fn(() =>
+      Promise.resolve({ state: "opened" as const }),
+    );
+    const staleProvider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      openMembershipFlow,
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getMembership: vi.fn(),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => staleProvider,
+    });
+
+    app.navigate("/start");
+
+    expect(root.querySelector("button.start-flow__cta")).toBeNull();
+    expect(root.querySelector('[role="status"]')?.textContent).toContain(
+      "Wallet update required",
+    );
+    expect(root.textContent).toContain(
+      "Reload the unpacked Castalia Wallet extension, then refresh this page.",
+    );
+    expect(openMembershipFlow).not.toHaveBeenCalled();
+    app.destroy();
+  });
+
+  it("rejects a valid credential copied from a different Wallet", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      membershipJoinProtocol: "castalia.zenith-membership.v3" as const,
+      openMembershipFlow: () => Promise.resolve({ state: "opened" as const }),
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getSubject: () =>
+        Promise.resolve({
+          subjectId: "did:castalia:member:other",
+          publicKey: "public-key",
+          dreggOwnerPublicKey: "44".repeat(32),
+          walletKind: "castalia-dregg" as const,
+        }),
+      getMembership: () => Promise.resolve(zenithMembershipFixture),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+    });
+    app.navigate("/start");
+    const button = root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!button) throw new Error("missing Join Castalia button");
+    click(button);
+    await vi.waitFor(() => {
+      expect(button.disabled).toBe(true);
+    });
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready", {
+        detail: { membership: zenithMembershipFixture },
+      }),
+    );
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "membership credential owner does not match this Wallet",
+      );
+    });
+    expect(button.textContent).toBe("Try again");
+    app.destroy();
+  });
+
+  it("reports a post-issuance verification error without falsely claiming nothing was issued", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      membershipJoinProtocol: "castalia.zenith-membership.v3" as const,
+      openMembershipFlow: () => Promise.resolve({ state: "opened" as const }),
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getSubject: fixtureSubject,
+      getMembership: vi.fn(() =>
+        Promise.reject(new Error("origin not approved: http://127.0.0.1:4173")),
+      ),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+    });
+    app.navigate("/start");
+    const becomeMember =
+      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!becomeMember) throw new Error("missing Join Castalia button");
+    click(becomeMember);
+    await vi.waitFor(() => {
+      expect(becomeMember.disabled).toBe(true);
+    });
+
+    // Compatibility path for a previously built Wallet that emitted no detail.
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready"),
+    );
+
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "origin not approved: http://127.0.0.1:4173",
+      );
+    });
+    expect(root.querySelector('[role="status"]')?.textContent).toContain(
+      "may already exist",
+    );
+    expect(root.querySelector('[role="status"]')?.textContent).not.toContain(
+      "No membership was issued",
+    );
+    app.destroy();
+  });
+
+  it("fails closed when a v3 credential is not deterministic for its owner", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      membershipJoinProtocol: "castalia.zenith-membership.v3" as const,
+      openMembershipFlow: () => Promise.resolve({ state: "opened" as const }),
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getSubject: fixtureSubject,
+      getMembership: vi.fn(() =>
+        Promise.resolve({
+          ...zenithMembershipFixture,
+          membershipId: "44".repeat(32),
+        }),
+      ),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+    });
+    app.navigate("/start");
+    const becomeMember =
+      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!becomeMember) throw new Error("missing Join Castalia button");
+    click(becomeMember);
+    await vi.waitFor(() => {
+      expect(becomeMember.disabled).toBe(true);
+    });
+
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready"),
+    );
+
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "membership credential ID is not deterministic for its owner",
+      );
+    });
+    expect(becomeMember.textContent).toBe("Try again");
+    expect(root.textContent).not.toContain(
+      "Castalia membership is Active for this Member Key.",
+    );
+    app.destroy();
+  });
+
+  it("rejects unrecognized fields in a Wallet membership handoff", async () => {
+    const root = document.querySelector<HTMLElement>("#root");
+    if (!root) throw new Error("missing test root");
+    const provider = {
+      kind: "castalia.wallet-provider" as const,
+      version: "1" as const,
+      membershipJoinProtocol: "castalia.zenith-membership.v3" as const,
+      openMembershipFlow: () => Promise.resolve({ state: "opened" as const }),
+      getStatus: () => Promise.resolve({ state: "ready" as const }),
+      createAuthenticationPresentation: vi.fn(),
+      getSubject: fixtureSubject,
+      getMembership: vi.fn(),
+    };
+    const app = mountCastaliaApp(root, {
+      walletInstallUrl: "",
+      getWalletProvider: () => provider,
+    });
+    app.navigate("/start");
+    const becomeMember =
+      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    if (!becomeMember) throw new Error("missing Join Castalia button");
+    click(becomeMember);
+    await vi.waitFor(() => {
+      expect(becomeMember.disabled).toBe(true);
+    });
+
+    window.dispatchEvent(
+      new CustomEvent("castalia:wallet:membership-flow-ready", {
+        detail: {
+          membership: {
+            ...zenithMembershipFixture,
+            applicationState: "approved",
+          },
+        },
+      }),
+    );
+
+    await vi.waitFor(() => {
+      expect(root.querySelector('[role="status"]')?.textContent).toContain(
+        "membership credential fields are not canonical v3",
+      );
+    });
+    expect(becomeMember.textContent).toBe("Try again");
+    expect(provider.getMembership).not.toHaveBeenCalled();
+    app.destroy();
   });
 
   it("renders the RFC catalog as a four-column fixture table", () => {

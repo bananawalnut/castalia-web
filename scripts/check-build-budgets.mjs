@@ -70,7 +70,7 @@ const webMs = await run(
     "--emptyOutDir",
   ],
   limit.webMs,
-  { VITE_APP_ENV: "production", VITE_FIXTURE_MODE: "true" },
+  { VITE_APP_ENV: "test", VITE_FIXTURE_MODE: "true" },
 );
 const bffMs = await run(
   "BFF build",
@@ -98,6 +98,7 @@ const turboMs = await run(
     join(output, "turbo-cache"),
   ],
   limit.turboMs,
+  { VITE_FIXTURE_MODE: "true" },
 );
 const assets = await walk(web);
 const sizes = [];

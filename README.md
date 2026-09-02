@@ -1,8 +1,8 @@
 # Castalia Web
 
-Public, fixture-only scaffold for the planned Castalia collective selector, Matrix forum shell, Castalia Control request/status flow, and contract documentation.
+Public fixture scaffold and unprivileged Web client for Castalia's Zenith-signed membership v3 Join, planned Matrix forum shell, separate Control operations, and contract documentation.
 
-The repository contains an executable fixture shell and BFF plus a fail-closed Rust/WASM validator for an exact wallet-onboarding request envelope. `/start` can detect the Castalia browser provider, ask the installed extension to render its own wallet-creation surface, and prepare a signed presentation for future remote verification. The presentation remains pending because this repository provides no Castalia Control admission endpoint. The static frontend does **not** provide live Matrix access, verified wallet authentication, active membership, Dregg capability presentation, Castalia Control connectivity, community or room provisioning, runtime security approval, or production readiness. Public claims remain limited to the deterministic fixtures and contract surfaces described here and in the [product boundary](docs/product-boundary.md), [wallet/WASM boundary](docs/vanilla-wasm-wallet-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
+The repository contains an executable fixture shell and BFF, the stateless Zenith membership issuer, and the Web verifier. `/start` opens extension-owned Wallet UI; Wallet proves possession of its durable Member Key, verifies the deterministic Zenith-signed credential, and hands that public credential to Web. Web independently verifies its exact fields, issuer-independent membership ID, pinned issuer key, and signature before displaying success. There is no individual/institution selector, application, review, Control call, cookie, or sign-in session. Dregg permissionless v2 remains preserved as a dormant forward-compatible path. `/chronicle` publishes the checked-in draft essay on portable data; the [Castaway vault boundary](docs/castaway-portable-vault.md) keeps that future encrypted vault outside Web custody. See the [membership onboarding boundary](docs/membership-onboarding.md), [product boundary](docs/product-boundary.md), [claim ledger](docs/authority-and-claims.md), and [Castalia Control authority boundary](docs/castalia-control-authority.md).
 
 ## Public fixture
 
@@ -14,17 +14,19 @@ The Pages site is deployment evidence for the static fixture only. It is not evi
 ## Architecture
 
 - `apps/web` — Vanilla TypeScript/Vite 7 direct-DOM SPA with bounded history routes and visible unavailable states.
-- `crates/castalia-wallet-wasm` — Rust/WASM exact-envelope validator for a future injected canonical-wallet provider; it signs nothing and issues no session.
+- `apps/membership-issuer` — narrow stateless Node service that verifies Member Key possession and signs deterministic v3 credentials.
+- `packages/membership-contract` — exact shared v3 schemas, transcripts, deterministic ID, trust policy, and browser verifier.
+- `crates/castalia-wallet-wasm` — Rust/WASM validator that reconstructs the exact membership-v2 transcript and BLAKE3 application commitment for independent browser verification; it signs nothing, consumes no challenge, and issues no session.
 - `apps/bff` — Fastify 5 fixture BFF with process-health/session/fixture reads, strict environment validation, exact-origin CORS, security headers, and allowlisted logs.
 - `packages/contracts` — authoritative OpenAPI 3.1 and JSON Schema 2020-12 sources, fixtures, checked-in generated TypeScript, and drift checks.
 - `packages/ui` — small local UI primitives used by the fixture shell.
 - `packages/matrix-client` — network-free, read-only interface and unavailable fixture; no Matrix SDK or privileged operations.
 
-The planned live composition keeps responsibilities separate: Castalia Control owns Dregg authorization, challenge/replay policy, admission policy/status, and authority receipts; an infrastructure provisioner owns cloud/DNS/Synapse/federation credentials and executes separately authorized mutations; Matrix remains canonical for Matrix state; Castalia Web remains unprivileged. None of those live integrations is implemented here.
+The composition keeps responsibilities separate: Wallet owns the Member Key and verifies its v3 credential; Zenith initially operates the only trusted signer; Castalia Web independently verifies the same public credential and remains unprivileged; Dregg v2 is dormant; Control is reserved for narrower consequential operations; Matrix remains canonical for Matrix state. This repository implements membership issuance and display, not a sign-in session or provisioner.
 
 ## Exact toolchain
 
-Node `24.18.0`, pnpm `11.12.0`, Turborepo `2.10.4`, ESM, and strict TypeScript are pinned by repository configuration and the frozen lockfile. The wallet validator currently builds with Rust `1.96.0`, the `wasm32-unknown-unknown` target, and `wasm-pack` `0.14.0`.
+Node `24.18.0`, pnpm `11.25.0`, Turborepo `2.10.4`, ESM, and strict TypeScript are pinned by repository configuration and the frozen lockfile. The wallet validator currently builds with Rust `1.96.0`, the `wasm32-unknown-unknown` target, and `wasm-pack` `0.14.0`.
 
 ```sh
 corepack enable
@@ -68,6 +70,6 @@ See [documentation verification](docs/verification.md), [repository and implemen
 
 Active product development is tracked through GitHub issues and evidence-backed pull requests. Issue #16's [RFC and Problem Board feature design](docs/issue-16-rfc-feature-design.md) defines a future community-facing RFC surface; it is not itself an RFC entry. The [RFC exchange architecture and authority map](docs/architecture/rfc-exchange.md) is the implementation entry point for component ownership, canonical versus generated state, Gate 2's local-export-only boundary, and the external WMT prerequisite.
 
-## Fixture-only non-goals
+## Current non-goals
 
-This issue does not claim or implement live Matrix rooms/messages/sync, login/session cookies, verified wallet authentication, active membership, `dga1_` custody/presentation, Castalia Control lookup or mutation, registration/join/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production endpoints/secrets, HSTS/CDN/WAF/rate limits, production deployment/rollback/signing, branch-rule binding, or production readiness. The Start flow produces only a pending signed presentation; `/health` proves only that the local fixture process is responding.
+This increment does not claim or implement live Matrix rooms/messages/sync, login/session cookies, an authenticated Web session, `dga1_` custody/presentation, registration/posting/redaction, hosted provisioning, administrator/appservice credentials, AI interpretation, production issuer-key custody, HSTS/CDN/WAF/rate limits, production deployment/rollback, branch-rule binding, or production readiness. `/start` reports membership only after cryptographically verifying an Active v3 credential. `/health` proves only that a process is responding.

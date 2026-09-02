@@ -1,45 +1,89 @@
 import { elementFromHtml, escapeHtml, type View } from "./dom.js";
+import type { CastaliaWalletProvider } from "./wallet/onboarding.js";
 import {
-  prepareWalletOnboarding,
-  type CastaliaWalletProvider,
-} from "./wallet/onboarding.js";
-import { validateWalletEnvelopeWithWasm } from "./wallet/wasm-validator.js";
+  ZENITH_MEMBERSHIP_PROTOCOL,
+  verifyZenithMembershipCredential,
+  type ZenithMembershipCredentialV3,
+  type ZenithMembershipTrustPolicyV1,
+} from "@castalia/membership-contract";
+
+export type StartMembershipSummary = ZenithMembershipCredentialV3;
 
 export type StartWalletProvider = CastaliaWalletProvider & {
+  readonly membershipJoinProtocol?: typeof ZENITH_MEMBERSHIP_PROTOCOL;
   openMembershipFlow(): Promise<{ state: "opened" }>;
+  getMembership(): Promise<StartMembershipSummary>;
 };
 
 export type StartFlowDependencies = {
   walletInstallUrl: string;
   getWalletProvider(): StartWalletProvider | undefined;
-  prepareAdmission(provider: StartWalletProvider): Promise<{ state: string }>;
 };
 
-export async function prepareAdmissionRequest(provider: StartWalletProvider) {
-  const nowMs = Date.now();
-  return prepareWalletOnboarding(
-    provider,
+const trustPolicy = {
+  schema: "castalia.zenith-membership-trust-policy.v1",
+  version: 1,
+  roots: [
     {
-      origin: window.location.origin,
-      audience: "castalia-control",
-      nowMs,
-      requestId: crypto.randomUUID(),
-      nonce: crypto.randomUUID(),
+      issuerId: "zenith-research",
+      keyId: __CASTALIA_ZENITH_ISSUER_KEY_ID__,
+      signatureSuite: "Ed25519",
+      publicKey: __CASTALIA_ZENITH_ISSUER_PUBLIC_KEY__,
     },
-    validateWalletEnvelopeWithWasm,
-  );
+  ],
+} satisfies ZenithMembershipTrustPolicyV1;
+
+function supportsZenithIssuedJoin(
+  provider: StartWalletProvider | undefined,
+): provider is StartWalletProvider & {
+  membershipJoinProtocol: typeof ZENITH_MEMBERSHIP_PROTOCOL;
+} {
+  return provider?.membershipJoinProtocol === ZENITH_MEMBERSHIP_PROTOCOL;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error && error.message.trim().length > 0
+    ? error.message
+    : "Unknown Wallet error";
+}
+
+async function assertMembershipMatchesWallet(
+  provider: StartWalletProvider | undefined,
+  membership: StartMembershipSummary,
+): Promise<void> {
+  if (!provider || typeof provider.getSubject !== "function")
+    throw new Error("Wallet cannot bind membership to its current Member Key");
+  const subject = await provider.getSubject();
+  if (subject.dreggOwnerPublicKey !== membership.ownerPublicKey)
+    throw new Error("membership credential owner does not match this Wallet");
+}
+
+export async function membershipFromReadyDetail(
+  detail: unknown,
+): Promise<StartMembershipSummary | null> {
+  if (typeof detail !== "object" || detail === null) return null;
+  const membership = (detail as { membership?: unknown }).membership;
+  if (typeof membership !== "object" || membership === null) {
+    throw new Error("Wallet readiness event did not contain a membership");
+  }
+  return verifyZenithMembershipCredential(membership, trustPolicy);
 }
 
 export function startView(dependencies: StartFlowDependencies): View {
   let provider = dependencies.getWalletProvider();
-  const action = provider
-    ? '<button class="start-flow__cta" type="button">Become a member</button>'
-    : dependencies.walletInstallUrl
-      ? `<a class="start-flow__cta" href="${escapeHtml(dependencies.walletInstallUrl)}" rel="noreferrer">Join now</a>`
-      : '<p class="start-flow__unavailable" role="status">Wallet installer not configured.</p>';
-  const explanation = provider
-    ? "The wallet will open securely over this page."
-    : "Install the Castalia wallet to create your private identity.";
+  const walletUpdateRequired = provider && !supportsZenithIssuedJoin(provider);
+  const action = walletUpdateRequired
+    ? '<p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>'
+    : provider
+      ? '<button class="start-flow__cta" type="button">Join Castalia</button>'
+      : dependencies.walletInstallUrl
+        ? `<a class="start-flow__cta" href="${escapeHtml(dependencies.walletInstallUrl)}" rel="noreferrer">Join now</a>`
+        : '<p class="start-flow__unavailable" role="status">Wallet installer not configured.</p>';
+  const explanation = walletUpdateRequired
+    ? "This Wallet build predates Zenith-issued membership v3."
+    : provider
+      ? "Your wallet will create or unlock your Member Key and request its signed membership from Zenith."
+      : "Install the Castalia wallet to create your private identity.";
   const element = elementFromHtml(
     `<article class="start-flow"><p class="start-flow__eyebrow">Castalia</p><h1>Start</h1><p class="start-flow__lede">Membership begins with a private wallet and a signed request you control.</p><section class="start-flow__step" aria-labelledby="membership-heading"><p class="start-flow__number">01</p><div><h2 id="membership-heading">Become a member</h2><div class="start-flow__action"><p>${explanation}</p>${action}</div></div></section><p class="start-flow__result" role="status" aria-label="Membership request status" hidden></p><section class="start-flow__activity" aria-labelledby="activity-heading"><h2 id="activity-heading">Activity</h2><div role="log" aria-label="Wallet activity" aria-live="polite" aria-relevant="additions"><ol></ol></div></section></article>`,
   );
@@ -50,6 +94,9 @@ export function startView(dependencies: StartFlowDependencies): View {
   let button = element.querySelector<HTMLButtonElement>(
     "button.start-flow__cta",
   );
+  let awaitingWallet = false;
+  let onboardingRunning = false;
+  let membershipIssued = false;
 
   const appendActivity = (message: string) => {
     const entry = document.createElement("li");
@@ -58,52 +105,91 @@ export function startView(dependencies: StartFlowDependencies): View {
     console.info(`[Castalia Start] ${message}`);
   };
   appendActivity(
-    provider ? "Wallet extension detected." : "Wallet extension not detected.",
+    walletUpdateRequired
+      ? "Wallet extension update required."
+      : provider
+        ? "Wallet extension detected."
+        : "Wallet extension not detected.",
   );
 
-  const showFailure = () => {
+  const showFailure = (error: unknown, membershipMayExist = false) => {
+    awaitingWallet = false;
+    onboardingRunning = false;
     if (!result) return;
     result.hidden = false;
-    result.textContent =
-      "The membership request could not continue. No membership was created.";
-    appendActivity("Flow stopped. No membership was created.");
+    const message = errorMessage(error);
+    result.textContent = membershipMayExist
+      ? `Wallet completed the join step, but Castalia Web could not confirm the membership: ${message}. The membership may already exist; retrying is safe and will not create a duplicate.`
+      : `The Wallet flow could not continue: ${message}. No membership was confirmed.`;
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Try again";
+    }
+    appendActivity(
+      membershipMayExist
+        ? `Web confirmation failed: ${message}`
+        : `Wallet flow stopped: ${message}`,
+    );
   };
-  const onReady = async () => {
+
+  const onReady = async (event: Event) => {
+    if (!awaitingWallet || onboardingRunning || membershipIssued) return;
+    awaitingWallet = false;
+    onboardingRunning = true;
     const current = dependencies.getWalletProvider();
-    if (!current || !result) {
-      showFailure();
+    if (!result) {
+      showFailure(new Error("Membership status surface is unavailable"), true);
       return;
     }
-    appendActivity("Temporary wallet created. Current site approved.");
-    appendActivity("Preparing signed admission presentation.");
+    appendActivity("Member Key ready. Zenith issuance completed by Wallet.");
     try {
-      const admission = await dependencies.prepareAdmission(current);
-      result.hidden = false;
-      result.textContent =
-        admission.state === "pending-server-verification"
-          ? "Wallet ready. Awaiting membership service."
-          : "The membership request could not continue. No membership was created.";
-      if (admission.state === "pending-server-verification") {
-        if (button) button.textContent = "Wallet ready";
+      const detail: unknown =
+        event instanceof CustomEvent
+          ? (event as CustomEvent<unknown>).detail
+          : null;
+      const handedOffMembership = await membershipFromReadyDetail(detail);
+      let membership: StartMembershipSummary;
+      if (handedOffMembership) {
+        appendActivity("Accepting Wallet's verified membership result.");
+        membership = handedOffMembership;
+      } else {
+        if (!current) throw new Error("Wallet provider is unavailable");
         appendActivity(
-          "Signed presentation ready. Awaiting membership service.",
+          "Reading and verifying the signed membership credential.",
         );
-      } else appendActivity("Flow stopped. No membership was created.");
-    } catch {
-      showFailure();
+        const fallbackMembership = await membershipFromReadyDetail({
+          membership: await current.getMembership(),
+        });
+        if (!fallbackMembership) {
+          throw new Error("Wallet did not return a membership summary");
+        }
+        membership = fallbackMembership;
+      }
+      await assertMembershipMatchesWallet(current, membership);
+      result.hidden = false;
+      membershipIssued = true;
+      onboardingRunning = false;
+      result.textContent = "Castalia membership is Active for this Member Key.";
+      if (button) {
+        button.disabled = true;
+        button.textContent = "Membership active";
+      }
+      appendActivity("Zenith-signed Castalia membership verified Active.");
+    } catch (error) {
+      showFailure(error, true);
     }
   };
+
   const onOpen = async () => {
     if (!provider || !button) return;
-    appendActivity("Opening extension-owned wallet flow.");
+    awaitingWallet = true;
     button.disabled = true;
     button.textContent = "Opening wallet…";
+    appendActivity("Opening the extension-owned wallet flow.");
     try {
       await provider.openMembershipFlow();
-    } catch {
-      button.disabled = false;
-      button.textContent = "Become a member";
-      showFailure();
+    } catch (error) {
+      showFailure(error);
     }
   };
 
@@ -114,8 +200,8 @@ export function startView(dependencies: StartFlowDependencies): View {
   const onOpenClick = () => {
     void onOpen();
   };
-  const onReadyEvent = () => {
-    void onReady();
+  const onReadyEvent = (event: Event) => {
+    void onReady(event);
   };
   wireButton();
   const providerTimer = provider
@@ -124,14 +210,20 @@ export function startView(dependencies: StartFlowDependencies): View {
         const detected = dependencies.getWalletProvider();
         if (!detected) return;
         provider = detected;
-        appendActivity("Wallet extension detected.");
         window.clearInterval(providerTimer);
         const actionContainer = element.querySelector<HTMLElement>(
           ".start-flow__action",
         );
         if (!actionContainer) return;
+        if (!supportsZenithIssuedJoin(detected)) {
+          appendActivity("Wallet extension update required.");
+          actionContainer.innerHTML =
+            '<p>This Wallet build predates Zenith-issued membership v3.</p><p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>';
+          return;
+        }
+        appendActivity("Wallet extension detected.");
         actionContainer.innerHTML =
-          '<p>The wallet will open securely over this page.</p><button class="start-flow__cta" type="button">Become a member</button>';
+          '<p>Your wallet will create or unlock your Member Key and request its signed membership from Zenith.</p><button class="start-flow__cta" type="button">Join Castalia</button>';
         wireButton();
       }, 250);
   window.addEventListener(

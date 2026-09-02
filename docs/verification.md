@@ -1,6 +1,6 @@
 # Documentation verification
 
-Status: documentation verification contract for the issue #9 Castalia Control authority reconciliation, preserving the issue #1 boundary and issue #2 fixture implementation as provenance. Passing these checks validates repository documentation shape and bounded wording only; it is not live upstream-service, Dregg authority, deployment, or production evidence.
+Status: documentation verification contract for the Castalia Control authority reconciliation and Web membership-onboarding boundary, preserving issues #1, #2, and #9 as provenance. Passing these checks validates repository documentation shape and bounded wording only; it is not live upstream-service, admission, session, deployment, or production evidence.
 
 ## Run
 
@@ -15,16 +15,17 @@ pnpm verify
 
 ## What the script checks
 
-- required issue #1/#9 documents, including repository evidence and the Castalia Control authority boundary, exist;
+- required issue #1/#9 documents, including repository evidence, the Castalia Control authority boundary, and the membership-onboarding boundary, exist;
 - current fixture implementation wording and issue #2 merge provenance are present;
 - README Markdown links resolve to committed files;
 - the canonical route inventory appears in the product boundary;
 - Matrix, Castalia Control, infrastructure-provisioner, request/status, unavailable-forum, deferred-interpretation, precedence, and non-claim language is present;
+- membership onboarding documents the Control-issued challenge, independent BLAKE3/Ed25519 verification, verification-before-submission order, required server-side repeat verification, public deployment limitation, and migration boundary;
 - superseded separate-registry authority statements are absent from current README/product/authority surfaces;
 - no tracked document contains common secret/private-key markers or operator-private absolute paths; and
 - no tracked documentation links to a missing local file.
 
-The checks are intentionally conservative text guards. Reviewers must still inspect the complete diff and claim strength. A passing script does not prove Matrix access, Castalia Control availability, wallet proof, anchored Dregg authority, provisioning, UI behavior, AI behavior, deployment, or production readiness.
+The checks are intentionally conservative text guards. Reviewers must still inspect the complete diff and claim strength. A passing script does not prove Matrix access, Castalia Control availability, authoritative wallet-proof processing, replay consumption, admission, anchored Dregg authority, provisioning, deployment, or production readiness.
 
 ## Acceptance mapping
 

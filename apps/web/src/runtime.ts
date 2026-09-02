@@ -1,4 +1,5 @@
 import { landingView } from "./landing.js";
+import { chronicleView } from "./chronicle.js";
 import { navigation } from "./routes.js";
 import type { View } from "./dom.js";
 import { rfcCatalogView } from "./rfc-catalog.js";
@@ -7,7 +8,6 @@ import { docsView, notFoundView } from "./retained-views.js";
 import { tenderCatalogView, tenderViewerView } from "./tenders.js";
 import { deployedPath, routePath } from "./base-path.js";
 import {
-  prepareAdmissionRequest,
   startView,
   type StartFlowDependencies,
   type StartWalletProvider,
@@ -18,7 +18,16 @@ export type CastaliaApp = {
   destroy(): void;
 };
 
-type CastaliaAppOptions = Partial<StartFlowDependencies>;
+type CastaliaAppOptions = Partial<StartFlowDependencies> & {
+  /** @deprecated Permissionless Join no longer calls Control. */
+  controlBaseUrl?: string;
+  /** @deprecated Permissionless Join no longer calls Control. */
+  controlAudience?: string;
+  /** @deprecated Retained only so older embedders do not fail to compile. */
+  membershipServiceAvailable?: boolean;
+  /** @deprecated Retained only so older embedders do not fail to compile. */
+  completeOnboarding?: unknown;
+};
 
 declare global {
   interface Window {
@@ -32,6 +41,7 @@ function route(
 ): View {
   if (pathname === "/") return landingView();
   if (pathname === "/start") return startView(startDependencies);
+  if (pathname === "/chronicle") return chronicleView();
   if (pathname === "/tenders") return tenderCatalogView();
   if (pathname.startsWith("/tenders/"))
     return tenderViewerView(
@@ -94,7 +104,6 @@ export function mountCastaliaApp(
     walletInstallUrl: options.walletInstallUrl ?? "",
     getWalletProvider:
       options.getWalletProvider ?? (() => window.castaliaWallet),
-    prepareAdmission: options.prepareAdmission ?? prepareAdmissionRequest,
   };
 
   const render = () => {
@@ -114,7 +123,7 @@ export function mountCastaliaApp(
         : currentPath;
     for (const link of nav.querySelectorAll<HTMLAnchorElement>("a")) {
       if (
-        ["/docs", "/rfcs", "/tenders"].includes(navigationPath) &&
+        ["/chronicle", "/docs", "/rfcs", "/tenders"].includes(navigationPath) &&
         routePath(link.pathname) === navigationPath
       )
         link.setAttribute("aria-current", "page");

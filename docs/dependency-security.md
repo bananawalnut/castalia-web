@@ -4,7 +4,7 @@ Status: issue #11 remediation evidence. This document records the fail-closed ba
 
 ## Baseline
 
-Issue #11 branches from `origin/main` commit `6852185a0a07c1269a449eade5fcce57fa7380e3` and uses the repository-pinned Node `24.18.0` and pnpm `11.12.0` toolchain.
+Issue #11 branches from `origin/main` commit `6852185a0a07c1269a449eade5fcce57fa7380e3` and uses the repository-pinned Node `24.18.0` and pnpm `11.25.0` toolchain.
 
 Before remediation, `pnpm security:dependencies` exited `1` with:
 

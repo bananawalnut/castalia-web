@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "pnpm --filter @castalia/membership-contract build && pnpm --filter @castalia/membership-issuer build",
+  "outputDirectory": "apps/membership-issuer/dist",
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/v3/memberships",
+      "destination": "/api/memberships"
+    }
+  ]
+}

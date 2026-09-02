@@ -7,10 +7,20 @@ const allowed = new Set([
   "VITE_BFF_BASE_URL",
   "VITE_FIXTURE_MODE",
   "VITE_CASTALIA_WALLET_INSTALL_URL",
+  "VITE_CASTALIA_CONTROL_BASE_URL",
+  "VITE_CASTALIA_CONTROL_AUDIENCE",
 ]);
 const appEnvironments = new Set(["development", "test", "production"] as const);
 
-function canonicalOrigin(value: string): string {
+function hasAsciiControl(value: string): boolean {
+  for (let index = 0; index < value.length; index += 1) {
+    const code = value.charCodeAt(index);
+    if (code <= 0x1f || code === 0x7f) return true;
+  }
+  return false;
+}
+
+function canonicalOrigin(value: string, key: string): string {
   if (value === "") return value;
   try {
     const url = new URL(value);
@@ -22,8 +32,30 @@ function canonicalOrigin(value: string): string {
     )
       throw new Error();
   } catch {
-    throw new Error("VITE_BFF_BASE_URL must be a canonical origin");
+    throw new Error(`${key} must be a canonical origin`);
   }
+  return value;
+}
+
+function controlOrigin(value: string): string {
+  const origin = canonicalOrigin(value, "VITE_CASTALIA_CONTROL_BASE_URL");
+  if (origin === "") return origin;
+  const url = new URL(origin);
+  const loopback = new Set(["localhost", "127.0.0.1", "[::1]"]);
+  if (url.protocol !== "https:" && !loopback.has(url.hostname))
+    throw new Error(
+      "VITE_CASTALIA_CONTROL_BASE_URL must use HTTPS outside loopback",
+    );
+  return origin;
+}
+
+function controlAudience(value: string): string {
+  if (
+    value === "" ||
+    value !== value.normalize("NFC") ||
+    hasAsciiControl(value)
+  )
+    throw new Error("VITE_CASTALIA_CONTROL_AUDIENCE must be canonical");
   return value;
 }
 
@@ -50,14 +82,30 @@ export function loadBrowserEnv(input: Record<string, string | undefined>) {
   const appEnv = input.VITE_APP_ENV ?? "development";
   if (!appEnvironments.has(appEnv as "development" | "test" | "production"))
     throw new Error("VITE_APP_ENV must be development, test, or production");
-  if (input.VITE_FIXTURE_MODE !== "true")
-    throw new Error("VITE_FIXTURE_MODE must equal true");
+  const fixtureMode = input.VITE_FIXTURE_MODE === "true";
+  if (
+    input.VITE_FIXTURE_MODE !== undefined &&
+    input.VITE_FIXTURE_MODE !== "true" &&
+    input.VITE_FIXTURE_MODE !== "false"
+  )
+    throw new Error("VITE_FIXTURE_MODE must be true or false");
+  if (appEnv === "production" && fixtureMode)
+    throw new Error("VITE_FIXTURE_MODE must not be true in production");
+  if (appEnv !== "production" && !fixtureMode)
+    throw new Error("VITE_FIXTURE_MODE must equal true outside production");
   return {
     appEnv: appEnv as "development" | "test" | "production",
-    bffBaseUrl: canonicalOrigin(input.VITE_BFF_BASE_URL ?? ""),
+    bffBaseUrl: canonicalOrigin(
+      input.VITE_BFF_BASE_URL ?? "",
+      "VITE_BFF_BASE_URL",
+    ),
+    controlBaseUrl: controlOrigin(input.VITE_CASTALIA_CONTROL_BASE_URL ?? ""),
+    controlAudience: controlAudience(
+      input.VITE_CASTALIA_CONTROL_AUDIENCE ?? "castalia-control-local",
+    ),
     walletInstallUrl: walletInstallUrl(
       input.VITE_CASTALIA_WALLET_INSTALL_URL ?? "",
     ),
-    fixtureMode: true as const,
+    fixtureMode,
   };
 }

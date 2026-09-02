@@ -6,7 +6,7 @@ fail() {
   exit 1
 }
 
-required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/repository-evidence.md docs/verification.md docs/issue-16-rfc-feature-design.md docs/issue-16-rfc-feature-review.md docs/architecture/rfc-exchange.md docs/rfc-exchange-ux-journeys.md docs/rfc-exchange-wireframes.md docs/rfc-exchange-copy-accessibility.md docs/rfc-exchange-usability-fixtures.md'
+required='README.md docs/product-boundary.md docs/authority-and-claims.md docs/community-registry-authority.md docs/castalia-control-authority.md docs/membership-onboarding.md docs/castaway-portable-vault.md docs/repository-evidence.md docs/verification.md docs/issue-16-rfc-feature-design.md docs/issue-16-rfc-feature-review.md docs/architecture/rfc-exchange.md docs/rfc-exchange-ux-journeys.md docs/rfc-exchange-wireframes.md docs/rfc-exchange-copy-accessibility.md docs/rfc-exchange-usability-fixtures.md'
 for file in $required; do
   test -f "$file" || fail "missing required file: $file"
 done
@@ -15,7 +15,7 @@ for phrase in 'C4 system context' 'C4 containers and components' 'Artifact graph
   grep -Fiq "$phrase" docs/architecture/rfc-exchange.md || fail "missing RFC exchange architecture contract phrase: $phrase"
 done
 
-for route in '/' '/tenders' '/tenders/:tenderId' '/rfcs' '/rfcs/:rfcId' '/docs'; do
+for route in '/' '/chronicle' '/tenders' '/tenders/:tenderId' '/rfcs' '/rfcs/:rfcId' '/docs'; do
   grep -Fq "\`$route\`" docs/product-boundary.md || fail "missing canonical route: $route"
 done
 
@@ -29,6 +29,10 @@ done
 
 for phrase in 'Castalia Control' 'authorization decisions' 'challenge and replay policy' 'syndicate admission' 'infrastructure provisioner' 'Matrix remains canonical' 'fixture issuer' 'anchored authority'; do
   grep -Fiq "$phrase" docs/castalia-control-authority.md || fail "missing Castalia Control authority phrase: $phrase"
+done
+
+for phrase in 'Zenith-signed' 'Wallet' 'Dregg permissionless v2' 'Ed25519' 'membership issuance' 'deterministic public credential' 'No part of Join issues' 'Control' 'compatibility'; do
+  grep -Fiq "$phrase" docs/membership-onboarding.md || fail "missing membership-onboarding boundary phrase: $phrase"
 done
 
 for phrase in 'ZenithResearch/castalia-web' 'Rust/Dregg Castalia' 'duplicate guard' 'b6452489a78b2f4c004bbe44f47fc38d5bff62e8' 'issue #1' 'docs/issue-1-boundaries' 'pull request #3' 'Non-claims'; do
