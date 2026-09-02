@@ -43,7 +43,7 @@ describe("browser environment", () => {
       }).fixtureMode,
     ).toBe(true);
   });
-  it.each(["development", "test", "production"])(
+  it.each(["development", "test"])(
     "accepts the %s application environment",
     (appEnv) => {
       expect(
@@ -54,6 +54,19 @@ describe("browser environment", () => {
       ).toBe(appEnv);
     },
   );
+  it("accepts production only without fixture mode", () => {
+    const env = loadBrowserEnv({ VITE_APP_ENV: "production" });
+    expect(env.appEnv).toBe("production");
+    expect(env.fixtureMode).toBe(false);
+  });
+  it("rejects fixture trust in production", () => {
+    expect(() =>
+      loadBrowserEnv({
+        VITE_APP_ENV: "production",
+        VITE_FIXTURE_MODE: "true",
+      }),
+    ).toThrow("must not be true in production");
+  });
   it.each([
     [{ VITE_APP_ENV: "test", VITE_FIXTURE_MODE: "false" }, "VITE_FIXTURE_MODE"],
     [

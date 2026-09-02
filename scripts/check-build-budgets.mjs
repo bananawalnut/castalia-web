@@ -70,7 +70,7 @@ const webMs = await run(
     "--emptyOutDir",
   ],
   limit.webMs,
-  { VITE_APP_ENV: "production", VITE_FIXTURE_MODE: "true" },
+  { VITE_APP_ENV: "test", VITE_FIXTURE_MODE: "true" },
 );
 const bffMs = await run(
   "BFF build",

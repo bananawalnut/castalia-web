@@ -82,8 +82,17 @@ export function loadBrowserEnv(input: Record<string, string | undefined>) {
   const appEnv = input.VITE_APP_ENV ?? "development";
   if (!appEnvironments.has(appEnv as "development" | "test" | "production"))
     throw new Error("VITE_APP_ENV must be development, test, or production");
-  if (input.VITE_FIXTURE_MODE !== "true")
-    throw new Error("VITE_FIXTURE_MODE must equal true");
+  const fixtureMode = input.VITE_FIXTURE_MODE === "true";
+  if (
+    input.VITE_FIXTURE_MODE !== undefined &&
+    input.VITE_FIXTURE_MODE !== "true" &&
+    input.VITE_FIXTURE_MODE !== "false"
+  )
+    throw new Error("VITE_FIXTURE_MODE must be true or false");
+  if (appEnv === "production" && fixtureMode)
+    throw new Error("VITE_FIXTURE_MODE must not be true in production");
+  if (appEnv !== "production" && !fixtureMode)
+    throw new Error("VITE_FIXTURE_MODE must equal true outside production");
   return {
     appEnv: appEnv as "development" | "test" | "production",
     bffBaseUrl: canonicalOrigin(
@@ -97,6 +106,6 @@ export function loadBrowserEnv(input: Record<string, string | undefined>) {
     walletInstallUrl: walletInstallUrl(
       input.VITE_CASTALIA_WALLET_INSTALL_URL ?? "",
     ),
-    fixtureMode: true as const,
+    fixtureMode,
   };
 }

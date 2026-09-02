@@ -2,7 +2,11 @@
   width: min(100%, 84rem);
   margin: 0 auto;
   padding: clamp(3rem, 8vw, 7rem) clamp(1.25rem, 6vw, 6rem) 7rem;
-  color: var(--castalia-ink, #071d49);
+  color: var(--castalia-paper, #fffdf5);
+}
+
+.chronicle-article a {
+  color: var(--castalia-paper, #fffdf5);
 }
 
 .chronicle-article__header {

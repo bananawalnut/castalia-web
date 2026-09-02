@@ -68,8 +68,29 @@ jobs:
           cargo install wasm-pack --version 0.14.0 --locked
       - run: pnpm install --frozen-lockfile
       - run: pnpm budgets:build
+      - name: Require reviewed production issuer trust
+        env:
+          ISSUER_KEY_ID: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_KEY_ID }}
+          ISSUER_PUBLIC_KEY: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_PUBLIC_KEY }}
+        run: |
+          test -n "$ISSUER_KEY_ID"
+          test -n "$ISSUER_PUBLIC_KEY"
+      - name: Build production Web artifact
+        env:
+          VITE_APP_ENV: production
+          CASTALIA_ZENITH_ISSUER_KEY_ID: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_KEY_ID }}
+          CASTALIA_ZENITH_ISSUER_PUBLIC_KEY: ${{ vars.CASTALIA_ZENITH_MEMBERSHIP_ISSUER_PUBLIC_KEY }}
+        run: pnpm --filter @castalia/web build
+      - name: Add static route entries
+        run: pnpm exec tsx scripts/generate-pages-route-entries.ts apps/web/dist
       - run: pnpm security:bundle
       - run: pnpm budgets:startup
+      - name: Upload production Web artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: castalia-web-production-${{ github.sha }}
+          path: apps/web/dist
+          if-no-files-found: error
   browser-a11y:
     name: browser-a11y
     runs-on: ubuntu-latest
