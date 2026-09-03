@@ -4,8 +4,12 @@ import {
   ZENITH_MEMBERSHIP_PROTOCOL,
   verifyZenithMembershipCredential,
   type ZenithMembershipCredentialV3,
-  type ZenithMembershipTrustPolicyV1,
 } from "@castalia/membership-contract";
+import { ZENITH_MEMBERSHIP_TRUST_POLICY } from "./membership/trust-policy.js";
+import {
+  createWebWalletPanel,
+  type WebWalletPanel,
+} from "./wallet/web-wallet-panel.js";
 
 export type StartMembershipSummary = ZenithMembershipCredentialV3;
 
@@ -17,21 +21,9 @@ export type StartWalletProvider = CastaliaWalletProvider & {
 
 export type StartFlowDependencies = {
   walletInstallUrl: string;
+  membershipIssuerUrl: string;
   getWalletProvider(): StartWalletProvider | undefined;
 };
-
-const trustPolicy = {
-  schema: "castalia.zenith-membership-trust-policy.v1",
-  version: 1,
-  roots: [
-    {
-      issuerId: "zenith-research",
-      keyId: __CASTALIA_ZENITH_ISSUER_KEY_ID__,
-      signatureSuite: "Ed25519",
-      publicKey: __CASTALIA_ZENITH_ISSUER_PUBLIC_KEY__,
-    },
-  ],
-} satisfies ZenithMembershipTrustPolicyV1;
 
 function supportsZenithIssuedJoin(
   provider: StartWalletProvider | undefined,
@@ -66,34 +58,45 @@ export async function membershipFromReadyDetail(
   if (typeof membership !== "object" || membership === null) {
     throw new Error("Wallet readiness event did not contain a membership");
   }
-  return verifyZenithMembershipCredential(membership, trustPolicy);
+  return verifyZenithMembershipCredential(
+    membership,
+    ZENITH_MEMBERSHIP_TRUST_POLICY,
+  );
 }
 
 export function startView(dependencies: StartFlowDependencies): View {
   let provider = dependencies.getWalletProvider();
   const walletUpdateRequired = provider && !supportsZenithIssuedJoin(provider);
-  const action = walletUpdateRequired
+  const extensionAction = walletUpdateRequired
     ? '<p class="start-flow__unavailable" role="status">Wallet update required. Reload the unpacked Castalia Wallet extension, then refresh this page.</p>'
     : provider
-      ? '<button class="start-flow__cta" type="button">Join Castalia</button>'
+      ? '<button class="start-flow__cta" data-extension-wallet type="button">Join with extension</button>'
       : dependencies.walletInstallUrl
-        ? `<a class="start-flow__cta" href="${escapeHtml(dependencies.walletInstallUrl)}" rel="noreferrer">Join now</a>`
+        ? `<a class="start-flow__secondary" href="${escapeHtml(dependencies.walletInstallUrl)}" rel="noreferrer">Install the extension</a>`
         : '<p class="start-flow__unavailable" role="status">Wallet installer not configured.</p>';
+  const action = `${extensionAction}<button class="start-flow__cta" data-web-wallet type="button">Use this browser</button>`;
   const explanation = walletUpdateRequired
     ? "This Wallet build predates Zenith-issued membership v3."
     : provider
       ? "Your wallet will create or unlock your Member Key and request its signed membership from Zenith."
-      : "Install the Castalia wallet to create your private identity.";
+      : "Create an encrypted wallet in this browser, or install the extension for desktop custody.";
   const element = elementFromHtml(
-    `<article class="start-flow"><p class="start-flow__eyebrow">Castalia</p><h1>Start</h1><p class="start-flow__lede">Membership begins with a private wallet and a signed request you control.</p><section class="start-flow__step" aria-labelledby="membership-heading"><p class="start-flow__number">01</p><div><h2 id="membership-heading">Become a member</h2><div class="start-flow__action"><p>${explanation}</p>${action}</div></div></section><p class="start-flow__result" role="status" aria-label="Membership request status" hidden></p><section class="start-flow__activity" aria-labelledby="activity-heading"><h2 id="activity-heading">Activity</h2><div role="log" aria-label="Wallet activity" aria-live="polite" aria-relevant="additions"><ol></ol></div></section></article>`,
+    `<article class="start-flow"><p class="start-flow__eyebrow">Castalia</p><h1>Start</h1><p class="start-flow__lede">Membership begins with a private wallet and a signed request you control.</p><section class="start-flow__step" aria-labelledby="membership-heading"><p class="start-flow__number">01</p><div><h2 id="membership-heading">Become a member</h2><div class="start-flow__action"><p>${explanation}</p>${action}</div></div></section><div class="start-flow__web-wallet" hidden></div><p class="start-flow__result" role="status" aria-label="Membership request status" hidden></p><section class="start-flow__activity" aria-labelledby="activity-heading"><h2 id="activity-heading">Activity</h2><div role="log" aria-label="Wallet activity" aria-live="polite" aria-relevant="additions"><ol></ol></div></section></article>`,
   );
   const result = element.querySelector<HTMLParagraphElement>(
     ".start-flow__result",
   );
   const activity = element.querySelector<HTMLOListElement>('[role="log"] ol');
   let button = element.querySelector<HTMLButtonElement>(
-    "button.start-flow__cta",
+    "button[data-extension-wallet]",
   );
+  let webButton = element.querySelector<HTMLButtonElement>(
+    "button[data-web-wallet]",
+  );
+  const webWalletHost = element.querySelector<HTMLElement>(
+    ".start-flow__web-wallet",
+  );
+  let webWalletPanel: WebWalletPanel | undefined;
   let awaitingWallet = false;
   let onboardingRunning = false;
   let membershipIssued = false;
@@ -194,14 +197,42 @@ export function startView(dependencies: StartFlowDependencies): View {
   };
 
   const wireButton = () => {
-    button = element.querySelector<HTMLButtonElement>("button.start-flow__cta");
+    button = element.querySelector<HTMLButtonElement>(
+      "button[data-extension-wallet]",
+    );
     button?.addEventListener("click", onOpenClick);
+    webButton = element.querySelector<HTMLButtonElement>(
+      "button[data-web-wallet]",
+    );
+    webButton?.addEventListener("click", onWebWalletClick);
   };
   const onOpenClick = () => {
     void onOpen();
   };
   const onReadyEvent = (event: Event) => {
     void onReady(event);
+  };
+  const onWebWalletClick = () => {
+    if (!webWalletHost || webWalletPanel) return;
+    webWalletHost.hidden = false;
+    webWalletPanel = createWebWalletPanel({
+      issuerOrigin: dependencies.membershipIssuerUrl,
+      onMembership(membership) {
+        void membershipFromReadyDetail({ membership })
+          .then((verified) => {
+            if (!verified || !result) return;
+            membershipIssued = true;
+            result.hidden = false;
+            result.textContent =
+              "Castalia membership is Active for this browser wallet.";
+            appendActivity("Browser wallet membership verified Active.");
+          })
+          .catch((error: unknown) => showFailure(error, true));
+      },
+    });
+    webWalletHost.replaceChildren(webWalletPanel.element);
+    webWalletHost.scrollIntoView({ behavior: "smooth", block: "start" });
+    appendActivity("Browser-owned encrypted wallet opened.");
   };
   wireButton();
   const providerTimer = provider
@@ -223,7 +254,7 @@ export function startView(dependencies: StartFlowDependencies): View {
         }
         appendActivity("Wallet extension detected.");
         actionContainer.innerHTML =
-          '<p>Your wallet will create or unlock your Member Key and request its signed membership from Zenith.</p><button class="start-flow__cta" type="button">Join Castalia</button>';
+          '<p>Your wallet will create or unlock your Member Key and request its signed membership from Zenith.</p><button class="start-flow__cta" data-extension-wallet type="button">Join with extension</button><button class="start-flow__secondary" data-web-wallet type="button">Use this browser</button>';
         wireButton();
       }, 250);
   window.addEventListener(
@@ -234,6 +265,8 @@ export function startView(dependencies: StartFlowDependencies): View {
     element,
     destroy() {
       button?.removeEventListener("click", onOpenClick);
+      webButton?.removeEventListener("click", onWebWalletClick);
+      webWalletPanel?.destroy();
       if (providerTimer !== undefined) window.clearInterval(providerTimer);
       window.removeEventListener(
         "castalia:wallet:membership-flow-ready",

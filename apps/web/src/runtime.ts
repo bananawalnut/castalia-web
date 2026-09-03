@@ -102,6 +102,8 @@ export function mountCastaliaApp(
   let currentView: View | undefined;
   const startDependencies: StartFlowDependencies = {
     walletInstallUrl: options.walletInstallUrl ?? "",
+    membershipIssuerUrl:
+      options.membershipIssuerUrl ?? "https://membership.zenith-research.ca",
     getWalletProvider:
       options.getWalletProvider ?? (() => window.castaliaWallet),
   };

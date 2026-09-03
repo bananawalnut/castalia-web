@@ -132,14 +132,19 @@ describe("vanilla Castalia shell", () => {
     app.navigate("/start");
     expect(root.querySelector("h1")?.textContent).toBe("Start");
     expect(
-      root.querySelector<HTMLAnchorElement>(".start-flow__cta")?.textContent,
-    ).toBe("Join now");
+      root.querySelector<HTMLAnchorElement>(".start-flow__secondary")
+        ?.textContent,
+    ).toBe("Install the extension");
+    expect(
+      root.querySelector<HTMLButtonElement>("button[data-web-wallet]")
+        ?.textContent,
+    ).toBe("Use this browser");
     providerState.current = provider;
     await vi.waitFor(() => {
       expect(
-        root.querySelector<HTMLButtonElement>("button.start-flow__cta")
+        root.querySelector<HTMLButtonElement>("button[data-extension-wallet]")
           ?.textContent,
-      ).toBe("Join Castalia");
+      ).toBe("Join with extension");
     });
     app.destroy();
 
@@ -148,8 +153,9 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     installedApp.navigate("/start");
-    const becomeMember =
-      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    const becomeMember = root.querySelector<HTMLButtonElement>(
+      "button[data-extension-wallet]",
+    );
     if (!becomeMember) throw new Error("missing Join Castalia button");
     window.dispatchEvent(
       new CustomEvent("castalia:wallet:membership-flow-ready"),
@@ -214,7 +220,8 @@ describe("vanilla Castalia shell", () => {
 
     app.navigate("/start");
 
-    expect(root.querySelector("button.start-flow__cta")).toBeNull();
+    expect(root.querySelector("button[data-extension-wallet]")).toBeNull();
+    expect(root.querySelector("button[data-web-wallet]")).not.toBeNull();
     expect(root.querySelector('[role="status"]')?.textContent).toContain(
       "Wallet update required",
     );
@@ -249,7 +256,9 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     app.navigate("/start");
-    const button = root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    const button = root.querySelector<HTMLButtonElement>(
+      "button[data-extension-wallet]",
+    );
     if (!button) throw new Error("missing Join Castalia button");
     click(button);
     await vi.waitFor(() => {
@@ -289,8 +298,9 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     app.navigate("/start");
-    const becomeMember =
-      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    const becomeMember = root.querySelector<HTMLButtonElement>(
+      "button[data-extension-wallet]",
+    );
     if (!becomeMember) throw new Error("missing Join Castalia button");
     click(becomeMember);
     await vi.waitFor(() => {
@@ -339,8 +349,9 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     app.navigate("/start");
-    const becomeMember =
-      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    const becomeMember = root.querySelector<HTMLButtonElement>(
+      "button[data-extension-wallet]",
+    );
     if (!becomeMember) throw new Error("missing Join Castalia button");
     click(becomeMember);
     await vi.waitFor(() => {
@@ -381,8 +392,9 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     app.navigate("/start");
-    const becomeMember =
-      root.querySelector<HTMLButtonElement>(".start-flow__cta");
+    const becomeMember = root.querySelector<HTMLButtonElement>(
+      "button[data-extension-wallet]",
+    );
     if (!becomeMember) throw new Error("missing Join Castalia button");
     click(becomeMember);
     await vi.waitFor(() => {

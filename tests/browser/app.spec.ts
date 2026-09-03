@@ -151,7 +151,7 @@ test("Start reports success only after Wallet hands off verified Active membersh
     ),
   ).toEqual([]);
 
-  await page.getByRole("button", { name: "Join Castalia" }).click();
+  await page.getByRole("button", { name: "Join with extension" }).click();
   await expect(
     page.getByRole("status", { name: "Membership request status" }),
   ).toHaveText("Castalia membership is Active for this Member Key.");

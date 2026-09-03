@@ -7,6 +7,7 @@ const allowed = new Set([
   "VITE_BFF_BASE_URL",
   "VITE_FIXTURE_MODE",
   "VITE_CASTALIA_WALLET_INSTALL_URL",
+  "VITE_CASTALIA_MEMBERSHIP_ISSUER_URL",
   "VITE_CASTALIA_CONTROL_BASE_URL",
   "VITE_CASTALIA_CONTROL_AUDIENCE",
 ]);
@@ -105,6 +106,10 @@ export function loadBrowserEnv(input: Record<string, string | undefined>) {
     ),
     walletInstallUrl: walletInstallUrl(
       input.VITE_CASTALIA_WALLET_INSTALL_URL ?? "",
+    ),
+    membershipIssuerUrl: controlOrigin(
+      input.VITE_CASTALIA_MEMBERSHIP_ISSUER_URL ??
+        "https://membership.zenith-research.ca",
     ),
     fixtureMode,
   };

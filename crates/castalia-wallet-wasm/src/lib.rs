@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 
+mod custody;
+pub use custody::*;
+
 const VERSION: &str = "castalia.wallet-onboarding.v1";
 const OPERATION: &str = "authenticate";
 const MEMBERSHIP_PRESENTATION_SCHEMA: &str = "castalia.wallet-membership-presentation.v2";

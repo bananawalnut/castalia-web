@@ -8,7 +8,7 @@ The canonical design contract is maintained by Castalia Wallet in `docs/castaway
 
 ## Web boundary
 
-Castalia Web may explain the format and request individually approved public projections from a compatible Wallet. It must not:
+Castalia Web may explain the format and request individually approved public projections from a compatible Wallet. Its mobile wallet may store a narrow `.castalia-recovery` signing-authority container, but it must not:
 
 - receive or decrypt a `.castaway` vault;
 - treat possession of a vault as Castalia membership or sign-in;

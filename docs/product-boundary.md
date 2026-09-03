@@ -16,9 +16,9 @@ Under current evidence, the Zenith forum posture remains **visible unavailable**
 
 ## Current fixture implementation
 
-Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment delegates Member Key custody and possession proof to Wallet, uses a stateless Zenith signer for deterministic v3 membership credentials, and independently verifies the exact public credential in Web. Dregg permissionless v2 remains dormant compatibility. There is no application, pending review, Control admission step, cookie, or Web session.
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment offers extension custody and encrypted browser custody, uses a stateless Zenith signer for deterministic v3 membership credentials, and independently verifies the exact public credential in Web. Browser custody is the mobile path and stores encrypted signing authority in IndexedDB; it does not create an account or session. Dregg permissionless v2 remains dormant compatibility. There is no application, pending review, Control admission step, cookie, or Web session.
 
-The static public Pages site can detect an installed Wallet, but a complete Join also requires that Wallet's configured Castalia Dregg node to be reachable. The current acceptance composition uses loopback and is not a public production-node deployment claim. The app performs no Matrix operation, provisioning, authenticated session issuance, or production operation.
+The static public site can detect an installed Wallet or open its first-party browser wallet, but a complete Join requires the configured HTTPS Zenith issuer to be reachable. Browser custody additionally requires IndexedDB, Web Workers, WebAssembly, and secure random support. The app performs no Matrix operation, provisioning, authenticated session issuance, or Dregg node operation.
 
 ## Canonical routes and navigation
 
