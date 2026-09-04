@@ -18,7 +18,6 @@ import {
   type WebWalletSession,
 } from "./wallet/web-wallet-session.js";
 import { ZENITH_MEMBERSHIP_TRUST_POLICY } from "./membership/trust-policy.js";
-import { verifyZenithMembershipCredential } from "@castalia/membership-contract";
 import { createIndexedDbWebWalletStorage } from "./wallet/web-wallet-storage.js";
 
 export type CastaliaApp = {
@@ -51,9 +50,13 @@ function route(
 ): View {
   if (pathname === "/") return landingView();
   if (pathname === "/start") return startView(startDependencies);
-  if (pathname === "/profile" && profileDependencies)
+  if (
+    (pathname === "/my-castalia" || pathname === "/profile") &&
+    profileDependencies
+  )
     return profileView(profileDependencies);
-  if (pathname === "/profile") return notFoundView();
+  if (pathname === "/my-castalia" || pathname === "/profile")
+    return notFoundView();
   if (pathname === "/chronicle") return chronicleView();
   if (pathname === "/tenders") return tenderCatalogView();
   if (pathname.startsWith("/tenders/"))
@@ -138,45 +141,37 @@ export function mountCastaliaApp(
   let accountRefresh = 0;
   const refreshAccountLink = async () => {
     const refresh = ++accountRefresh;
-    let member = false;
+    let keypairAvailable = false;
     try {
       if (webWalletSession)
-        member = Boolean((await webWalletSession.snapshot()).membership);
+        keypairAvailable = Boolean(
+          (await webWalletSession.snapshot()).identity,
+        );
       else if (webWalletStorage) {
         const stored = await webWalletStorage.load();
-        if (stored?.membership) {
-          await verifyZenithMembershipCredential(
-            stored.membership,
-            ZENITH_MEMBERSHIP_TRUST_POLICY,
-            stored.identity.ownerPublicKey,
-          );
-          member = true;
-        }
+        keypairAvailable = Boolean(stored?.identity);
       }
-      if (!member) {
+      if (!keypairAvailable) {
         const provider = options.getWalletProvider?.() ?? window.castaliaWallet;
-        if (provider && typeof provider.getSubject === "function") {
-          const [membership, subject] = await Promise.all([
-            provider.getMembership(),
-            provider.getSubject(),
-          ]);
-          const verified = await verifyZenithMembershipCredential(
-            membership,
-            ZENITH_MEMBERSHIP_TRUST_POLICY,
-          );
-          member = verified.ownerPublicKey === subject.dreggOwnerPublicKey;
+        if (provider) {
+          const status = await provider.getStatus();
+          keypairAvailable =
+            status.state === "ready" || Boolean(status.publicIdentity);
         }
       }
     } catch {
-      member = false;
+      keypairAvailable = false;
     }
     if (refresh !== accountRefresh || !accountLink) return;
-    accountLink.textContent = member ? "Profile" : "Join";
-    accountLink.href = deployedPath(member ? "/profile" : "/start");
+    accountLink.textContent = keypairAvailable ? "My Castalia" : "Join";
+    accountLink.href = deployedPath(
+      keypairAvailable ? "/my-castalia" : "/start",
+    );
     const currentPath = routePath(window.location.pathname);
     if (
-      (member && currentPath === "/profile") ||
-      (!member && currentPath === "/start")
+      (keypairAvailable &&
+        (currentPath === "/my-castalia" || currentPath === "/profile")) ||
+      (!keypairAvailable && currentPath === "/start")
     )
       accountLink.setAttribute("aria-current", "page");
     else accountLink.removeAttribute("aria-current");
@@ -196,7 +191,9 @@ export function mountCastaliaApp(
     currentView?.destroy?.();
     const currentPath = routePath(window.location.pathname);
     const currentSession =
-      currentPath === "/start" || currentPath === "/profile"
+      currentPath === "/start" ||
+      currentPath === "/my-castalia" ||
+      currentPath === "/profile"
         ? ensureWebWalletSession()
         : webWalletSession;
     const profileDependencies: ProfileDependencies | null = currentSession
@@ -235,6 +232,7 @@ export function mountCastaliaApp(
           "/rfcs",
           "/tenders",
           "/start",
+          "/my-castalia",
           "/profile",
         ].includes(navigationPath) &&
         routePath(link.pathname) === navigationPath
@@ -288,6 +286,19 @@ export function mountCastaliaApp(
     if (document.visibilityState !== "hidden" || !webWalletSession) return;
     void webWalletSession.lock().then(refreshAccountLink, () => undefined);
   };
+  let providerTimer: number | undefined;
+  if (!(options.getWalletProvider?.() ?? window.castaliaWallet)) {
+    providerTimer = window.setInterval(() => {
+      const detected = options.getWalletProvider?.() ?? window.castaliaWallet;
+      if (!detected) return;
+      if (providerTimer !== undefined) window.clearInterval(providerTimer);
+      providerTimer = undefined;
+      const currentPath = routePath(window.location.pathname);
+      if (currentPath === "/my-castalia" || currentPath === "/profile")
+        render();
+      else void refreshAccountLink();
+    }, 250);
+  }
   document.addEventListener("visibilitychange", onVisibility);
   render();
 
@@ -298,6 +309,7 @@ export function mountCastaliaApp(
       root.removeEventListener("click", onClick);
       window.removeEventListener("popstate", onPopState);
       document.removeEventListener("visibilitychange", onVisibility);
+      if (providerTimer !== undefined) window.clearInterval(providerTimer);
       if (ownsWebWalletSession) webWalletSession?.destroy();
       root.replaceChildren();
     },

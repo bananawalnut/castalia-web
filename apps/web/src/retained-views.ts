@@ -28,9 +28,9 @@ const navigationDestinations = [
   ],
   ["Docs", "/docs", "Implemented reference page."],
   [
-    "Profile",
-    "/profile",
-    "Private browser-wallet identity editor; claims are encrypted and disclosure is explicit.",
+    "My Castalia",
+    "/my-castalia",
+    "Keypair-owned personal home and private browser-wallet identity editor; claims are encrypted and disclosure is explicit.",
   ],
 ] as const;
 
@@ -47,7 +47,7 @@ export function docsView(): View {
     .join("");
 
   return view(
-    `<article class="docs-hub"><header class="docs-hub__header"><p class="docs-hub__eyebrow">Castalia reference</p><h1>Documentation</h1><p>Landing, Chronicle, Tenders, RFCs, Docs, Join, and the private browser-wallet Profile are implemented surfaces.</p></header><section id="surfaces" class="docs-hub__section" aria-labelledby="surfaces-heading"><div class="docs-hub__section-heading"><h2 id="surfaces-heading">Navigation map</h2><span>${String(navigationDestinations.length)} destinations</span></div><div class="docs-hub__table" role="table" aria-label="Navigation destinations"><div class="docs-hub__table-head" role="row"><span role="columnheader">Label</span><span role="columnheader">Route</span><span role="columnheader">Status</span></div>${rows}</div></section><section id="boundaries" class="docs-hub__section" aria-labelledby="boundaries-heading"><div class="docs-hub__section-heading"><h2 id="boundaries-heading">Current boundary</h2></div><ul class="docs-hub__boundaries"><li>Chronicle is a checked-in read-only essay; Merch remains a navigation placeholder and the standalone Proposals route is removed.</li><li>The browser wallet stores private profile claims in an encrypted .castaway identity section. Claims leave only through an explicit selected-claims download; no profile synchronization or publication is connected.</li><li>Proposal documents use RFC identifiers, revisions, viewers, and a Proposal kind in the RFC catalog.</li><li>Tenders are read-only contract opportunities. A bid is an offer; no bid submission, award decision, contract, payment, or remote operation is connected.</li><li>The RFC and Tender registries read checked-in fixtures only; publication and comment submission remain unavailable.</li><li>Unknown, removed, and placeholder routes use the retained not-found surface.</li></ul></section></article>`,
+    `<article class="docs-hub"><header class="docs-hub__header"><p class="docs-hub__eyebrow">Castalia reference</p><h1>Documentation</h1><p>Landing, Chronicle, Tenders, RFCs, Docs, Join, and the keypair-owned My Castalia home are implemented surfaces.</p></header><section id="surfaces" class="docs-hub__section" aria-labelledby="surfaces-heading"><div class="docs-hub__section-heading"><h2 id="surfaces-heading">Navigation map</h2><span>${String(navigationDestinations.length)} destinations</span></div><div class="docs-hub__table" role="table" aria-label="Navigation destinations"><div class="docs-hub__table-head" role="row"><span role="columnheader">Label</span><span role="columnheader">Route</span><span role="columnheader">Status</span></div>${rows}</div></section><section id="boundaries" class="docs-hub__section" aria-labelledby="boundaries-heading"><div class="docs-hub__section-heading"><h2 id="boundaries-heading">Current boundary</h2></div><ul class="docs-hub__boundaries"><li>Chronicle is a checked-in read-only essay; Merch remains a navigation placeholder and the standalone Proposals route is removed.</li><li>A usable keypair changes Join to My Castalia; membership issuance remains a separate status. The browser wallet stores private profile claims in an encrypted .castaway identity section. Claims leave only through an explicit selected-claims download; no profile synchronization or publication is connected.</li><li>Proposal documents use RFC identifiers, revisions, viewers, and a Proposal kind in the RFC catalog.</li><li>Tenders are read-only contract opportunities. A bid is an offer; no bid submission, award decision, contract, payment, or remote operation is connected.</li><li>The RFC and Tender registries read checked-in fixtures only; publication and comment submission remain unavailable.</li><li>Unknown, removed, and placeholder routes use the retained not-found surface.</li></ul></section></article>`,
   );
 }
 

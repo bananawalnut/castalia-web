@@ -26,6 +26,7 @@ The route inventory is:
 
 - `/`
 - `/start`
+- `/my-castalia`
 - `/profile`
 - `/chronicle`
 - `/tenders`
@@ -34,7 +35,7 @@ The route inventory is:
 - `/rfcs/:rfcId`
 - `/docs`
 
-The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), **Docs** (`/docs`), and a membership-aware action. That action is **Join** (`/start`) before membership and **Profile** (`/profile`) after a verified local or extension membership is detected. Chronicle, Tenders, RFC, and Docs are implemented fixture destinations; Merch remains a visible placeholder. Chronicle publishes a checked-in read-only essay about portable data, not a remote publication system. The landing **Start** action opens `/start`; Join requires a compatible Wallet and its configured Zenith issuer. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
+The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), **Docs** (`/docs`), and a keypair-aware action. That action is **Join** (`/start`) before a usable local or extension keypair is detected and **My Castalia** (`/my-castalia`) afterward, whether or not membership has been issued. `/profile` remains a compatibility route to the same view. My Castalia presents an early-Web-style private personal home and, for the browser wallet, an encrypted identity editor; it is not a server account or published profile. Chronicle, Tenders, RFC, and Docs are implemented fixture destinations; Merch remains a visible placeholder. Chronicle publishes a checked-in read-only essay about portable data, not a remote publication system. The landing **Start** action opens `/start`; Join requires a compatible Wallet and its configured Zenith issuer. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
 
 These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or Castalia Control integration, authentication, provisioning, deployment, or production readiness.
 

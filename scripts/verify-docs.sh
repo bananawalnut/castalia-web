@@ -15,7 +15,7 @@ for phrase in 'C4 system context' 'C4 containers and components' 'Artifact graph
   grep -Fiq "$phrase" docs/architecture/rfc-exchange.md || fail "missing RFC exchange architecture contract phrase: $phrase"
 done
 
-for route in '/' '/start' '/profile' '/chronicle' '/tenders' '/tenders/:tenderId' '/rfcs' '/rfcs/:rfcId' '/docs'; do
+for route in '/' '/start' '/my-castalia' '/profile' '/chronicle' '/tenders' '/tenders/:tenderId' '/rfcs' '/rfcs/:rfcId' '/docs'; do
   grep -Fq "\`$route\`" docs/product-boundary.md || fail "missing canonical route: $route"
 done
 

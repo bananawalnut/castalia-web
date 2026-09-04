@@ -17,7 +17,7 @@ Private operations run in a dedicated Web Worker backed by `crates/castalia-wall
 
 The encrypted container uses NFC-normalized passphrase input, Argon2id with 64 MiB memory and three iterations, and AES-256-GCM with the canonical header as associated data. The passphrase encrypts the random identity root; it does not derive the identity.
 
-The unlocked root lives only in Worker memory. Same-origin in-app navigation retains the unlocked Worker so a member can move from Join to Profile; hiding the page locks it, and a later visit requires the passphrase again. Browser storage is not hardware-backed custody and must not be presented as suitable for high-value authority.
+The unlocked root lives only in Worker memory. Same-origin in-app navigation retains the unlocked Worker so a person can move from Join to My Castalia; hiding the page locks it, and a later visit requires the passphrase again. Browser storage is not hardware-backed custody and must not be presented as suitable for high-value authority.
 
 ## Recovery
 
@@ -27,7 +27,7 @@ The member may also download `.castalia-recovery`, an independently randomized e
 
 ## Private profile and Castaway
 
-An Active browser-wallet member can open `/profile`. The profile defaults to the Zenith Ontology `Person` type, with optional Author, Researcher, and Student roles plus structured academic-institution and journal relationships. Academic Institution is modeled as an organization affiliation, not as a kind of Person.
+A browser wallet with a usable keypair can open canonical `/my-castalia`; membership is not required, and `/profile` remains a compatibility route to the same view. My Castalia presents the identity as an early-Web-style private personal homepage plus a private editor. The profile defaults to the Zenith Ontology `Person` type, with optional Author, Researcher, and Student roles plus structured academic-institution and journal relationships. Academic Institution is modeled as an organization affiliation, not as a kind of Person. An extension keypair also changes the primary action to My Castalia, although extension-backed editing remains unavailable until the extension exposes its encrypted identity section to the site.
 
 The Rust/WASM Worker seals the validated identity section with a root-derived, domain-separated AES-256-GCM key before IndexedDB persistence. Portable `.castaway` export uses an independent member-chosen passphrase, Argon2id, and fresh encryption randomness. Import requires an unlocked wallet with the same Member Key and rejects unknown sections rather than losing data.
 

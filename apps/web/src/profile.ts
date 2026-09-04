@@ -104,6 +104,92 @@ function journalView(
   return `<fieldset class="profile-repeat" data-journal><legend>Journal ${String(index + 1)}</legend><label>Journal name<input name="journalName" value="${escapeHtml(journal.name)}"></label><label>Relationship<select name="journalRelationship">${options}</select></label><label>Identifier (for example, ISSN)<input name="journalIdentifier" value="${escapeHtml(journal.identifier)}"></label><label>Journal website (HTTPS)<input name="journalWebsite" value="${escapeHtml(journal.website)}"></label><label class="identity-claim__disclosure"><input type="checkbox" name="journalDisclosure"${checked(journal.disclosure)}> Include this journal relationship in a selected-claims file</label><button class="profile-button profile-button--quiet" type="button" data-remove-journal>Remove journal</button></fieldset>`;
 }
 
+function profileValue(
+  profile: ZenithIdentitySectionV1,
+  name: keyof ZenithIdentityFields,
+): string {
+  return profile.subject.fields[name].value;
+}
+
+function initials(name: string): string {
+  const letters = name
+    .trim()
+    .split(/\s+/u)
+    .slice(0, 2)
+    .map((part) => Array.from(part)[0] ?? "")
+    .join("")
+    .toUpperCase();
+  return letters || "ME";
+}
+
+function selectedClaimCount(profile: ZenithIdentitySectionV1): number {
+  const disclosure = selectedIdentityDisclosure(profile, profile.updatedAt);
+  return (
+    Object.keys(disclosure.claims.fields).length +
+    disclosure.claims.roles.length +
+    disclosure.claims.affiliations.length +
+    disclosure.claims.journals.length
+  );
+}
+
+function localDate(timestamp: number): string {
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime())
+    ? "Unknown"
+    : date.toISOString().slice(0, 10);
+}
+
+function homepageView(
+  profile: ZenithIdentitySectionV1,
+  membershipActive: boolean,
+): string {
+  const displayName = profileValue(profile, "displayName") || "Untitled Person";
+  const headline =
+    profileValue(profile, "headline") ||
+    "A private person finding their place in the Castalia commons.";
+  const biography =
+    profileValue(profile, "biography") ||
+    "This is your corner of Castalia. Add an introduction when you are ready.";
+  const website = profileValue(profile, "website");
+  const orcid = profileValue(profile, "orcid");
+  const roles = profile.subject.roles.length
+    ? profile.subject.roles
+        .map(({ role }) => `<li>${escapeHtml(role)}</li>`)
+        .join("")
+    : '<li class="homepage-empty">No roles listed yet.</li>';
+  const affiliations = profile.subject.affiliations.length
+    ? profile.subject.affiliations
+        .map(
+          ({ name, department, position, website: affiliationWebsite }) =>
+            `<li><strong>${escapeHtml(name || "Unnamed institution")}</strong>${department ? `<span>${escapeHtml(department)}</span>` : ""}${position ? `<span>${escapeHtml(position)}</span>` : ""}${affiliationWebsite ? `<a href="${escapeHtml(affiliationWebsite)}" rel="noreferrer">Visit institution</a>` : ""}</li>`,
+        )
+        .join("")
+    : '<li class="homepage-empty">No academic affiliations listed yet.</li>';
+  const journals = profile.subject.journals.length
+    ? profile.subject.journals
+        .map(
+          ({ name, relationship, website: journalWebsite }) =>
+            `<li><strong>${escapeHtml(name || "Unnamed journal")}</strong><span>${escapeHtml(relationship)}</span>${journalWebsite ? `<a href="${escapeHtml(journalWebsite)}" rel="noreferrer">Visit journal</a>` : ""}</li>`,
+        )
+        .join("")
+    : '<li class="homepage-empty">No journal relationships listed yet.</li>';
+  const selected = selectedClaimCount(profile);
+  const updated = localDate(profile.updatedAt);
+  const memberKey = profile.subject.memberKey;
+  const publicLinks = [
+    website
+      ? `<a href="${escapeHtml(website)}" rel="noreferrer">My website</a>`
+      : "",
+    orcid
+      ? `<a href="https://orcid.org/${escapeHtml(orcid)}" rel="noreferrer">ORCID ${escapeHtml(orcid)}</a>`
+      : "",
+  ]
+    .filter(Boolean)
+    .join('<span aria-hidden="true"> · </span>');
+
+  return `<section class="homepage-window" aria-labelledby="homepage-name"><div class="homepage-titlebar"><span>castalia://person/${escapeHtml(memberKey.slice(0, 12))}</span><span>PRIVATE LOCAL COPY</span></div><div class="homepage-address"><span aria-hidden="true">⌂</span><span>My Castalia / ${escapeHtml(displayName)}</span><span class="homepage-led" title="Encrypted vault available"></span></div><header class="homepage-hero"><div class="homepage-avatar" aria-hidden="true"><span>${escapeHtml(initials(displayName))}</span></div><div><p class="homepage-welcome">Welcome to my Castalia</p><h2 id="homepage-name">${escapeHtml(displayName)}</h2><p>${escapeHtml(headline)}</p>${publicLinks ? `<p class="homepage-links">${publicLinks}</p>` : ""}</div></header><nav class="homepage-index" aria-label="My Castalia page index"><span>Page index:</span><a href="#my-about">About</a><a href="#my-roles">Roles</a><a href="#my-places">Institutions</a><a href="#my-journals">Journals</a><a href="#identity-editor">Edit page</a><a href="#my-vault">Vault</a></nav><div class="homepage-grid"><main class="homepage-content"><section id="my-about" class="homepage-panel homepage-about"><p class="homepage-marker">01 / ABOUT.TXT</p><h3>About me</h3><p>${escapeHtml(biography)}</p></section><section id="my-places" class="homepage-panel"><p class="homepage-marker">02 / PLACES.HTML</p><h3>Academic institutions</h3><ul class="homepage-records">${affiliations}</ul></section><section id="my-journals" class="homepage-panel"><p class="homepage-marker">03 / JOURNALS.HTML</p><h3>Journal desk</h3><ul class="homepage-records">${journals}</ul></section></main><aside class="homepage-sidebar"><section id="my-roles" class="homepage-panel"><p class="homepage-marker">WHOAMI</p><h3>Person</h3><ul class="homepage-role-list">${roles}</ul></section><section class="homepage-panel homepage-status"><p class="homepage-marker">STATUS.LOG</p><dl><div><dt>Keypair</dt><dd>Ready</dd></div><div><dt>Membership</dt><dd>${membershipActive ? "Active" : '<a href="/start">Not issued</a>'}</dd></div><div><dt>Selected claims</dt><dd>${String(selected)}</dd></div><div><dt>Last local save</dt><dd>${escapeHtml(updated)}</dd></div></dl></section><section class="homepage-panel homepage-privacy"><p class="homepage-marker">ROBOTS.TXT</p><h3>Private by default</h3><p>This page is an on-device preview. Nothing here is published or sent to a server.</p></section></aside></div><footer class="homepage-footer"><span>Zenith Ontology: Person</span><span>Member Key ${escapeHtml(memberKey.slice(0, 10))}&hellip;${escapeHtml(memberKey.slice(-6))}</span><span>Best viewed with curiosity</span></footer></section>`;
+}
+
 function profileEditor(profile: ZenithIdentitySectionV1): string {
   const fields = FIELD_LABELS.map(({ name, label, kind, autocomplete }) =>
     fieldView(
@@ -123,7 +209,7 @@ function profileEditor(profile: ZenithIdentitySectionV1): string {
     .map(affiliationView)
     .join("");
   const journals = profile.subject.journals.map(journalView).join("");
-  return `<form class="profile-form" data-profile-form><section class="profile-section" aria-labelledby="profile-person-heading"><p class="profile-kicker">Zenith Ontology</p><h2 id="profile-person-heading">Person</h2><p>These are self-asserted claims. They remain private inside your encrypted vault unless you deliberately export selected claims.</p><div class="profile-field-grid">${fields}</div></section><section class="profile-section" aria-labelledby="profile-roles-heading"><h2 id="profile-roles-heading">Roles</h2><p>A Person may also describe themself as an Author, Researcher, or Student. Roles do not grant permissions.</p><div class="profile-role-grid">${roles}</div></section><section class="profile-section" aria-labelledby="profile-institutions-heading"><h2 id="profile-institutions-heading">Academic institutions</h2><p>Institutions are organization affiliations, not kinds of Person.</p><div data-affiliations>${affiliations}</div><button class="profile-button profile-button--quiet" type="button" data-add-affiliation>Add institution</button></section><section class="profile-section" aria-labelledby="profile-journals-heading"><h2 id="profile-journals-heading">Journals</h2><p>Record a relationship to a journal without claiming that the journal verified it.</p><div data-journals>${journals}</div><button class="profile-button profile-button--quiet" type="button" data-add-journal>Add journal</button></section><div class="profile-actions"><button class="profile-button" type="submit">Save private profile</button><button class="profile-button profile-button--quiet" type="button" data-download-disclosure>Download selected claims</button></div></form>`;
+  return `<form id="identity-editor" class="profile-form" data-profile-form><header class="profile-control-header"><p class="profile-kicker">Webmaster desk / private</p><h2>Edit My Castalia</h2><p>Write your personal page in Zenith's ontology. Every field stays inside the encrypted identity section unless its sharing box is selected and you deliberately create a selected-claims file.</p></header><section class="profile-section" aria-labelledby="profile-person-heading"><div class="profile-section__titlebar"><span>person.properties</span><span>SELF-ASSERTED</span></div><div class="profile-section__body"><p class="profile-kicker">Zenith Ontology</p><h3 id="profile-person-heading">Person</h3><div class="profile-field-grid">${fields}</div></div></section><section class="profile-section" aria-labelledby="profile-roles-heading"><div class="profile-section__titlebar"><span>roles.list</span><span>OPTIONAL</span></div><div class="profile-section__body"><h3 id="profile-roles-heading">Roles</h3><p>A Person may also describe themself as an Author, Researcher, or Student. Roles do not grant permissions.</p><div class="profile-role-grid">${roles}</div></div></section><section class="profile-section" aria-labelledby="profile-institutions-heading"><div class="profile-section__titlebar"><span>institutions.list</span><span>0–12</span></div><div class="profile-section__body"><h3 id="profile-institutions-heading">Academic institutions</h3><p>Institutions are organization affiliations, not kinds of Person.</p><div data-affiliations>${affiliations}</div><button class="profile-button profile-button--quiet" type="button" data-add-affiliation>Add institution</button></div></section><section class="profile-section" aria-labelledby="profile-journals-heading"><div class="profile-section__titlebar"><span>journals.list</span><span>0–24</span></div><div class="profile-section__body"><h3 id="profile-journals-heading">Journals</h3><p>Record a relationship to a journal without claiming that the journal verified it.</p><div data-journals>${journals}</div><button class="profile-button profile-button--quiet" type="button" data-add-journal>Add journal</button></div></section><div class="profile-actions"><button class="profile-button" type="submit">Save My Castalia</button><button class="profile-button profile-button--quiet" type="button" data-download-disclosure>Create selected-claims file</button></div></form>`;
 }
 
 function emptyAffiliation(): ZenithAcademicInstitutionAffiliation {
@@ -160,7 +246,7 @@ function download(name: string, contents: string, type = "application/json") {
 
 export function profileView(dependencies: ProfileDependencies): View {
   const element = elementFromHtml(
-    `<article class="profile-page"><header class="profile-header"><p class="profile-kicker">Private identity</p><h1>Profile</h1><p>Your profile is a Zenith-typed identity section in this browser wallet's encrypted <code>.castaway</code> vault.</p></header><div data-profile-status></div></article>`,
+    `<article class="profile-page"><header class="profile-header"><p class="profile-kicker">Personal home service / local-first</p><h1>My Castalia</h1><p>Your keypair opens a private corner of Castalia. Build a Person page, keep it in the encrypted <code>.castaway</code> identity section, and choose each claim that may leave your wallet.</p><div class="profile-header__rule" aria-hidden="true"><span>✦</span><span>✦</span><span>✦</span></div></header><div data-profile-status></div></article>`,
   );
   const host = element.querySelector<HTMLElement>("[data-profile-status]");
   let profile: ZenithIdentitySectionV1 | null = null;
@@ -359,17 +445,23 @@ export function profileView(dependencies: ProfileDependencies): View {
     const status = notice
       ? `<p class="profile-notice" role="status">${escapeHtml(notice)}</p>`
       : "";
-    if (!snapshot.membership) {
+    if (!snapshot.identity) {
       const extension = dependencies.getWalletProvider();
       if (extension) {
-        host.innerHTML = `${status}<section class="profile-gate"><h2>Wallet profile unavailable</h2><p>This extension can prove membership, but it does not yet expose the <code>.castaway</code> identity-section interface to Castalia Web.</p><a class="profile-button" href="/start">Open wallet options</a></section>`;
-      } else {
-        host.innerHTML = `${status}<section class="profile-gate"><h2>Membership required</h2><p>Create or restore a wallet and issue its Castalia membership before creating a profile.</p><a class="profile-button" href="/start">Join Castalia</a></section>`;
+        const extensionStatus = await extension.getStatus();
+        const publicIdentity = extensionStatus.publicIdentity?.trim();
+        const keypairAvailable =
+          extensionStatus.state === "ready" || Boolean(publicIdentity);
+        if (keypairAvailable) {
+          host.innerHTML = `${status}<section class="homepage-window homepage-window--gate"><div class="homepage-titlebar"><span>castalia://wallet-extension</span><span>KEYPAIR READY</span></div><div class="profile-gate"><p class="profile-kicker">My Castalia found</p><h2>Your personal page begins here.</h2><p>Castalia can see that your extension has a keypair${publicIdentity ? ` <code>${escapeHtml(publicIdentity.slice(0, 18))}&hellip;</code>` : ""}. This extension version does not yet expose its encrypted <code>.castaway</code> identity section to the site, so editing remains inside Castalia Web's own wallet for now.</p><a class="profile-button" href="/start">Open wallet options</a></div></section>`;
+          return;
+        }
       }
+      host.innerHTML = `${status}<section class="homepage-window homepage-window--gate"><div class="homepage-titlebar"><span>castalia://new-person</span><span>NO KEYPAIR</span></div><div class="profile-gate"><p class="profile-kicker">A blank page on the old web</p><h2>Claim your corner of Castalia.</h2><p>Create or restore a wallet keypair first. Membership can come afterward; My Castalia belongs to the identity, not to a browser login session.</p><a class="profile-button" href="/start">Create my keypair</a></div></section>`;
       return;
     }
     if (snapshot.state === "locked") {
-      host.innerHTML = `${status}<section class="profile-gate"><p class="profile-kicker">Member ${escapeHtml(snapshot.identity?.ownerPublicKey.slice(0, 12) ?? "")}&hellip;</p><h2>Unlock your private profile</h2><p>The profile is encrypted with this wallet identity and cannot be read while the wallet is locked.</p><form data-profile-unlock><label>Wallet passphrase<input name="passphrase" type="password" autocomplete="current-password" required></label><button class="profile-button" type="submit">Unlock profile</button></form></section>`;
+      host.innerHTML = `${status}<section class="homepage-window homepage-window--gate"><div class="homepage-titlebar"><span>castalia://person/${escapeHtml(snapshot.identity.ownerPublicKey.slice(0, 12))}</span><span>${snapshot.membership ? "MEMBER" : "KEYPAIR READY"}</span></div><div class="profile-gate"><p class="profile-kicker">My Castalia / encrypted</p><h2>Unlock your personal page.</h2><p>The public keypair is available, so this link replaces Join. Your private Person profile remains unreadable until you unlock the wallet.</p><form data-profile-unlock><label>Wallet passphrase<input name="passphrase" type="password" autocomplete="current-password" required></label><button class="profile-button" type="submit">Unlock My Castalia</button></form><p class="profile-keyline">Member Key <code>${escapeHtml(snapshot.identity.ownerPublicKey)}</code></p></div></section>`;
       host
         .querySelector<HTMLFormElement>("[data-profile-unlock]")
         ?.addEventListener("submit", (event) => {
@@ -380,14 +472,14 @@ export function profileView(dependencies: ProfileDependencies): View {
               requiredInput(form, '[name="passphrase"]').value,
             );
             profile = await dependencies.webWalletSession.identityProfile();
-            notice = "Private profile unlocked for this tab.";
+            notice = "My Castalia unlocked for this tab.";
             dependencies.onWalletChanged();
           });
         });
       return;
     }
     profile ??= await dependencies.webWalletSession.identityProfile();
-    host.innerHTML = `${status}<div class="profile-member-binding"><span>Active Member Key</span><code>${escapeHtml(profile.subject.memberKey)}</code></div>${profileEditor(profile)}<section class="profile-section profile-portability" aria-labelledby="profile-vault-heading"><h2 id="profile-vault-heading">Portable vault</h2><p><code>.castaway</code> carries this encrypted identity section between compatible wallet apps. It does not contain your signing key and does not create membership.</p><div class="profile-portability__grid"><form data-castaway-export><h3>Export identity vault</h3><label>Vault passphrase<input name="passphrase" type="password" minlength="12" autocomplete="new-password" required></label><label>Confirm vault passphrase<input name="confirmation" type="password" minlength="12" autocomplete="new-password" required></label><button class="profile-button" type="submit">Download .castaway</button></form><form data-castaway-import><h3>Import identity vault</h3><label>Castaway file<input name="file" type="file" accept=".castaway,application/json" required></label><label>Vault passphrase<input name="passphrase" type="password" autocomplete="current-password" required></label><button class="profile-button" type="submit">Import .castaway</button></form></div><button class="profile-button profile-button--quiet" type="button" data-profile-lock>Lock wallet</button></section>`;
+    host.innerHTML = `${status}${homepageView(profile, Boolean(snapshot.membership))}${profileEditor(profile)}<section id="my-vault" class="profile-section profile-portability" aria-labelledby="profile-vault-heading"><div class="profile-section__titlebar"><span>castaway.vault</span><span>PORTABLE</span></div><div class="profile-section__body"><p class="profile-kicker">My files</p><h2 id="profile-vault-heading">Portable identity vault</h2><p><code>.castaway</code> carries this encrypted identity section between compatible wallet apps. It does not contain your signing key and does not create membership.</p><div class="profile-portability__grid"><form data-castaway-export><h3>Export identity vault</h3><label>Vault passphrase<input name="passphrase" type="password" minlength="12" autocomplete="new-password" required></label><label>Confirm vault passphrase<input name="confirmation" type="password" minlength="12" autocomplete="new-password" required></label><button class="profile-button" type="submit">Download .castaway</button></form><form data-castaway-import><h3>Import identity vault</h3><label>Castaway file<input name="file" type="file" accept=".castaway,application/json" required></label><label>Vault passphrase<input name="passphrase" type="password" autocomplete="current-password" required></label><button class="profile-button" type="submit">Import .castaway</button></form></div><button class="profile-button profile-button--quiet" type="button" data-profile-lock>Lock My Castalia</button></div></section>`;
     wireEditor();
     host
       .querySelector<HTMLFormElement>("[data-castaway-export]")
@@ -439,7 +531,7 @@ export function profileView(dependencies: ProfileDependencies): View {
         void run(async () => {
           await dependencies.webWalletSession.lock();
           profile = null;
-          notice = "Wallet locked.";
+          notice = "My Castalia locked.";
           dependencies.onWalletChanged();
         });
       });

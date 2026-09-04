@@ -19,6 +19,7 @@ const routes = [
   "/",
   "/docs",
   "/start",
+  "/my-castalia",
   "/profile",
   "/chronicle",
   "/proposals",
@@ -143,6 +144,22 @@ test("Start reports success only after Wallet hands off verified Active membersh
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/start");
+  await expect(
+    page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+      name: "My Castalia",
+    }),
+  ).toHaveAttribute("href", "/my-castalia");
+  await page
+    .getByRole("navigation", { name: "Primary" })
+    .getByRole("link", { name: "My Castalia" })
+    .click();
+  await expect(page).toHaveURL(/\/my-castalia$/);
+  await expect(
+    page.getByRole("heading", { name: "My Castalia" }),
+  ).toBeVisible();
+  await expect(page.getByText("KEYPAIR READY")).toBeVisible();
+  await page.getByRole("link", { name: "Open wallet options" }).click();
+  await expect(page).toHaveURL(/\/start$/);
   await expect(page.getByLabel("Membership type")).toHaveCount(0);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -162,9 +179,9 @@ test("Start reports success only after Wallet hands off verified Active membersh
   ).toBeDisabled();
   await expect(
     page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
-      name: "Profile",
+      name: "My Castalia",
     }),
-  ).toHaveAttribute("href", "/profile");
+  ).toHaveAttribute("href", "/my-castalia");
   expect(await page.context().cookies()).toEqual([]);
   expect(
     await page.evaluate(() => ({

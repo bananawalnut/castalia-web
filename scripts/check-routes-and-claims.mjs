@@ -27,6 +27,7 @@ const [
 const requiredRoutes = [
   "/",
   "/start",
+  "/my-castalia",
   "/profile",
   "/chronicle",
   "/tenders",
@@ -41,7 +42,7 @@ const requiredCopy = [
   "<h1>Castalia</h1>",
   "an open spring for independent worlds.",
   'href="/start">Start</a>',
-  "Landing, Chronicle, Tenders, RFCs, Docs, Join, and the private browser-wallet Profile are implemented surfaces",
+  "Landing, Chronicle, Tenders, RFCs, Docs, Join, and the keypair-owned My Castalia home are implemented surfaces",
   "Portable data is the part of Web3 we still owe people",
   "Catalog UI draft",
   "Comment submission is disabled",

@@ -262,6 +262,7 @@ export function startView(dependencies: StartFlowDependencies): View {
         if (!detected) return;
         provider = detected;
         window.clearInterval(providerTimer);
+        dependencies.onMembershipChanged?.();
         const actionContainer = element.querySelector<HTMLElement>(
           ".start-flow__action",
         );
