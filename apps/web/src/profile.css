@@ -6,13 +6,13 @@
   );
   width: min(100% - var(--space-4), 74rem);
   margin: 0 auto;
-  padding: clamp(var(--space-8), 7vw, var(--space-24)) 0;
+  padding: clamp(var(--space-6), 4vw, var(--space-12)) 0;
   color: var(--castalia-paper);
 }
 
 .profile-header {
-  max-width: 58rem;
-  padding: clamp(var(--space-5), 4vw, var(--space-10));
+  max-width: 48rem;
+  padding: clamp(var(--space-4), 2.5vw, var(--space-8));
   border: 3px dotted var(--castalia-paper);
   box-shadow: 7px 7px 0 var(--castalia-shadow);
 }
@@ -30,25 +30,25 @@
 .profile-header h1 {
   margin: var(--space-2) 0 var(--space-4);
   font-family: var(--font-editorial-display);
-  font-size: clamp(3.8rem, 11vw, 8rem);
+  font-size: clamp(2.75rem, 5vw, 4.5rem);
   font-weight: 400;
-  line-height: 0.82;
-  letter-spacing: -0.055em;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
 }
 
 .profile-header > p:nth-of-type(2) {
-  max-width: 49rem;
+  max-width: 43rem;
   font-family: var(--font-editorial-body);
-  font-size: clamp(1.15rem, 2.4vw, 1.55rem);
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
   line-height: 1.45;
 }
 
 .profile-header__rule {
   display: flex;
-  max-width: 24rem;
+  max-width: 16rem;
   align-items: center;
   gap: var(--space-3);
-  margin-top: var(--space-6);
+  margin-top: var(--space-4);
 }
 
 .profile-header__rule::before,
@@ -70,7 +70,7 @@
 }
 
 .homepage-window {
-  margin-top: clamp(var(--space-8), 6vw, var(--space-16));
+  margin-top: clamp(var(--space-6), 4vw, var(--space-10));
   border: 3px outset var(--color-base-border-strong);
   background: var(--castalia-paper);
   color: var(--castalia-ink);

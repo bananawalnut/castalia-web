@@ -102,6 +102,27 @@ for (const route of routes) {
   });
 }
 
+test("account action anchors right and the My Castalia masthead stays compact", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/my-castalia");
+  const accountBox = await page
+    .locator('[data-account-link="true"]')
+    .boundingBox();
+  const docsBox = await page.getByRole("link", { name: "Docs" }).boundingBox();
+  if (!accountBox || !docsBox)
+    throw new Error("navigation geometry unavailable");
+  expect(accountBox.x).toBeGreaterThan(0.8 * 1440);
+  expect(accountBox.x).toBeGreaterThan(docsBox.x + docsBox.width + 100);
+  const headingSize = await page
+    .getByRole("heading", { name: "My Castalia" })
+    .evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).fontSize),
+    );
+  expect(headingSize).toBeLessThanOrEqual(72);
+});
+
 test("Start reports success only after Wallet hands off verified Active membership", async ({
   page,
 }) => {
