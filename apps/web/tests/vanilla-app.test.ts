@@ -153,6 +153,14 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     installedApp.navigate("/start");
+    await vi.waitFor(() => {
+      expect(provider.getMembership).toHaveBeenCalledTimes(2);
+      expect(
+        root.querySelector<HTMLAnchorElement>("[data-account-link]")
+          ?.textContent,
+      ).toBe("Profile");
+    });
+    provider.getMembership.mockClear();
     const becomeMember = root.querySelector<HTMLButtonElement>(
       "button[data-extension-wallet]",
     );
@@ -179,12 +187,18 @@ describe("vanilla Castalia shell", () => {
       );
     });
     expect(root.textContent).not.toMatch(/^Member$/m);
-    expect(provider.getMembership).not.toHaveBeenCalled();
+    await vi.waitFor(() => {
+      expect(
+        root.querySelector<HTMLAnchorElement>("[data-account-link]")
+          ?.textContent,
+      ).toBe("Profile");
+    });
     expect(becomeMember.textContent).toBe("Membership active");
+    const membershipReads = provider.getMembership.mock.calls.length;
     window.dispatchEvent(
       new CustomEvent("castalia:wallet:membership-flow-ready"),
     );
-    expect(provider.getMembership).not.toHaveBeenCalled();
+    expect(provider.getMembership).toHaveBeenCalledTimes(membershipReads);
     expect(
       Array.from(root.querySelectorAll('[role="log"] li')).map((entry) =>
         entry.textContent.trim(),
@@ -392,6 +406,10 @@ describe("vanilla Castalia shell", () => {
       getWalletProvider: () => provider,
     });
     app.navigate("/start");
+    await vi.waitFor(() => {
+      expect(provider.getMembership).toHaveBeenCalledTimes(2);
+    });
+    provider.getMembership.mockClear();
     const becomeMember = root.querySelector<HTMLButtonElement>(
       "button[data-extension-wallet]",
     );

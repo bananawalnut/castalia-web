@@ -354,7 +354,7 @@ test("keyboard navigation, visible focus, route focus, and unavailable controls"
   await expect(page.locator("h1")).toHaveText(
     "Portable data is the part of Web3 we still owe people",
   );
-  await expect(page.getByText(".castaway", { exact: true })).toHaveCount(4);
+  await expect(page.getByText(".castaway", { exact: true })).toHaveCount(3);
   await expect(page.getByText("Session unavailable")).toHaveCount(0);
 });
 

@@ -155,7 +155,7 @@ export function mountCastaliaApp(
       }
       if (!member) {
         const provider = options.getWalletProvider?.() ?? window.castaliaWallet;
-        if (provider) {
+        if (provider && typeof provider.getSubject === "function") {
           const [membership, subject] = await Promise.all([
             provider.getMembership(),
             provider.getSubject(),
