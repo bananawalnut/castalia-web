@@ -19,6 +19,8 @@ const routes = [
   "/",
   "/docs",
   "/start",
+  "/my-castalia",
+  "/profile",
   "/chronicle",
   "/proposals",
   "/tenders",
@@ -27,7 +29,7 @@ const routes = [
   "/merch",
   "/missing",
 ];
-const primary = ["Chronicle", "Tenders", "RFC", "Merch", "Docs"];
+const primary = ["Chronicle", "Tenders", "RFC", "Merch", "Docs", "Join"];
 for (const route of routes) {
   test(`${route} has bounded semantics, privacy, responsiveness, and no serious axe findings`, async ({
     page,
@@ -66,6 +68,7 @@ for (const route of routes) {
       "/rfcs",
       "/tenders",
       "/tenders/tnd-0001",
+      "/start",
     ].includes(route)
       ? 1
       : 0;
@@ -98,6 +101,27 @@ for (const route of routes) {
     ).toEqual({ local: 0, session: 0, serviceWorker: false });
   });
 }
+
+test("account action anchors right and the My Castalia masthead stays compact", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/my-castalia");
+  const accountBox = await page
+    .locator('[data-account-link="true"]')
+    .boundingBox();
+  const docsBox = await page.getByRole("link", { name: "Docs" }).boundingBox();
+  if (!accountBox || !docsBox)
+    throw new Error("navigation geometry unavailable");
+  expect(accountBox.x).toBeGreaterThan(0.8 * 1440);
+  expect(accountBox.x).toBeGreaterThan(docsBox.x + docsBox.width + 100);
+  const headingSize = await page
+    .getByRole("heading", { name: "My Castalia" })
+    .evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).fontSize),
+    );
+  expect(headingSize).toBeLessThanOrEqual(72);
+});
 
 test("Start reports success only after Wallet hands off verified Active membership", async ({
   page,
@@ -141,6 +165,22 @@ test("Start reports success only after Wallet hands off verified Active membersh
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/start");
+  await expect(
+    page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+      name: "My Castalia",
+    }),
+  ).toHaveAttribute("href", "/my-castalia");
+  await page
+    .getByRole("navigation", { name: "Primary" })
+    .getByRole("link", { name: "My Castalia" })
+    .click();
+  await expect(page).toHaveURL(/\/my-castalia$/);
+  await expect(
+    page.getByRole("heading", { name: "My Castalia" }),
+  ).toBeVisible();
+  await expect(page.getByText("KEYPAIR READY")).toBeVisible();
+  await page.getByRole("link", { name: "Open wallet options" }).click();
+  await expect(page).toHaveURL(/\/start$/);
   await expect(page.getByLabel("Membership type")).toHaveCount(0);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
@@ -151,13 +191,18 @@ test("Start reports success only after Wallet hands off verified Active membersh
     ),
   ).toEqual([]);
 
-  await page.getByRole("button", { name: "Join Castalia" }).click();
+  await page.getByRole("button", { name: "Join with extension" }).click();
   await expect(
     page.getByRole("status", { name: "Membership request status" }),
   ).toHaveText("Castalia membership is Active for this Member Key.");
   await expect(
     page.getByRole("button", { name: "Membership active" }),
   ).toBeDisabled();
+  await expect(
+    page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+      name: "My Castalia",
+    }),
+  ).toHaveAttribute("href", "/my-castalia");
   expect(await page.context().cookies()).toEqual([]);
   expect(
     await page.evaluate(() => ({
@@ -347,7 +392,7 @@ test("keyboard navigation, visible focus, route focus, and unavailable controls"
   await expect(page.locator("h1")).toHaveText(
     "Portable data is the part of Web3 we still owe people",
   );
-  await expect(page.getByText(".castaway", { exact: true })).toHaveCount(4);
+  await expect(page.getByText(".castaway", { exact: true })).toHaveCount(3);
   await expect(page.getByText("Session unavailable")).toHaveCount(0);
 });
 

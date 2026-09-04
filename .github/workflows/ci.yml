@@ -48,6 +48,11 @@ jobs:
           rustup target add wasm32-unknown-unknown
           cargo install wasm-pack --version 0.14.0 --locked
       - run: pnpm install --frozen-lockfile
+      - name: Verify browser custody Rust core
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy -p castalia-wallet-wasm --all-targets -- -D warnings
+          cargo test -p castalia-wallet-wasm
       - run: pnpm test
       - run: pnpm verify:contracts
   build-and-budgets:

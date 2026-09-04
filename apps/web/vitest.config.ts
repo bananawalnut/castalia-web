@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 const membershipVector = JSON.parse(
@@ -12,6 +13,22 @@ const membershipVector = JSON.parse(
 ) as { issuerKeyId: string; issuerPublicKey: string };
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      "@castalia/castaway-contract": fileURLToPath(
+        new URL(
+          "../../packages/castaway-contract/src/index.ts",
+          import.meta.url,
+        ),
+      ),
+      "@castalia/membership-contract": fileURLToPath(
+        new URL(
+          "../../packages/membership-contract/src/index.ts",
+          import.meta.url,
+        ),
+      ),
+    },
+  },
   define: {
     __CASTALIA_ZENITH_ISSUER_KEY_ID__: JSON.stringify(
       membershipVector.issuerKeyId,

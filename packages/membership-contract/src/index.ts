@@ -385,3 +385,61 @@ export async function verifyZenithMembershipCredential(
   if (!valid) throw new Error("membership credential signature is invalid");
   return credential;
 }
+
+export async function issueZenithMembershipCredential(input: {
+  issuerOrigin: string;
+  ownerPublicKey: string;
+  signature: string;
+  trustPolicy: ZenithMembershipTrustPolicyV1;
+  fetchImpl?: typeof fetch;
+}): Promise<ZenithMembershipCredentialV3> {
+  let issuer: URL;
+  try {
+    issuer = new URL(input.issuerOrigin);
+  } catch {
+    throw new Error("membership issuer must be a canonical HTTPS origin");
+  }
+  const loopback = new Set(["localhost", "127.0.0.1", "[::1]"]);
+  if (
+    issuer.origin !== input.issuerOrigin ||
+    issuer.username !== "" ||
+    issuer.password !== "" ||
+    (issuer.protocol !== "https:" && !loopback.has(issuer.hostname))
+  )
+    throw new Error("membership issuer must be a canonical HTTPS origin");
+
+  const request = parseZenithMembershipRequest({
+    schema: ZENITH_MEMBERSHIP_REQUEST_SCHEMA,
+    version: ZENITH_MEMBERSHIP_VERSION,
+    ownerPublicKey: input.ownerPublicKey,
+    signatureSuite: "Ed25519",
+    signature: input.signature,
+  });
+  const response = await (input.fetchImpl ?? fetch)(
+    new URL(ZENITH_MEMBERSHIP_ENDPOINT_PATH, issuer),
+    {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(request),
+      cache: "no-store",
+      credentials: "omit",
+      redirect: "error",
+      referrerPolicy: "no-referrer",
+    },
+  );
+  if (!response.ok)
+    throw new Error(
+      `membership issuer rejected the request (${String(response.status)})`,
+    );
+  let candidate: unknown;
+  try {
+    candidate = await response.json();
+  } catch {
+    throw new Error("membership issuer returned malformed JSON");
+  }
+  return verifyZenithMembershipCredential(
+    candidate,
+    input.trustPolicy,
+    input.ownerPublicKey,
+  );
+}

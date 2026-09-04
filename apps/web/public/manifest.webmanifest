@@ -1,0 +1,18 @@
+{
+  "name": "Castalia",
+  "short_name": "Castalia",
+  "description": "A private Castalia wallet and membership client.",
+  "start_url": "/start",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f52bd",
+  "theme_color": "#0f52bd",
+  "icons": [
+    {
+      "src": "/brand/castalia-crest.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

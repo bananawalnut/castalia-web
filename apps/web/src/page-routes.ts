@@ -4,6 +4,8 @@ import { TENDER_FIXTURES } from "./tenderFixtures.js";
 export const TOP_LEVEL_PAGE_ROUTES = [
   { path: "/", label: "Landing" },
   { path: "/start", label: "Start" },
+  { path: "/my-castalia", label: "My Castalia" },
+  { path: "/profile", label: "My Castalia (compatibility route)" },
   { path: "/chronicle", label: "Chronicle" },
   { path: "/tenders", label: "Tenders" },
   { path: "/rfcs", label: "RFCs" },

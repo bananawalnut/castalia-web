@@ -13,6 +13,15 @@ describe("browser environment", () => {
     ).toBe("https://chromewebstore.google.com/detail/castalia/example");
   });
 
+  it("defaults the browser wallet to the production HTTPS issuer", () => {
+    expect(
+      loadBrowserEnv({
+        VITE_APP_ENV: "test",
+        VITE_FIXTURE_MODE: "true",
+      }).membershipIssuerUrl,
+    ).toBe("https://membership.zenith-research.ca");
+  });
+
   it("accepts a canonical Control origin and public audience", () => {
     const env = loadBrowserEnv({
       VITE_APP_ENV: "test",
@@ -104,6 +113,15 @@ describe("browser environment", () => {
         VITE_CASTALIA_CONTROL_AUDIENCE: "castalia-control\nother",
       },
       "must be canonical",
+    ],
+    [
+      {
+        VITE_APP_ENV: "test",
+        VITE_FIXTURE_MODE: "true",
+        VITE_CASTALIA_MEMBERSHIP_ISSUER_URL:
+          "http://membership.castalia.example",
+      },
+      "HTTPS outside loopback",
     ],
   ])("rejects invalid keys", (env, message) => {
     expect(() => loadBrowserEnv(env)).toThrow(message);

@@ -6,14 +6,16 @@ Status: Zenith-signed base-membership v3 is the active Join contract. It creates
 
 `/start` accepts a compatible Wallet only when it advertises `membershipJoinProtocol: "castalia.zenith-membership.v3"`. Older Wallet builds receive **Wallet update required** and their Join UI is not opened.
 
-1. The member selects **Join Castalia**. There is no individual/institution selector, application, review, approval, or Pending state.
-2. The member's active user action asks Wallet to open a Chrome-owned popup outside page-owned DOM; automatic page calls are rejected. The popup names the requesting Web origin and binds any later approval to that same initiating tab and origin. Web never receives a passphrase, private key, `.castalia-recovery` file, `.castaway` vault, private vault entry, or generic signing interface.
+1. The member selects either **Join with extension** or **Use this browser**. There is no individual/institution selector, application, review, approval, or Pending state.
+2. On the extension path, the member's active user action asks Wallet to open a Chrome-owned popup outside page-owned DOM; automatic page calls are rejected. The popup names the requesting Web origin and binds any later approval to that same initiating tab and origin. Extension integration never gives Web a passphrase, private key, `.castalia-recovery` file, `.castaway` vault, private vault entry, or generic signing interface.
 3. Wallet creates or unlocks its encrypted durable Ed25519 Member Key.
 4. Wallet signs `castalia/zenith-membership-join/v3\0 || ownerPublicKey` and sends only the public key and signature to `POST /v3/memberships` on its compiled Zenith issuer origin.
 5. Zenith verifies possession and signs the deterministic Active credential. A retry returns the same credential bytes and creates no session or database record.
 6. Wallet verifies the exact credential, owner, issuer-independent membership ID, pinned issuer root, and Ed25519 issuer signature, then persists that public credential.
 7. Wallet emits `castalia:wallet:membership-flow-ready` with the full public credential. If an already-v3 Wallet emits no detail, Web reads `getMembership()` once.
 8. Web independently repeats strict schema, deterministic-ID, trust-root, and issuer-signature verification before displaying **Membership active**.
+
+On mobile, **Use this browser** creates the same hybrid identity inside a dedicated Web Worker, encrypts its root with Argon2id and AES-256-GCM, and stores only the encrypted custody container plus public bindings in IndexedDB. The member must save and confirm a recovery method before the browser wallet can contact the issuer. The passphrase is an encryption key input; it is not the identity seed. See [Mobile Web wallet](web-wallet-mobile.md).
 
 Unsolicited or duplicate readiness events cannot start or repeat Join. Unknown fields, wrong owners, altered membership IDs, fixture or untrusted issuers, and invalid signatures fail closed. If Wallet reports completion but Web verification fails, Web warns that retry is safe; it never claims an unverified membership.
 

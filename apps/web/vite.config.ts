@@ -35,6 +35,12 @@ export default defineConfig(() => {
     build: { sourcemap: true },
     resolve: {
       alias: {
+        "@castalia/castaway-contract": fileURLToPath(
+          new URL(
+            "../../packages/castaway-contract/src/index.ts",
+            import.meta.url,
+          ),
+        ),
         "@castalia/membership-contract": fileURLToPath(
           new URL(
             "../../packages/membership-contract/src/index.ts",

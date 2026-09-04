@@ -4,18 +4,18 @@
 
 Castalia Web boots through the direct DOM/history runtime in `apps/web/src/main.ts` and `apps/web/src/runtime.ts`. React is not in the web application manifest or production entrypoint.
 
-The enrollment-v2 verifier described below is now legacy compatibility code. The active `/start` path opens extension-owned Wallet UI and cryptographically verifies the full Zenith-signed v3 credential, with `getMembership()` retained only for no-detail ready events; it does not call this verifier, construct an application, or contact Control. Web is not a wallet, signer, login screen, admission authority, or authenticated session. No Web credential form accepts a passphrase, recovery material, private key, seed, or generic bytes to sign.
+The enrollment-v2 verifier described below is now legacy compatibility code. The active `/start` path supports both extension-owned Wallet UI and an explicit first-party browser wallet. The browser wallet accepts a passphrase or recovery artifact, but its private key and decrypted seed remain inside a dedicated Worker backed by the Rust/WASM custody core. Page code receives only public identity fields, signatures for the fixed membership transcript, an encrypted recovery export, and the recovery key during the member-requested backup ceremony. Neither path constructs an application, contacts Control, or issues a login session.
 
 ## Ownership boundaries
 
-- Castalia Wallet owns key custody, extension-owned confirmation, and production of `castalia.wallet-membership-presentation.v2`.
+- Castalia Wallet owns extension custody. Castalia Web owns the separate mobile browser-custody record described in [Mobile Web wallet](web-wallet-mobile.md).
 - For legacy v1 only, Castalia Control owned challenge issuance, replay consumption, proof verification, application persistence, and lifecycle policy. Permissionless v2 base membership has none of those steps.
 - `crates/castalia-wallet-wasm` independently validates the exact application and v2 presentation context, reconstructs the BLAKE3 application commitment, and returns only the exact Ed25519 verification bytes.
 - `apps/web/src/wallet/wasm-validator.ts` accepts only the Rust module's finite result schema and uses browser WebCrypto to verify the Ed25519 signature.
 - `apps/web/src/wallet/onboarding.ts` enforces challenge → Wallet confirmation → local verification → submission ordering and fails closed before submission.
 - `apps/web/src/membership/control-client.ts` implements the exact uncredentialed challenge and application HTTP requests. It does not decide whether the member is admitted.
 
-A generic localhost signing HTTP server, in-page key storage, direct encrypted-directory access, arbitrary `sign_bytes`, a JS fallback signer, cookie authority, and proof persistence are intentionally absent.
+A generic localhost signing HTTP server, direct encrypted-directory access, a JS fallback signer, cookie authority, and proof persistence are intentionally absent. Browser custody exposes no generic site-facing signer; its Worker signs only operations invoked by the first-party wallet controller.
 
 ## Exact membership verification contract
 
@@ -47,4 +47,4 @@ pnpm --filter @castalia/web build
 pnpm browser:a11y
 ```
 
-The positive fixed vector matches the Wallet v2 producer's application, challenge, canonical transcript, and signature. Negative cases mutate application context and a valid-length signature so formatting checks cannot masquerade as cryptographic verification.
+The public repository intentionally contains no deterministic browser-wallet seed, plaintext private-key fixture, or reusable recovery key. Custody tests generate ephemeral key material at runtime. The private cross-client compatibility suite remains responsible for any restricted fixed vectors.
