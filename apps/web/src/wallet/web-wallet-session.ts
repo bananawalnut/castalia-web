@@ -5,6 +5,14 @@ import {
   type ZenithMembershipCredentialV3,
   type ZenithMembershipTrustPolicyV1,
 } from "@castalia/membership-contract";
+import {
+  castawayContents,
+  createPrivateZenithIdentity,
+  parseCastawayContents,
+  parseCastawayEnvelope,
+  parseZenithIdentitySection,
+  type ZenithIdentitySectionV1,
+} from "@castalia/castaway-contract";
 import type { WebWalletIdentity } from "./custody-protocol.js";
 import {
   createWebWalletCustodyClient,
@@ -21,6 +29,7 @@ export type WebWalletSnapshot = {
   identity: WebWalletIdentity | null;
   backupConfirmed: boolean;
   membership: ZenithMembershipCredentialV3 | null;
+  profileAvailable: boolean;
 };
 
 export class WebWalletSession {
@@ -53,6 +62,9 @@ export class WebWalletSession {
       identity: stored?.identity ?? null,
       backupConfirmed: stored?.backupConfirmed ?? false,
       membership,
+      profileAvailable:
+        stored?.encryptedIdentitySection !== null &&
+        stored?.encryptedIdentitySection !== undefined,
     };
   }
 
@@ -67,6 +79,7 @@ export class WebWalletSession {
       identity: created.identity,
       backupConfirmed: false,
       membership: null,
+      encryptedIdentitySection: null,
     });
     this.unlocked = true;
     return { identity: created.identity, recoveryKey: created.recoveryKey };
@@ -87,6 +100,7 @@ export class WebWalletSession {
       identity: restored.identity,
       backupConfirmed: true,
       membership: null,
+      encryptedIdentitySection: null,
     });
     this.unlocked = true;
     return restored.identity;
@@ -103,6 +117,7 @@ export class WebWalletSession {
       identity,
       backupConfirmed: true,
       membership: null,
+      encryptedIdentitySection: null,
     });
     this.unlocked = true;
     return identity;
@@ -174,6 +189,62 @@ export class WebWalletSession {
     );
   }
 
+  async identityProfile(): Promise<ZenithIdentitySectionV1> {
+    this.requireUnlocked();
+    const stored = await this.requireStored();
+    if (!stored.encryptedIdentitySection)
+      return createPrivateZenithIdentity(stored.identity.ownerPublicKey);
+    const opened = await this.custody.openIdentitySection(
+      stored.encryptedIdentitySection,
+    );
+    const profile = parseZenithIdentitySection(JSON.parse(opened) as unknown);
+    this.assertProfileOwner(profile, stored);
+    return profile;
+  }
+
+  async saveIdentityProfile(
+    candidate: ZenithIdentitySectionV1,
+  ): Promise<ZenithIdentitySectionV1> {
+    this.requireUnlocked();
+    const stored = await this.requireStored();
+    const profile = parseZenithIdentitySection(candidate);
+    this.assertProfileOwner(profile, stored);
+    stored.encryptedIdentitySection = await this.custody.sealIdentitySection(
+      JSON.stringify(profile),
+    );
+    await this.storage.save(stored);
+    return profile;
+  }
+
+  async exportCastaway(passphrase: string): Promise<string> {
+    this.requireUnlocked();
+    const profile = await this.identityProfile();
+    const encrypted = await this.custody.exportCastaway(
+      JSON.stringify(castawayContents(profile)),
+      passphrase,
+      Date.now(),
+    );
+    const envelope = parseCastawayEnvelope(JSON.parse(encrypted) as unknown);
+    if (envelope.ownerPublicKey !== profile.subject.memberKey)
+      throw new Error("Castaway export does not match this Member Key");
+    return encrypted;
+  }
+
+  async importCastaway(
+    encrypted: string,
+    passphrase: string,
+  ): Promise<ZenithIdentitySectionV1> {
+    this.requireUnlocked();
+    const stored = await this.requireStored();
+    const envelope = parseCastawayEnvelope(JSON.parse(encrypted) as unknown);
+    if (envelope.ownerPublicKey !== stored.identity.ownerPublicKey)
+      throw new Error("Castaway identity belongs to a different Member Key");
+    const opened = await this.custody.importCastaway(encrypted, passphrase);
+    const contents = parseCastawayContents(JSON.parse(opened) as unknown);
+    this.assertProfileOwner(contents.sections.identity, stored);
+    return this.saveIdentityProfile(contents.sections.identity);
+  }
+
   async lock(): Promise<void> {
     await this.custody.lock();
     this.unlocked = false;
@@ -201,6 +272,14 @@ export class WebWalletSession {
       await this.custody.lock();
       throw error;
     }
+  }
+
+  private assertProfileOwner(
+    profile: ZenithIdentitySectionV1,
+    stored: StoredWebWallet,
+  ): void {
+    if (profile.subject.memberKey !== stored.identity.ownerPublicKey)
+      throw new Error("Castaway identity belongs to a different Member Key");
   }
 }
 

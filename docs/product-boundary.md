@@ -16,7 +16,7 @@ Under current evidence, the Zenith forum posture remains **visible unavailable**
 
 ## Current fixture implementation
 
-Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment offers extension custody and encrypted browser custody, uses a stateless Zenith signer for deterministic v3 membership credentials, and independently verifies the exact public credential in Web. Browser custody is the mobile path and stores encrypted signing authority in IndexedDB; it does not create an account or session. Dregg permissionless v2 remains dormant compatibility. There is no application, pending review, Control admission step, cookie, or Web session.
+Issue #2 implemented the deterministic fixture shell, fixture BFF, canonical OpenAPI/JSON Schema sources, local UI primitives, and a network-free read-only Matrix interface. The current `/start` increment offers extension custody and encrypted browser custody, uses a stateless Zenith signer for deterministic v3 membership credentials, and independently verifies the exact public credential in Web. Browser custody is the mobile path and stores encrypted signing authority plus a separately sealed private identity section in IndexedDB; it does not create an account or server session. Dregg permissionless v2 remains dormant compatibility. There is no application, pending review, Control admission step, cookie, or Web session.
 
 The static public site can detect an installed Wallet or open its first-party browser wallet, but a complete Join requires the configured HTTPS Zenith issuer to be reachable. Browser custody additionally requires IndexedDB, Web Workers, WebAssembly, and secure random support. The app performs no Matrix operation, provisioning, authenticated session issuance, or Dregg node operation.
 
@@ -25,6 +25,8 @@ The static public site can detect an installed Wallet or open its first-party br
 The route inventory is:
 
 - `/`
+- `/start`
+- `/profile`
 - `/chronicle`
 - `/tenders`
 - `/tenders/:tenderId`
@@ -32,7 +34,7 @@ The route inventory is:
 - `/rfcs/:rfcId`
 - `/docs`
 
-The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), and **Docs** (`/docs`). Chronicle, Tenders, RFC, and Docs are implemented fixture destinations; Merch remains a visible placeholder. Chronicle publishes a checked-in read-only essay about portable data and the planned `.castaway` vault, not a remote publication system. The landing **Start** action opens `/start`; Join requires a compatible Wallet and its configured Zenith issuer. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
+The compact primary navigation contains **Chronicle** (`/chronicle`), **Tenders** (`/tenders`), **RFC** (`/rfcs`), **Merch** (`/merch`), **Docs** (`/docs`), and a membership-aware action. That action is **Join** (`/start`) before membership and **Profile** (`/profile`) after a verified local or extension membership is detected. Chronicle, Tenders, RFC, and Docs are implemented fixture destinations; Merch remains a visible placeholder. Chronicle publishes a checked-in read-only essay about portable data, not a remote publication system. The landing **Start** action opens `/start`; Join requires a compatible Wallet and its configured Zenith issuer. The previous standalone Proposals, Spaces, Rooms, Problems, creation, request, API-doc, specification, architecture, and exchange-preview routes resolve to the retained not-found page.
 
 These paths began as the I01 navigation contract and now exist as deterministic fixture surfaces. Their existence is not evidence of live Matrix or Castalia Control integration, authentication, provisioning, deployment, or production readiness.
 
@@ -60,7 +62,7 @@ These registries and viewers read checked-in synthetic examples only. They conta
 
 `/docs` is the only routed documentation page. It is a compact, information-first map of retained surfaces, product-model distinctions, and fixture boundaries. The previous large card grid and nested API, specifications, RFC architecture, and exchange-preview pages are no longer routed.
 
-The [Castaway portable-vault boundary](castaway-portable-vault.md) documents Web's relationship to the planned application-neutral encrypted vault. Web may request individually approved public projections from Wallet, but it does not receive, decrypt, store, or install the vault or its private entries.
+The [Castaway portable-vault boundary](castaway-portable-vault.md) documents the first implemented application-neutral encrypted-vault slice. Castalia Web's browser wallet stores a private Zenith identity section, can import or export that section in a passphrase-encrypted `.castaway`, and can create a plaintext projection only from individually selected self-asserted claims. It does not automatically transmit a claim or install keys, credentials, capabilities, or executable entries. Extension-wallet profile access remains unavailable until the extension exposes the same bounded contract.
 
 ## Project and repository boundary
 

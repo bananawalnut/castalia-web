@@ -54,13 +54,13 @@ describe("vanilla Castalia shell", () => {
     const app = mountCastaliaApp(root);
 
     expect(root.querySelectorAll('nav[aria-label="Primary"] a')).toHaveLength(
-      5,
+      6,
     );
     expect(
       Array.from(root.querySelectorAll('nav[aria-label="Primary"] a')).map(
         (link) => link.textContent,
       ),
-    ).toEqual(["Chronicle", "Tenders", "RFC", "Merch", "Docs"]);
+    ).toEqual(["Chronicle", "Tenders", "RFC", "Merch", "Docs", "Join"]);
     expect(
       root.querySelector<HTMLImageElement>(".brand-logo")?.getAttribute("src"),
     ).toBe("/brand/castalia-crest.svg");

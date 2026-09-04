@@ -10,6 +10,7 @@ Status: accepted authority contract from issue #9, preserving Historical issue #
 | Castalia authorization, challenge/replay policy, syndicate admission policy/status, revocation/discharge enforcement, and authority receipts | Castalia Control using Dregg authorization | This repository does not implement that service. Its unprivileged Web client may send exact enrollment-v2 wallet proof directly to configured Control; a later capability-bearing operation using a wallet-held `dga1_` remains separate. |
 | Infrastructure execution, including Zenith-hosted Matrix provisioning | The infrastructure provisioner; Hub may fill this role for Zenith-hosted resources | The provisioner alone holds cloud, DNS, Synapse-admin, signing, federation-admission, and deployment credentials. It is not the authorization source or Castalia lifecycle authority. |
 | Product routes and presentation | `bananawalnut/castalia-web` | The public repository may define and deploy the unprivileged fixture web experience, while displaying upstream states without turning them into authority. |
+| Self-asserted profile claims | The member who controls the local `.castaway` vault | Castalia Web stores the identity section encrypted, marks every claim private by default, and creates only a member-selected plaintext projection. A profile role, affiliation, or journal relationship is not a verified credential or authorization grant. |
 | Documentation interpretation | The precedence rules below | Prose cannot override Matrix truth, verified Dregg authority, accepted issue boundaries, or reviewed evidence. |
 
 ## Request/status-first lifecycle
@@ -52,6 +53,7 @@ Lower-precedence text must be corrected; it cannot broaden a higher-precedence a
 | Claim or posture | Current status | Evidence gate / owner |
 | --- | --- | --- |
 | Product routes and navigation contract are defined | Implemented fixture claim | Issues #1 and #2, the route shell, and route/browser checks; no live upstream behavior claimed. |
+| Browser-wallet profile and `.castaway` identity section | Implemented local-custody claim | `@castalia/castaway-contract`, Rust/WASM sealed storage, exact-owner import, private defaults, and selected-disclosure tests; no server publication, verification, or synchronization claimed. |
 | Fixture BFF and canonical contract sources exist | Implemented fixture claim | Issue #2, local/hosted verification, and checked-in OpenAPI/JSON Schema sources; no deployed API claimed. |
 | Matrix is canonical for Matrix state and authorized sends | Authority boundary | Matrix; this repository remains unprivileged. |
 | Castalia creation/admission uses request/status-first semantics | Web submission client implemented; authority and status unavailable | The Web client can submit only after local proof verification. Control application processing, status, anchored authority, provisioner work, and lifecycle evidence remain required. |
@@ -70,6 +72,6 @@ This repository does not currently claim:
 - live Matrix reading, discovery, joining, authentication, posting, membership, federation, or live rooms;
 - Synapse admin/appservice authority or credentials;
 - implementation or deployment of Castalia Control, authoritative proof verification/replay consumption, or anchored Dregg authority;
-- authenticated sessions, active membership, `dga1_` custody/presentation, application status retrieval, or community/room provisioning;
+- authenticated server sessions, verified profile claims, `dga1_` custody/presentation, application status retrieval, or community/room provisioning;
 - AI interpretation, canonical summaries, or an interpreter repository;
 - infrastructure, deployment, security approval, or production readiness.

@@ -12,6 +12,7 @@ import type {
   StoredWebWallet,
   WebWalletStorage,
 } from "../src/wallet/web-wallet-storage.js";
+import { createPrivateZenithIdentity } from "@castalia/castaway-contract";
 
 const randomHex32 = () =>
   hexFromBytes(globalThis.crypto.getRandomValues(new Uint8Array(32)));
@@ -73,6 +74,50 @@ function fakeCustody(ownerPublicKey: string): WebWalletCustodyClient {
     },
     exportRandomized() {
       return Promise.resolve("encrypted");
+    },
+    sealIdentitySection(contents) {
+      return Promise.resolve(`sealed:${btoa(contents)}`);
+    },
+    openIdentitySection(encrypted) {
+      if (!encrypted.startsWith("sealed:"))
+        return Promise.reject(new Error("malformed"));
+      return Promise.resolve(atob(encrypted.slice("sealed:".length)));
+    },
+    exportCastaway(contents) {
+      return Promise.resolve(
+        JSON.stringify({
+          schema: "castalia.castaway.v1",
+          contentsSchema: "castalia.castaway-contents.v1",
+          ownerPublicKey,
+          exportedAt: Date.now(),
+          kdf: {
+            name: "Argon2id",
+            version: 19,
+            salt: "A".repeat(22),
+            memoryKiB: 65_536,
+            iterations: 3,
+            parallelism: 1,
+            derivedKeyBytes: 32,
+          },
+          aead: {
+            name: "AES-256-GCM",
+            nonce: "A".repeat(16),
+            tagBits: 128,
+          },
+          ciphertext: base64urlFromBytes(new TextEncoder().encode(contents)),
+        }),
+      );
+    },
+    importCastaway(encrypted) {
+      const value = JSON.parse(encrypted) as { ciphertext?: unknown };
+      if (typeof value.ciphertext !== "string")
+        return Promise.reject(new Error("malformed"));
+      const padded = value.ciphertext.replaceAll("-", "+").replaceAll("_", "/");
+      const bytes = Uint8Array.from(
+        atob(padded.padEnd(Math.ceil(padded.length / 4) * 4, "=")),
+        (character) => character.charCodeAt(0),
+      );
+      return Promise.resolve(new TextDecoder().decode(bytes));
     },
     signMembershipJoin() {
       return Promise.resolve(
@@ -201,5 +246,62 @@ describe("mobile Web wallet session", () => {
       "a new runtime passphrase",
     );
     expect((await session.snapshot()).backupConfirmed).toBe(true);
+  });
+
+  it("stores a bound identity profile only as a sealed Castaway section", async () => {
+    const ownerPublicKey = randomHex32();
+    const storage = memoryStorage();
+    const session = new WebWalletSession(
+      fakeCustody(ownerPublicKey),
+      storage,
+      "https://membership.example",
+      trustPolicy,
+      issuerFetch,
+    );
+    await session.create("generated during this test only");
+    const profile = createPrivateZenithIdentity(ownerPublicKey, Date.now());
+    profile.subject.fields.displayName.value = "Runtime Researcher";
+    await session.saveIdentityProfile(profile);
+
+    expect(storage.current?.encryptedIdentitySection).toMatch(/^sealed:/u);
+    expect(storage.current?.encryptedIdentitySection).not.toContain(
+      "Runtime Researcher",
+    );
+    expect(
+      (await session.identityProfile()).subject.fields.displayName.value,
+    ).toBe("Runtime Researcher");
+
+    const wrongOwner = createPrivateZenithIdentity(randomHex32(), Date.now());
+    await expect(session.saveIdentityProfile(wrongOwner)).rejects.toThrow(
+      /different Member Key/u,
+    );
+  });
+
+  it("round-trips the identity section through a portable Castaway export", async () => {
+    const ownerPublicKey = randomHex32();
+    const session = new WebWalletSession(
+      fakeCustody(ownerPublicKey),
+      memoryStorage(),
+      "https://membership.example",
+      trustPolicy,
+      issuerFetch,
+    );
+    await session.create("generated during this test only");
+    const profile = createPrivateZenithIdentity(ownerPublicKey, Date.now());
+    profile.subject.fields.displayName = {
+      value: "Portable Runtime Person",
+      disclosure: "selected",
+    };
+    await session.saveIdentityProfile(profile);
+    const vaultPassphrase = `runtime-${randomHex32()}`;
+    const exported = await session.exportCastaway(vaultPassphrase);
+
+    profile.subject.fields.displayName.value = "Locally changed";
+    await session.saveIdentityProfile(profile);
+    const imported = await session.importCastaway(exported, vaultPassphrase);
+    expect(imported.subject.fields.displayName).toEqual({
+      value: "Portable Runtime Person",
+      disclosure: "selected",
+    });
   });
 });

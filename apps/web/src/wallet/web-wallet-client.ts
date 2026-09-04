@@ -35,6 +35,14 @@ export interface WebWalletCustodyClient {
   identity(): Promise<WebWalletIdentity>;
   recoveryKey(): Promise<string>;
   exportRandomized(passphrase: string): Promise<string>;
+  sealIdentitySection(contents: string): Promise<string>;
+  openIdentitySection(encrypted: string): Promise<string>;
+  exportCastaway(
+    contents: string,
+    passphrase: string,
+    exportedAt: number,
+  ): Promise<string>;
+  importCastaway(encrypted: string, passphrase: string): Promise<string>;
   signMembershipJoin(): Promise<Uint8Array>;
   lock(): Promise<void>;
   destroy(): void;
@@ -89,6 +97,19 @@ export function createWebWalletCustodyClient(
     identity: () => call({ operation: "identity" }),
     recoveryKey: () => call({ operation: "recovery-key" }),
     exportRandomized: (passphrase) => call({ operation: "export", passphrase }),
+    sealIdentitySection: (contents) =>
+      call({ operation: "seal-identity-section", contents }),
+    openIdentitySection: (encrypted) =>
+      call({ operation: "open-identity-section", encrypted }),
+    exportCastaway: (contents, passphrase, exportedAt) =>
+      call({
+        operation: "export-castaway",
+        contents,
+        passphrase,
+        exportedAt,
+      }),
+    importCastaway: (encrypted, passphrase) =>
+      call({ operation: "import-castaway", encrypted, passphrase }),
     signMembershipJoin: () => call({ operation: "sign-membership-join" }),
     lock: () => call({ operation: "lock" }),
     destroy() {

@@ -7,6 +7,7 @@ export type StoredWebWallet = {
   identity: WebWalletIdentity;
   backupConfirmed: boolean;
   membership: ZenithMembershipCredentialV3 | null;
+  encryptedIdentitySection: string | null;
 };
 
 export interface WebWalletStorage {
@@ -78,7 +79,14 @@ async function withStore<T>(
   }
 }
 
-function isStoredWebWallet(value: unknown): value is StoredWebWallet {
+type CompatibleStoredWebWallet = Omit<
+  StoredWebWallet,
+  "encryptedIdentitySection"
+> & {
+  encryptedIdentitySection?: string | null;
+};
+
+function isStoredWebWallet(value: unknown): value is CompatibleStoredWebWallet {
   if (typeof value !== "object" || value === null || Array.isArray(value))
     return false;
   const record = value as Partial<StoredWebWallet>;
@@ -87,8 +95,10 @@ function isStoredWebWallet(value: unknown): value is StoredWebWallet {
     | null
     | undefined;
   return (
-    Object.keys(record).sort().join(",") ===
-      "backupConfirmed,encryptedCustody,identity,membership,schema" &&
+    [
+      "backupConfirmed,encryptedCustody,identity,membership,schema",
+      "backupConfirmed,encryptedCustody,encryptedIdentitySection,identity,membership,schema",
+    ].includes(Object.keys(record).sort().join(",")) &&
     record.schema === "castalia.web-wallet.v1" &&
     typeof record.encryptedCustody === "string" &&
     record.encryptedCustody.length > 0 &&
@@ -104,8 +114,22 @@ function isStoredWebWallet(value: unknown): value is StoredWebWallet {
     ML_DSA_65_PUBLIC_KEY.test(identity.mlDsa65PublicKey) &&
     typeof identity.mlDsa65PublicKeyCommitment === "string" &&
     HEX32.test(identity.mlDsa65PublicKeyCommitment) &&
+    (record.encryptedIdentitySection === undefined ||
+      record.encryptedIdentitySection === null ||
+      (typeof record.encryptedIdentitySection === "string" &&
+        record.encryptedIdentitySection.length > 0 &&
+        record.encryptedIdentitySection.length <= 1_048_576)) &&
     (record.membership === null || typeof record.membership === "object")
   );
+}
+
+export function parseStoredWebWallet(value: unknown): StoredWebWallet {
+  if (!isStoredWebWallet(value))
+    throw new Error("stored Web wallet record is malformed");
+  return structuredClone({
+    ...value,
+    encryptedIdentitySection: value.encryptedIdentitySection ?? null,
+  });
 }
 
 export function createIndexedDbWebWalletStorage(): WebWalletStorage {
@@ -115,9 +139,7 @@ export function createIndexedDbWebWalletStorage(): WebWalletStorage {
         store.get(RECORD),
       );
       if (value === undefined) return null;
-      if (!isStoredWebWallet(value))
-        throw new Error("stored Web wallet record is malformed");
-      return structuredClone(value);
+      return parseStoredWebWallet(value);
     },
     async save(value) {
       await withStore("readwrite", (store) =>

@@ -12,6 +12,14 @@ import {
   type StartFlowDependencies,
   type StartWalletProvider,
 } from "./start.js";
+import { profileView, type ProfileDependencies } from "./profile.js";
+import {
+  createWebWalletSession,
+  type WebWalletSession,
+} from "./wallet/web-wallet-session.js";
+import { ZENITH_MEMBERSHIP_TRUST_POLICY } from "./membership/trust-policy.js";
+import { verifyZenithMembershipCredential } from "@castalia/membership-contract";
+import { createIndexedDbWebWalletStorage } from "./wallet/web-wallet-storage.js";
 
 export type CastaliaApp = {
   navigate(path: string): void;
@@ -27,6 +35,7 @@ type CastaliaAppOptions = Partial<StartFlowDependencies> & {
   membershipServiceAvailable?: boolean;
   /** @deprecated Retained only so older embedders do not fail to compile. */
   completeOnboarding?: unknown;
+  webWalletSession?: WebWalletSession;
 };
 
 declare global {
@@ -38,9 +47,13 @@ declare global {
 function route(
   pathname: string,
   startDependencies: StartFlowDependencies,
+  profileDependencies: ProfileDependencies | null,
 ): View {
   if (pathname === "/") return landingView();
   if (pathname === "/start") return startView(startDependencies);
+  if (pathname === "/profile" && profileDependencies)
+    return profileView(profileDependencies);
+  if (pathname === "/profile") return notFoundView();
   if (pathname === "/chronicle") return chronicleView();
   if (pathname === "/tenders") return tenderCatalogView();
   if (pathname.startsWith("/tenders/"))
@@ -81,6 +94,7 @@ function createShell(root: HTMLElement) {
     const link = document.createElement("a");
     link.href = deployedPath(item.to);
     link.textContent = item.label;
+    if (item.to === "/start") link.dataset.accountLink = "true";
     nav.append(link);
   }
   headerLeft.append(brand, nav);
@@ -91,27 +105,117 @@ function createShell(root: HTMLElement) {
   main.tabIndex = -1;
   shell.append(skip, header, main);
   root.replaceChildren(shell);
-  return { main, nav };
+  return {
+    main,
+    nav,
+    accountLink: nav.querySelector<HTMLAnchorElement>("[data-account-link]"),
+  };
 }
 
 export function mountCastaliaApp(
   root: HTMLElement,
   options: CastaliaAppOptions = {},
 ): CastaliaApp {
-  const { main, nav } = createShell(root);
+  const { main, nav, accountLink } = createShell(root);
   let currentView: View | undefined;
+  const ownsWebWalletSession = options.webWalletSession === undefined;
+  const webWalletStorage =
+    typeof indexedDB !== "undefined"
+      ? createIndexedDbWebWalletStorage()
+      : undefined;
+  let webWalletSession = options.webWalletSession;
+  const ensureWebWalletSession = () => {
+    if (webWalletSession) return webWalletSession;
+    if (typeof Worker === "undefined" || !webWalletStorage) return undefined;
+    webWalletSession = createWebWalletSession({
+      issuerOrigin:
+        options.membershipIssuerUrl ?? "https://membership.zenith-research.ca",
+      trustPolicy: ZENITH_MEMBERSHIP_TRUST_POLICY,
+      storage: webWalletStorage,
+    });
+    return webWalletSession;
+  };
+  let accountRefresh = 0;
+  const refreshAccountLink = async () => {
+    const refresh = ++accountRefresh;
+    let member = false;
+    try {
+      if (webWalletSession)
+        member = Boolean((await webWalletSession.snapshot()).membership);
+      else if (webWalletStorage) {
+        const stored = await webWalletStorage.load();
+        if (stored?.membership) {
+          await verifyZenithMembershipCredential(
+            stored.membership,
+            ZENITH_MEMBERSHIP_TRUST_POLICY,
+            stored.identity.ownerPublicKey,
+          );
+          member = true;
+        }
+      }
+      if (!member) {
+        const provider = options.getWalletProvider?.() ?? window.castaliaWallet;
+        if (provider) {
+          const [membership, subject] = await Promise.all([
+            provider.getMembership(),
+            provider.getSubject(),
+          ]);
+          const verified = await verifyZenithMembershipCredential(
+            membership,
+            ZENITH_MEMBERSHIP_TRUST_POLICY,
+          );
+          member = verified.ownerPublicKey === subject.dreggOwnerPublicKey;
+        }
+      }
+    } catch {
+      member = false;
+    }
+    if (refresh !== accountRefresh || !accountLink) return;
+    accountLink.textContent = member ? "Profile" : "Join";
+    accountLink.href = deployedPath(member ? "/profile" : "/start");
+    const currentPath = routePath(window.location.pathname);
+    if (
+      (member && currentPath === "/profile") ||
+      (!member && currentPath === "/start")
+    )
+      accountLink.setAttribute("aria-current", "page");
+    else accountLink.removeAttribute("aria-current");
+  };
   const startDependencies: StartFlowDependencies = {
     walletInstallUrl: options.walletInstallUrl ?? "",
     membershipIssuerUrl:
       options.membershipIssuerUrl ?? "https://membership.zenith-research.ca",
     getWalletProvider:
       options.getWalletProvider ?? (() => window.castaliaWallet),
+    onMembershipChanged() {
+      void refreshAccountLink();
+    },
   };
 
   const render = () => {
     currentView?.destroy?.();
     const currentPath = routePath(window.location.pathname);
-    currentView = route(currentPath, startDependencies);
+    const currentSession =
+      currentPath === "/start" || currentPath === "/profile"
+        ? ensureWebWalletSession()
+        : webWalletSession;
+    const profileDependencies: ProfileDependencies | null = currentSession
+      ? {
+          webWalletSession: currentSession,
+          getWalletProvider: () => startDependencies.getWalletProvider(),
+          onWalletChanged() {
+            void refreshAccountLink();
+          },
+        }
+      : null;
+    currentView = route(
+      currentPath,
+      {
+        ...startDependencies,
+        ...(currentSession ? { webWalletSession: currentSession } : {}),
+      },
+      profileDependencies,
+    );
     main.replaceChildren(currentView.element);
     for (const link of main.querySelectorAll<HTMLAnchorElement>("a[href]")) {
       const href = link.getAttribute("href");
@@ -125,12 +229,20 @@ export function mountCastaliaApp(
         : currentPath;
     for (const link of nav.querySelectorAll<HTMLAnchorElement>("a")) {
       if (
-        ["/chronicle", "/docs", "/rfcs", "/tenders"].includes(navigationPath) &&
+        [
+          "/chronicle",
+          "/docs",
+          "/rfcs",
+          "/tenders",
+          "/start",
+          "/profile",
+        ].includes(navigationPath) &&
         routePath(link.pathname) === navigationPath
       )
         link.setAttribute("aria-current", "page");
       else link.removeAttribute("aria-current");
     }
+    void refreshAccountLink();
     main.focus({ preventScroll: true });
   };
 
@@ -172,6 +284,11 @@ export function mountCastaliaApp(
   };
   root.addEventListener("click", onClick);
   window.addEventListener("popstate", onPopState);
+  const onVisibility = () => {
+    if (document.visibilityState !== "hidden" || !webWalletSession) return;
+    void webWalletSession.lock().then(refreshAccountLink, () => undefined);
+  };
+  document.addEventListener("visibilitychange", onVisibility);
   render();
 
   return {
@@ -180,6 +297,8 @@ export function mountCastaliaApp(
       currentView?.destroy?.();
       root.removeEventListener("click", onClick);
       window.removeEventListener("popstate", onPopState);
+      document.removeEventListener("visibilitychange", onVisibility);
+      if (ownsWebWalletSession) webWalletSession?.destroy();
       root.replaceChildren();
     },
   };

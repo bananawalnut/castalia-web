@@ -8,6 +8,7 @@ import "./rfc-catalog.css";
 import "./rfc-document.css";
 import "./spaces.css";
 import "./start.css";
+import "./profile.css";
 
 const env = loadBrowserEnv(import.meta.env);
 const root = document.getElementById("root");

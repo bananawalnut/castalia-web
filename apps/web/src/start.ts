@@ -10,6 +10,7 @@ import {
   createWebWalletPanel,
   type WebWalletPanel,
 } from "./wallet/web-wallet-panel.js";
+import type { WebWalletSession } from "./wallet/web-wallet-session.js";
 
 export type StartMembershipSummary = ZenithMembershipCredentialV3;
 
@@ -23,6 +24,8 @@ export type StartFlowDependencies = {
   walletInstallUrl: string;
   membershipIssuerUrl: string;
   getWalletProvider(): StartWalletProvider | undefined;
+  webWalletSession?: WebWalletSession;
+  onMembershipChanged?(): void;
 };
 
 function supportsZenithIssuedJoin(
@@ -181,6 +184,7 @@ export function startView(dependencies: StartFlowDependencies): View {
         button.textContent = "Membership active";
       }
       appendActivity("Zenith-signed Castalia membership verified Active.");
+      dependencies.onMembershipChanged?.();
     } catch (error) {
       showFailure(error, true);
     }
@@ -220,6 +224,16 @@ export function startView(dependencies: StartFlowDependencies): View {
     webWalletHost.hidden = false;
     webWalletPanel = createWebWalletPanel({
       issuerOrigin: dependencies.membershipIssuerUrl,
+      ...(dependencies.webWalletSession
+        ? { session: dependencies.webWalletSession }
+        : {}),
+      ...(dependencies.onMembershipChanged
+        ? {
+            onStateChange: () => {
+              dependencies.onMembershipChanged?.();
+            },
+          }
+        : {}),
       onMembership(membership) {
         void membershipFromReadyDetail({ membership })
           .then((verified) => {
@@ -229,6 +243,7 @@ export function startView(dependencies: StartFlowDependencies): View {
             result.textContent =
               "Castalia membership is Active for this browser wallet.";
             appendActivity("Browser wallet membership verified Active.");
+            dependencies.onMembershipChanged?.();
           })
           .catch((error: unknown) => {
             showFailure(error, true);

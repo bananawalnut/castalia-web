@@ -27,6 +27,25 @@ export type CustodyRequest =
   | { id: number; operation: "identity" }
   | { id: number; operation: "recovery-key" }
   | { id: number; operation: "export"; passphrase: string }
+  | { id: number; operation: "seal-identity-section"; contents: string }
+  | {
+      id: number;
+      operation: "open-identity-section";
+      encrypted: string;
+    }
+  | {
+      id: number;
+      operation: "export-castaway";
+      contents: string;
+      passphrase: string;
+      exportedAt: number;
+    }
+  | {
+      id: number;
+      operation: "import-castaway";
+      encrypted: string;
+      passphrase: string;
+    }
   | { id: number; operation: "sign-membership-join" }
   | { id: number; operation: "lock" };
 

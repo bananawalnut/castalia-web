@@ -8,4 +8,5 @@ export const navigation = [
   { to: "/rfcs", label: "RFC" },
   { to: "/merch", label: "Merch" },
   { to: "/docs", label: "Docs" },
+  { to: "/start", label: "Join" },
 ] as const;

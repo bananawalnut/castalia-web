@@ -17,6 +17,14 @@ type WasmCustody = {
   ): string;
   unlock(encrypted: Uint8Array, passphrase: string): string;
   exportRandomized(passphrase: string): string;
+  sealIdentitySection(contents: string): string;
+  openIdentitySection(encrypted: Uint8Array): string;
+  exportCastaway(
+    contents: string,
+    passphrase: string,
+    exportedAt: bigint,
+  ): string;
+  importCastaway(encrypted: Uint8Array, passphrase: string): string;
   recoveryKey(): string;
   publicKey(): string;
   mlDsaPublicKey(): string;
@@ -79,6 +87,23 @@ async function execute(request: CustodyRequest): Promise<unknown> {
       return wallet.recoveryKey();
     case "export":
       return wallet.exportRandomized(request.passphrase);
+    case "seal-identity-section":
+      return wallet.sealIdentitySection(request.contents);
+    case "open-identity-section":
+      return wallet.openIdentitySection(
+        new TextEncoder().encode(request.encrypted),
+      );
+    case "export-castaway":
+      return wallet.exportCastaway(
+        request.contents,
+        request.passphrase,
+        BigInt(request.exportedAt),
+      );
+    case "import-castaway":
+      return wallet.importCastaway(
+        new TextEncoder().encode(request.encrypted),
+        request.passphrase,
+      );
     case "sign-membership-join":
       return wallet.signZenithMembershipJoin();
     case "lock":

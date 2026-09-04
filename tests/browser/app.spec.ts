@@ -19,6 +19,7 @@ const routes = [
   "/",
   "/docs",
   "/start",
+  "/profile",
   "/chronicle",
   "/proposals",
   "/tenders",
@@ -27,7 +28,7 @@ const routes = [
   "/merch",
   "/missing",
 ];
-const primary = ["Chronicle", "Tenders", "RFC", "Merch", "Docs"];
+const primary = ["Chronicle", "Tenders", "RFC", "Merch", "Docs", "Join"];
 for (const route of routes) {
   test(`${route} has bounded semantics, privacy, responsiveness, and no serious axe findings`, async ({
     page,
@@ -66,6 +67,7 @@ for (const route of routes) {
       "/rfcs",
       "/tenders",
       "/tenders/tnd-0001",
+      "/start",
     ].includes(route)
       ? 1
       : 0;
@@ -158,6 +160,11 @@ test("Start reports success only after Wallet hands off verified Active membersh
   await expect(
     page.getByRole("button", { name: "Membership active" }),
   ).toBeDisabled();
+  await expect(
+    page.getByRole("navigation", { name: "Primary" }).getByRole("link", {
+      name: "Profile",
+    }),
+  ).toHaveAttribute("href", "/profile");
   expect(await page.context().cookies()).toEqual([]);
   expect(
     await page.evaluate(() => ({

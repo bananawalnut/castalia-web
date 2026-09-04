@@ -18,7 +18,7 @@ pnpm verify
 - required issue #1/#9 documents, including repository evidence, the Castalia Control authority boundary, and the membership-onboarding boundary, exist;
 - current fixture implementation wording and issue #2 merge provenance are present;
 - README Markdown links resolve to committed files;
-- the canonical route inventory appears in the product boundary;
+- the canonical route inventory, membership-aware Join/Profile navigation, and private Castaway identity boundary appear in the product boundary;
 - Matrix, Castalia Control, infrastructure-provisioner, request/status, unavailable-forum, deferred-interpretation, precedence, and non-claim language is present;
 - membership onboarding documents the Control-issued challenge, independent BLAKE3/Ed25519 verification, verification-before-submission order, required server-side repeat verification, public deployment limitation, and migration boundary;
 - superseded separate-registry authority statements are absent from current README/product/authority surfaces;

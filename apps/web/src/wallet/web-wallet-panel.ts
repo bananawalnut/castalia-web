@@ -22,7 +22,9 @@ export function createWebWalletPanel(input: {
   issuerOrigin: string;
   session?: WebWalletSession;
   onMembership(membership: ZenithMembershipCredentialV3): void;
+  onStateChange?(): void;
 }): WebWalletPanel {
+  const ownsSession = input.session === undefined;
   const session =
     input.session ??
     createWebWalletSession({
@@ -53,6 +55,7 @@ export function createWebWalletPanel(input: {
       notice = message(error);
     } finally {
       busy = false;
+      input.onStateChange?.();
       await render();
     }
   };
@@ -225,7 +228,7 @@ export function createWebWalletPanel(input: {
     element,
     destroy() {
       document.removeEventListener("visibilitychange", onVisibility);
-      session.destroy();
+      if (ownsSession) session.destroy();
     },
   };
 }

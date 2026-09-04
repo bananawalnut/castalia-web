@@ -24,6 +24,12 @@ const ZENITH_MEMBERSHIP_JOIN_DOMAIN: &[u8] = b"castalia/zenith-membership-join/v
 const MAX_WALLET_BYTES: usize = 1_048_576;
 const DREGG_HYBRID_TURN_PQ_CONTEXT: &[u8] = b"dregg-hybrid-turn-v1";
 const DREGG_ML_DSA_KEY_COMMITMENT_DOMAIN: &str = "dregg-cell-ml-dsa-key-v1";
+const CASTAWAY_LOCAL_SCHEMA: &str = "castalia.castaway-local-section.v1";
+const CASTAWAY_LOCAL_KEY_DOMAIN: &str = "castalia/castaway-local-section/v1";
+const CASTAWAY_OUTER_SCHEMA: &str = "castalia.castaway.v1";
+const CASTAWAY_CONTENTS_SCHEMA: &str = "castalia.castaway-contents.v1";
+const CASTAWAY_LOCAL_KEY_DERIVATION: &str = "BLAKE3-DERIVE-KEY";
+const MAX_CASTAWAY_BYTES: usize = 1_048_576;
 const ED25519_PKCS8_PREFIX: [u8; 16] = [
     0x30, 0x2e, 0x02, 0x01, 0x00, 0x30, 0x05, 0x06, 0x03, 0x2b, 0x65, 0x70, 0x04, 0x22, 0x04, 0x20,
 ];
@@ -102,6 +108,72 @@ struct SecretPlaintext {
     created_at: u64,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+struct CastawayLocalHeader {
+    schema: String,
+    owner_public_key: String,
+    key_derivation: String,
+    aead: AeadHeader,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+struct CastawayLocalContainer {
+    schema: String,
+    owner_public_key: String,
+    key_derivation: String,
+    aead: AeadHeader,
+    ciphertext: String,
+}
+
+impl CastawayLocalContainer {
+    fn header(&self) -> CastawayLocalHeader {
+        CastawayLocalHeader {
+            schema: self.schema.clone(),
+            owner_public_key: self.owner_public_key.clone(),
+            key_derivation: self.key_derivation.clone(),
+            aead: self.aead.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+struct CastawayHeader {
+    schema: String,
+    contents_schema: String,
+    owner_public_key: String,
+    exported_at: u64,
+    kdf: KdfHeader,
+    aead: AeadHeader,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "camelCase")]
+struct CastawayContainer {
+    schema: String,
+    contents_schema: String,
+    owner_public_key: String,
+    exported_at: u64,
+    kdf: KdfHeader,
+    aead: AeadHeader,
+    ciphertext: String,
+}
+
+impl CastawayContainer {
+    fn header(&self) -> CastawayHeader {
+        CastawayHeader {
+            schema: self.schema.clone(),
+            contents_schema: self.contents_schema.clone(),
+            owner_public_key: self.owner_public_key.clone(),
+            exported_at: self.exported_at,
+            kdf: self.kdf.clone(),
+            aead: self.aead.clone(),
+        }
+    }
+}
+
 pub struct OpenedWallet {
     signing_key: SigningKey,
     ml_dsa_signing_key: ml_dsa_65::PrivateKey,
@@ -166,6 +238,136 @@ impl OpenedWallet {
             salt,
             nonce,
         )
+    }
+
+    pub fn seal_identity_section(&self, contents: &str) -> Result<Zeroizing<String>> {
+        let plaintext = canonical_json(contents)?;
+        let mut nonce = [0_u8; 12];
+        OsRng.fill_bytes(&mut nonce);
+        let header = CastawayLocalHeader {
+            schema: CASTAWAY_LOCAL_SCHEMA.into(),
+            owner_public_key: self.public_key_hex(),
+            key_derivation: CASTAWAY_LOCAL_KEY_DERIVATION.into(),
+            aead: AeadHeader {
+                name: "AES-256-GCM".into(),
+                nonce: URL_SAFE_NO_PAD.encode(nonce),
+                tag_bits: 128,
+            },
+        };
+        let aad = jcs_to_vec(&header)?;
+        let key = self.castaway_local_key();
+        let ciphertext = encrypt_bytes(plaintext.as_ref(), &aad, &key, &nonce)?;
+        let container = CastawayLocalContainer {
+            schema: header.schema,
+            owner_public_key: header.owner_public_key,
+            key_derivation: header.key_derivation,
+            aead: header.aead,
+            ciphertext: URL_SAFE_NO_PAD.encode(ciphertext),
+        };
+        Ok(Zeroizing::new(
+            String::from_utf8(jcs_to_vec(&container)?).map_err(closed)?,
+        ))
+    }
+
+    pub fn open_identity_section(&self, encoded: &[u8]) -> Result<Zeroizing<String>> {
+        if encoded.is_empty() || encoded.len() > MAX_CASTAWAY_BYTES {
+            return Err(CustodyError::InvalidWalletFile);
+        }
+        let container: CastawayLocalContainer = serde_json::from_slice(encoded).map_err(closed)?;
+        if container.schema != CASTAWAY_LOCAL_SCHEMA
+            || container.owner_public_key != self.public_key_hex()
+            || container.key_derivation != CASTAWAY_LOCAL_KEY_DERIVATION
+            || container.aead.name != "AES-256-GCM"
+            || container.aead.tag_bits != 128
+        {
+            return Err(CustodyError::InvalidWalletFile);
+        }
+        let nonce = decode_exact::<12>(&container.aead.nonce)?;
+        let ciphertext = decode_ciphertext(&container.ciphertext)?;
+        let aad = jcs_to_vec(&container.header())?;
+        let key = self.castaway_local_key();
+        decrypt_json(&ciphertext, &aad, &key, &nonce)
+    }
+
+    pub fn export_castaway(
+        &self,
+        contents: &str,
+        passphrase: &str,
+        exported_at: u64,
+    ) -> Result<Zeroizing<String>> {
+        let plaintext = canonical_json(contents)?;
+        let mut salt = [0_u8; 16];
+        let mut nonce = [0_u8; 12];
+        OsRng.fill_bytes(&mut salt);
+        OsRng.fill_bytes(&mut nonce);
+        let header = CastawayHeader {
+            schema: CASTAWAY_OUTER_SCHEMA.into(),
+            contents_schema: CASTAWAY_CONTENTS_SCHEMA.into(),
+            owner_public_key: self.public_key_hex(),
+            exported_at,
+            kdf: KdfHeader {
+                name: "Argon2id".into(),
+                version: 19,
+                salt: URL_SAFE_NO_PAD.encode(salt),
+                memory_kib: 65_536,
+                iterations: 3,
+                parallelism: 1,
+                derived_key_bytes: 32,
+            },
+            aead: AeadHeader {
+                name: "AES-256-GCM".into(),
+                nonce: URL_SAFE_NO_PAD.encode(nonce),
+                tag_bits: 128,
+            },
+        };
+        let aad = jcs_to_vec(&header)?;
+        let key = derive_key(passphrase, &salt)?;
+        let ciphertext = encrypt_bytes(plaintext.as_ref(), &aad, &key, &nonce)?;
+        let container = CastawayContainer {
+            schema: header.schema,
+            contents_schema: header.contents_schema,
+            owner_public_key: header.owner_public_key,
+            exported_at: header.exported_at,
+            kdf: header.kdf,
+            aead: header.aead,
+            ciphertext: URL_SAFE_NO_PAD.encode(ciphertext),
+        };
+        Ok(Zeroizing::new(
+            String::from_utf8(jcs_to_vec(&container)?).map_err(closed)?,
+        ))
+    }
+
+    pub fn import_castaway(&self, encoded: &[u8], passphrase: &str) -> Result<Zeroizing<String>> {
+        if encoded.is_empty() || encoded.len() > MAX_CASTAWAY_BYTES {
+            return Err(CustodyError::InvalidWalletFile);
+        }
+        let container: CastawayContainer = serde_json::from_slice(encoded).map_err(closed)?;
+        if container.schema != CASTAWAY_OUTER_SCHEMA
+            || container.contents_schema != CASTAWAY_CONTENTS_SCHEMA
+            || container.owner_public_key != self.public_key_hex()
+            || container.kdf.name != "Argon2id"
+            || container.kdf.version != 19
+            || container.kdf.memory_kib != 65_536
+            || container.kdf.iterations != 3
+            || container.kdf.parallelism != 1
+            || container.kdf.derived_key_bytes != 32
+            || container.aead.name != "AES-256-GCM"
+            || container.aead.tag_bits != 128
+        {
+            return Err(CustodyError::InvalidWalletFile);
+        }
+        let salt = decode_exact::<16>(&container.kdf.salt)?;
+        let nonce = decode_exact::<12>(&container.aead.nonce)?;
+        let ciphertext = decode_ciphertext(&container.ciphertext)?;
+        let aad = jcs_to_vec(&container.header())?;
+        let key = derive_key(passphrase, &salt)?;
+        decrypt_json(&ciphertext, &aad, &key, &nonce)
+    }
+
+    fn castaway_local_key(&self) -> Zeroizing<[u8; 32]> {
+        let mut hasher = blake3::Hasher::new_derive_key(CASTAWAY_LOCAL_KEY_DOMAIN);
+        hasher.update(&self.signing_key.to_bytes());
+        Zeroizing::new(*hasher.finalize().as_bytes())
     }
 }
 
@@ -383,6 +585,70 @@ fn derive_key(passphrase: &str, salt: &[u8; 16]) -> Result<Zeroizing<[u8; 32]>> 
     Ok(key)
 }
 
+fn canonical_json(value: &str) -> Result<Zeroizing<Vec<u8>>> {
+    if value.is_empty() || value.len() > MAX_CASTAWAY_BYTES {
+        return Err(CustodyError::InvalidWalletFile);
+    }
+    let parsed: serde_json::Value = serde_json::from_str(value).map_err(closed)?;
+    if !parsed.is_object() {
+        return Err(CustodyError::InvalidWalletFile);
+    }
+    Ok(Zeroizing::new(serde_jcs::to_vec(&parsed).map_err(closed)?))
+}
+
+fn encrypt_bytes(
+    plaintext: &[u8],
+    aad: &[u8],
+    key: &[u8; 32],
+    nonce: &[u8; 12],
+) -> Result<Vec<u8>> {
+    let cipher = Aes256Gcm::new_from_slice(key).map_err(closed)?;
+    cipher
+        .encrypt(
+            nonce.into(),
+            Payload {
+                msg: plaintext,
+                aad,
+            },
+        )
+        .map_err(closed)
+}
+
+fn decode_ciphertext(value: &str) -> Result<Vec<u8>> {
+    let ciphertext = URL_SAFE_NO_PAD.decode(value.as_bytes()).map_err(closed)?;
+    if ciphertext.len() < 16 || URL_SAFE_NO_PAD.encode(&ciphertext) != value {
+        return Err(CustodyError::InvalidWalletFile);
+    }
+    Ok(ciphertext)
+}
+
+fn decrypt_json(
+    ciphertext: &[u8],
+    aad: &[u8],
+    key: &[u8; 32],
+    nonce: &[u8; 12],
+) -> Result<Zeroizing<String>> {
+    let cipher = Aes256Gcm::new_from_slice(key).map_err(closed)?;
+    let plaintext = Zeroizing::new(
+        cipher
+            .decrypt(
+                nonce.into(),
+                Payload {
+                    msg: ciphertext,
+                    aad,
+                },
+            )
+            .map_err(closed)?,
+    );
+    let parsed: serde_json::Value = serde_json::from_slice(&plaintext).map_err(closed)?;
+    if !parsed.is_object() {
+        return Err(CustodyError::InvalidWalletFile);
+    }
+    String::from_utf8(plaintext.to_vec())
+        .map(Zeroizing::new)
+        .map_err(closed)
+}
+
 fn decode_exact<const N: usize>(encoded: &str) -> Result<[u8; N]> {
     let decoded = URL_SAFE_NO_PAD.decode(encoded.as_bytes()).map_err(closed)?;
     if URL_SAFE_NO_PAD.encode(&decoded) != encoded {
@@ -501,6 +767,47 @@ impl WebWalletCustody {
         self.wallet()?.sign_dregg_pq(message).map_err(js_closed)
     }
 
+    #[wasm_bindgen(js_name = sealIdentitySection)]
+    pub fn seal_identity_section(&self, contents: &str) -> core::result::Result<String, JsValue> {
+        self.wallet()?
+            .seal_identity_section(contents)
+            .map(|value| value.to_string())
+            .map_err(js_closed)
+    }
+
+    #[wasm_bindgen(js_name = openIdentitySection)]
+    pub fn open_identity_section(&self, encoded: &[u8]) -> core::result::Result<String, JsValue> {
+        self.wallet()?
+            .open_identity_section(encoded)
+            .map(|value| value.to_string())
+            .map_err(js_closed)
+    }
+
+    #[wasm_bindgen(js_name = exportCastaway)]
+    pub fn export_castaway(
+        &self,
+        contents: &str,
+        passphrase: &str,
+        exported_at: u64,
+    ) -> core::result::Result<String, JsValue> {
+        self.wallet()?
+            .export_castaway(contents, passphrase, exported_at)
+            .map(|value| value.to_string())
+            .map_err(js_closed)
+    }
+
+    #[wasm_bindgen(js_name = importCastaway)]
+    pub fn import_castaway(
+        &self,
+        encoded: &[u8],
+        passphrase: &str,
+    ) -> core::result::Result<String, JsValue> {
+        self.wallet()?
+            .import_castaway(encoded, passphrase)
+            .map(|value| value.to_string())
+            .map_err(js_closed)
+    }
+
     pub fn lock(&mut self) {
         self.inner = None;
     }
@@ -574,5 +881,60 @@ mod tests {
             .verifying_key()
             .verify(&transcript, &signature)
             .unwrap();
+    }
+
+    #[test]
+    fn random_wallet_seals_and_reopens_its_private_identity_section() {
+        let (wallet, _) = create_wallet("runtime local vault passphrase", 42).unwrap();
+        let identity = serde_json::json!({
+            "schema": "zenith.identity-section.v1",
+            "memberKey": wallet.public_key_hex(),
+            "displayName": "Runtime Person"
+        })
+        .to_string();
+        let sealed = wallet.seal_identity_section(&identity).unwrap();
+        assert!(!sealed.contains("Runtime Person"));
+        let opened = wallet.open_identity_section(sealed.as_bytes()).unwrap();
+        let opened: serde_json::Value = serde_json::from_str(&opened).unwrap();
+        let expected: serde_json::Value = serde_json::from_str(&identity).unwrap();
+        assert_eq!(opened, expected);
+    }
+
+    #[test]
+    fn random_castaway_export_is_portable_only_with_its_passphrase_and_owner() {
+        let (wallet, _) = create_wallet("runtime wallet passphrase", 42).unwrap();
+        let contents = serde_json::json!({
+            "schema": CASTAWAY_CONTENTS_SCHEMA,
+            "version": 1,
+            "sections": {
+                "identity": {
+                    "schema": "zenith.identity-section.v1",
+                    "memberKey": wallet.public_key_hex()
+                }
+            }
+        })
+        .to_string();
+        let exported = wallet
+            .export_castaway(&contents, "runtime vault passphrase", 84)
+            .unwrap();
+        assert!(!exported.contains("zenith.identity-section.v1"));
+        let imported = wallet
+            .import_castaway(exported.as_bytes(), "runtime vault passphrase")
+            .unwrap();
+        let imported: serde_json::Value = serde_json::from_str(&imported).unwrap();
+        let expected: serde_json::Value = serde_json::from_str(&contents).unwrap();
+        assert_eq!(imported, expected);
+        assert!(
+            wallet
+                .import_castaway(exported.as_bytes(), "wrong runtime passphrase")
+                .is_err()
+        );
+
+        let (other_wallet, _) = create_wallet("another runtime passphrase", 85).unwrap();
+        assert!(
+            other_wallet
+                .import_castaway(exported.as_bytes(), "runtime vault passphrase")
+                .is_err()
+        );
     }
 }
