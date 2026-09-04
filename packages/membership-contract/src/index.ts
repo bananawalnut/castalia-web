@@ -429,7 +429,7 @@ export async function issueZenithMembershipCredential(input: {
   );
   if (!response.ok)
     throw new Error(
-      `membership issuer rejected the request (${response.status})`,
+      `membership issuer rejected the request (${String(response.status)})`,
     );
   let candidate: unknown;
   try {

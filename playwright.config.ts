@@ -25,7 +25,7 @@ export default defineConfig({
     serviceWorkers: "block",
   },
   webServer: {
-    command: `NODE_ENV=development VITE_APP_ENV=test VITE_FIXTURE_MODE=true VITE_CASTALIA_CONTROL_BASE_URL=${browserOrigin} pnpm --filter @castalia/web exec vite --host 127.0.0.1 --port ${browserPort} --strictPort`,
+    command: `VITE_APP_ENV=test VITE_FIXTURE_MODE=true VITE_CASTALIA_CONTROL_BASE_URL=${browserOrigin} pnpm --filter @castalia/web build && pnpm --filter @castalia/web exec vite preview --host 127.0.0.1 --port ${browserPort} --strictPort`,
     url: browserOrigin,
     reuseExistingServer: false,
     timeout: 30_000,
