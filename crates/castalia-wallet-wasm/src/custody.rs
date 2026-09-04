@@ -320,7 +320,8 @@ fn encode_recovery_key(seed: &[u8; 32]) -> Zeroizing<String> {
     let mut hasher = blake3::Hasher::new();
     hasher.update(RECOVERY_CHECKSUM_DOMAIN);
     hasher.update(seed);
-    let checksum = &hasher.finalize().as_bytes()[..4];
+    let digest = hasher.finalize();
+    let checksum = &digest.as_bytes()[..4];
     Zeroizing::new(format!(
         "{RECOVERY_KEY_PREFIX}.{}.{}",
         URL_SAFE_NO_PAD.encode(seed),
