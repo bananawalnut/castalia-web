@@ -50,13 +50,16 @@ async function assertMembershipMatchesWallet(
     throw new Error("membership credential owner does not match this Wallet");
 }
 
-export async function membershipFromReadyDetail(
+export function membershipFromReadyDetail(
   detail: unknown,
 ): Promise<StartMembershipSummary | null> {
-  if (typeof detail !== "object" || detail === null) return null;
+  if (typeof detail !== "object" || detail === null)
+    return Promise.resolve(null);
   const membership = (detail as { membership?: unknown }).membership;
   if (typeof membership !== "object" || membership === null) {
-    throw new Error("Wallet readiness event did not contain a membership");
+    return Promise.reject(
+      new Error("Wallet readiness event did not contain a membership"),
+    );
   }
   return verifyZenithMembershipCredential(
     membership,
@@ -227,7 +230,9 @@ export function startView(dependencies: StartFlowDependencies): View {
               "Castalia membership is Active for this browser wallet.";
             appendActivity("Browser wallet membership verified Active.");
           })
-          .catch((error: unknown) => showFailure(error, true));
+          .catch((error: unknown) => {
+            showFailure(error, true);
+          });
       },
     });
     webWalletHost.replaceChildren(webWalletPanel.element);

@@ -21,14 +21,18 @@ function memoryStorage(): WebWalletStorage & {
 } {
   return {
     current: null,
-    async load() {
-      return this.current ? structuredClone(this.current) : null;
+    load() {
+      return Promise.resolve(
+        this.current ? structuredClone(this.current) : null,
+      );
     },
-    async save(value) {
+    save(value) {
       this.current = structuredClone(value);
+      return Promise.resolve();
     },
-    async clear() {
+    clear() {
       this.current = null;
+      return Promise.resolve();
     },
   };
 }
@@ -43,37 +47,41 @@ function fakeCustody(ownerPublicKey: string): WebWalletCustodyClient {
   };
   let ready = false;
   return {
-    async create() {
+    create() {
       ready = true;
-      return {
+      return Promise.resolve({
         encryptedCustody: JSON.stringify({ encrypted: true }),
         identity,
         recoveryKey: `runtime-only-${randomHex32()}`,
-      };
+      });
     },
-    async restoreFromRecoveryKey() {
+    restoreFromRecoveryKey() {
       ready = true;
-      return { encryptedCustody: "encrypted", identity };
+      return Promise.resolve({ encryptedCustody: "encrypted", identity });
     },
-    async unlock() {
+    unlock() {
       ready = true;
-      return identity;
+      return Promise.resolve(identity);
     },
-    async identity() {
-      if (!ready) throw new Error("locked");
-      return identity;
+    identity() {
+      return ready
+        ? Promise.resolve(identity)
+        : Promise.reject(new Error("locked"));
     },
-    async recoveryKey() {
-      return `runtime-only-${randomHex32()}`;
+    recoveryKey() {
+      return Promise.resolve(`runtime-only-${randomHex32()}`);
     },
-    async exportRandomized() {
-      return "encrypted";
+    exportRandomized() {
+      return Promise.resolve("encrypted");
     },
-    async signMembershipJoin() {
-      return globalThis.crypto.getRandomValues(new Uint8Array(64));
+    signMembershipJoin() {
+      return Promise.resolve(
+        globalThis.crypto.getRandomValues(new Uint8Array(64)),
+      );
     },
-    async lock() {
+    lock() {
       ready = false;
+      return Promise.resolve();
     },
     destroy() {
       ready = false;
@@ -87,11 +95,11 @@ describe("mobile Web wallet session", () => {
   let issuerFetch: typeof fetch;
 
   beforeEach(async () => {
-    issuerKeys = (await globalThis.crypto.subtle.generateKey(
+    issuerKeys = await globalThis.crypto.subtle.generateKey(
       { name: "Ed25519" },
       true,
       ["sign", "verify"],
-    )) as CryptoKeyPair;
+    );
     const issuerPublicKey = hexFromBytes(
       new Uint8Array(
         await globalThis.crypto.subtle.exportKey("raw", issuerKeys.publicKey),
@@ -110,14 +118,20 @@ describe("mobile Web wallet session", () => {
       ],
     };
     issuerFetch = async (_url, init) => {
-      const request = JSON.parse(String(init?.body)) as {
-        ownerPublicKey: string;
-      };
+      if (typeof init?.body !== "string")
+        throw new Error("membership request body is missing");
+      const candidate: unknown = JSON.parse(init.body);
+      if (typeof candidate !== "object" || candidate === null)
+        throw new Error("membership request is malformed");
+      const ownerPublicKey = (candidate as { ownerPublicKey?: unknown })
+        .ownerPublicKey;
+      if (typeof ownerPublicKey !== "string")
+        throw new Error("membership owner key is missing");
       const payload = {
         schema: "castalia.zenith-membership-credential.v3" as const,
         version: 3 as const,
-        membershipId: await deriveZenithMembershipId(request.ownerPublicKey),
-        ownerPublicKey: request.ownerPublicKey,
+        membershipId: await deriveZenithMembershipId(ownerPublicKey),
+        ownerPublicKey,
         status: "active" as const,
         issuerId: "zenith-research",
         issuerKeyId: "runtime-test-key",

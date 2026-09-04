@@ -65,7 +65,9 @@ export function createWebWalletCustodyClient(
     const id = ++requestId;
     return new Promise<T>((resolve, reject) => {
       pending.set(id, {
-        resolve: (value) => resolve(value as T),
+        resolve: (value) => {
+          resolve(value as T);
+        },
         reject,
       });
       worker.postMessage({ ...request, id });

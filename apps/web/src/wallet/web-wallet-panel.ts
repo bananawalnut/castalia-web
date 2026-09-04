@@ -171,7 +171,7 @@ export function createWebWalletPanel(input: {
           );
           const link = document.createElement("a");
           link.href = url;
-          link.download = `Castalia-Recovery-${Date.now()}.castalia-recovery`;
+          link.download = `Castalia-Recovery-${String(Date.now())}.castalia-recovery`;
           link.click();
           URL.revokeObjectURL(url);
           notice = "Encrypted recovery downloaded.";

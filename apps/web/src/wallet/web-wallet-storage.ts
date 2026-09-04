@@ -23,12 +23,18 @@ const ML_DSA_65_PUBLIC_KEY = /^[A-Za-z0-9_-]{2603}$/u;
 
 function requestResult<T>(request: IDBRequest<T>): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    request.addEventListener("success", () => resolve(request.result), {
-      once: true,
-    });
+    request.addEventListener(
+      "success",
+      () => {
+        resolve(request.result);
+      },
+      { once: true },
+    );
     request.addEventListener(
       "error",
-      () => reject(request.error ?? new Error("wallet storage failed")),
+      () => {
+        reject(request.error ?? new Error("wallet storage failed"));
+      },
       { once: true },
     );
   });
@@ -41,12 +47,18 @@ function openDatabase(): Promise<IDBDatabase> {
       if (!request.result.objectStoreNames.contains(STORE))
         request.result.createObjectStore(STORE);
     });
-    request.addEventListener("success", () => resolve(request.result), {
-      once: true,
-    });
+    request.addEventListener(
+      "success",
+      () => {
+        resolve(request.result);
+      },
+      { once: true },
+    );
     request.addEventListener(
       "error",
-      () => reject(request.error ?? new Error("wallet storage unavailable")),
+      () => {
+        reject(request.error ?? new Error("wallet storage unavailable"));
+      },
       { once: true },
     );
   });
@@ -70,7 +82,10 @@ function isStoredWebWallet(value: unknown): value is StoredWebWallet {
   if (typeof value !== "object" || value === null || Array.isArray(value))
     return false;
   const record = value as Partial<StoredWebWallet>;
-  const identity = record.identity as Partial<WebWalletIdentity> | undefined;
+  const identity = record.identity as
+    | Partial<WebWalletIdentity>
+    | null
+    | undefined;
   return (
     Object.keys(record).sort().join(",") ===
       "backupConfirmed,encryptedCustody,identity,membership,schema" &&
@@ -96,7 +111,9 @@ function isStoredWebWallet(value: unknown): value is StoredWebWallet {
 export function createIndexedDbWebWalletStorage(): WebWalletStorage {
   return {
     async load() {
-      const value = await withStore("readonly", (store) => store.get(RECORD));
+      const value = await withStore<unknown>("readonly", (store) =>
+        store.get(RECORD),
+      );
       if (value === undefined) return null;
       if (!isStoredWebWallet(value))
         throw new Error("stored Web wallet record is malformed");
