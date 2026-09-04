@@ -196,15 +196,13 @@ export function mountCastaliaApp(
       currentPath === "/profile"
         ? ensureWebWalletSession()
         : webWalletSession;
-    const profileDependencies: ProfileDependencies | null = currentSession
-      ? {
-          webWalletSession: currentSession,
-          getWalletProvider: () => startDependencies.getWalletProvider(),
-          onWalletChanged() {
-            void refreshAccountLink();
-          },
-        }
-      : null;
+    const profileDependencies: ProfileDependencies = {
+      ...(currentSession ? { webWalletSession: currentSession } : {}),
+      getWalletProvider: () => startDependencies.getWalletProvider(),
+      onWalletChanged() {
+        void refreshAccountLink();
+      },
+    };
     currentView = route(
       currentPath,
       {

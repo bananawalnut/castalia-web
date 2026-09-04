@@ -13,7 +13,7 @@ import type { StartWalletProvider } from "./start.js";
 import type { WebWalletSession } from "./wallet/web-wallet-session.js";
 
 export type ProfileDependencies = {
-  webWalletSession: WebWalletSession;
+  webWalletSession?: WebWalletSession;
   getWalletProvider(): StartWalletProvider | undefined;
   onWalletChanged(): void;
 };
@@ -245,6 +245,7 @@ function download(name: string, contents: string, type = "application/json") {
 }
 
 export function profileView(dependencies: ProfileDependencies): View {
+  const webWalletSession = dependencies.webWalletSession;
   const element = elementFromHtml(
     `<article class="profile-page"><header class="profile-header"><p class="profile-kicker">Personal home service / local-first</p><h1>My Castalia</h1><p>Your keypair opens a private corner of Castalia. Build a Person page, keep it in the encrypted <code>.castaway</code> identity section, and choose each claim that may leave your wallet.</p><div class="profile-header__rule" aria-hidden="true"><span>✦</span><span>✦</span><span>✦</span></div></header><div data-profile-status></div></article>`,
   );
@@ -358,14 +359,12 @@ export function profileView(dependencies: ProfileDependencies): View {
   };
 
   const wireEditor = () => {
+    if (!webWalletSession) return;
     const form = element.querySelector<HTMLFormElement>("[data-profile-form]");
     form?.addEventListener("submit", (event) => {
       event.preventDefault();
       void run(async () => {
-        profile =
-          await dependencies.webWalletSession.saveIdentityProfile(
-            readProfile(),
-          );
+        profile = await webWalletSession.saveIdentityProfile(readProfile());
         notice = "Private profile saved inside the encrypted identity section.";
         dependencies.onWalletChanged();
       });
@@ -418,8 +417,7 @@ export function profileView(dependencies: ProfileDependencies): View {
       ?.addEventListener("click", () => {
         void run(async () => {
           const candidate = readProfile();
-          profile =
-            await dependencies.webWalletSession.saveIdentityProfile(candidate);
+          profile = await webWalletSession.saveIdentityProfile(candidate);
           const disclosure = selectedIdentityDisclosure(candidate);
           const selectedCount =
             Object.keys(disclosure.claims.fields).length +
@@ -441,7 +439,15 @@ export function profileView(dependencies: ProfileDependencies): View {
 
   const render = async () => {
     if (!host || destroyed) return;
-    const snapshot = await dependencies.webWalletSession.snapshot();
+    const snapshot = webWalletSession
+      ? await webWalletSession.snapshot()
+      : {
+          state: "empty" as const,
+          identity: null,
+          backupConfirmed: false,
+          membership: null,
+          profileAvailable: false,
+        };
     const status = notice
       ? `<p class="profile-notice" role="status">${escapeHtml(notice)}</p>`
       : "";
@@ -460,6 +466,8 @@ export function profileView(dependencies: ProfileDependencies): View {
       host.innerHTML = `${status}<section class="homepage-window homepage-window--gate"><div class="homepage-titlebar"><span>castalia://new-person</span><span>NO KEYPAIR</span></div><div class="profile-gate"><p class="profile-kicker">A blank page on the old web</p><h2>Claim your corner of Castalia.</h2><p>Create or restore a wallet keypair first. Membership can come afterward; My Castalia belongs to the identity, not to a browser login session.</p><a class="profile-button" href="/start">Create my keypair</a></div></section>`;
       return;
     }
+    if (!webWalletSession)
+      throw new Error("browser wallet session is unavailable");
     if (snapshot.state === "locked") {
       host.innerHTML = `${status}<section class="homepage-window homepage-window--gate"><div class="homepage-titlebar"><span>castalia://person/${escapeHtml(snapshot.identity.ownerPublicKey.slice(0, 12))}</span><span>${snapshot.membership ? "MEMBER" : "KEYPAIR READY"}</span></div><div class="profile-gate"><p class="profile-kicker">My Castalia / encrypted</p><h2>Unlock your personal page.</h2><p>The public keypair is available, so this link replaces Join. Your private Person profile remains unreadable until you unlock the wallet.</p><form data-profile-unlock><label>Wallet passphrase<input name="passphrase" type="password" autocomplete="current-password" required></label><button class="profile-button" type="submit">Unlock My Castalia</button></form><p class="profile-keyline">Member Key <code>${escapeHtml(snapshot.identity.ownerPublicKey)}</code></p></div></section>`;
       host
@@ -468,17 +476,17 @@ export function profileView(dependencies: ProfileDependencies): View {
           event.preventDefault();
           void run(async () => {
             const form = event.currentTarget as HTMLFormElement;
-            await dependencies.webWalletSession.unlock(
+            await webWalletSession.unlock(
               requiredInput(form, '[name="passphrase"]').value,
             );
-            profile = await dependencies.webWalletSession.identityProfile();
+            profile = await webWalletSession.identityProfile();
             notice = "My Castalia unlocked for this tab.";
             dependencies.onWalletChanged();
           });
         });
       return;
     }
-    profile ??= await dependencies.webWalletSession.identityProfile();
+    profile ??= await webWalletSession.identityProfile();
     host.innerHTML = `${status}${homepageView(profile, Boolean(snapshot.membership))}${profileEditor(profile)}<section id="my-vault" class="profile-section profile-portability" aria-labelledby="profile-vault-heading"><div class="profile-section__titlebar"><span>castaway.vault</span><span>PORTABLE</span></div><div class="profile-section__body"><p class="profile-kicker">My files</p><h2 id="profile-vault-heading">Portable identity vault</h2><p><code>.castaway</code> carries this encrypted identity section between compatible wallet apps. It does not contain your signing key and does not create membership.</p><div class="profile-portability__grid"><form data-castaway-export><h3>Export identity vault</h3><label>Vault passphrase<input name="passphrase" type="password" minlength="12" autocomplete="new-password" required></label><label>Confirm vault passphrase<input name="confirmation" type="password" minlength="12" autocomplete="new-password" required></label><button class="profile-button" type="submit">Download .castaway</button></form><form data-castaway-import><h3>Import identity vault</h3><label>Castaway file<input name="file" type="file" accept=".castaway,application/json" required></label><label>Vault passphrase<input name="passphrase" type="password" autocomplete="current-password" required></label><button class="profile-button" type="submit">Import .castaway</button></form></div><button class="profile-button profile-button--quiet" type="button" data-profile-lock>Lock My Castalia</button></div></section>`;
     wireEditor();
     host
@@ -486,10 +494,7 @@ export function profileView(dependencies: ProfileDependencies): View {
       ?.addEventListener("submit", (event) => {
         event.preventDefault();
         void run(async () => {
-          profile =
-            await dependencies.webWalletSession.saveIdentityProfile(
-              readProfile(),
-            );
+          profile = await webWalletSession.saveIdentityProfile(readProfile());
           const form = event.currentTarget as HTMLFormElement;
           const passphrase = requiredInput(form, '[name="passphrase"]');
           const confirmation = requiredInput(form, '[name="confirmation"]');
@@ -497,7 +502,7 @@ export function profileView(dependencies: ProfileDependencies): View {
             throw new Error("Use a vault passphrase of at least 12 characters");
           if (passphrase.value !== confirmation.value)
             throw new Error("Vault passphrases do not match");
-          const encrypted = await dependencies.webWalletSession.exportCastaway(
+          const encrypted = await webWalletSession.exportCastaway(
             passphrase.value,
           );
           download(
@@ -517,7 +522,7 @@ export function profileView(dependencies: ProfileDependencies): View {
           if (!file) throw new Error("Choose a .castaway file");
           if (file.size > 1_048_576)
             throw new Error("Castaway file exceeds the 1 MiB limit");
-          profile = await dependencies.webWalletSession.importCastaway(
+          profile = await webWalletSession.importCastaway(
             await file.text(),
             requiredInput(form, '[name="passphrase"]').value,
           );
@@ -529,7 +534,7 @@ export function profileView(dependencies: ProfileDependencies): View {
       .querySelector<HTMLButtonElement>("[data-profile-lock]")
       ?.addEventListener("click", () => {
         void run(async () => {
-          await dependencies.webWalletSession.lock();
+          await webWalletSession.lock();
           profile = null;
           notice = "My Castalia locked.";
           dependencies.onWalletChanged();
@@ -539,7 +544,8 @@ export function profileView(dependencies: ProfileDependencies): View {
 
   const onVisibility = () => {
     if (document.visibilityState !== "hidden") return;
-    void dependencies.webWalletSession.lock().then(() => {
+    if (!webWalletSession) return;
+    void webWalletSession.lock().then(() => {
       profile = null;
       dependencies.onWalletChanged();
       return render();
